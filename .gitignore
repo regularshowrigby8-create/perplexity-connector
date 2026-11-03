@@ -5,3 +5,7 @@ dist/
 .vercel/
 *.log
 .DS_Store
+
+# MCP SuperAssistant local setup — NEVER commit secrets
+superassistant/.generated-config.json
+superassistant/.github-pat

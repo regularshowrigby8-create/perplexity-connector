@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "github": {
+      "name": "github",
+      "type": "streamable-http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": { "Authorization": "Bearer __GITHUB_PAT__" }
+    },
+    "github-readonly": {
+      "name": "github-readonly",
+      "type": "streamable-http",
+      "url": "https://api.githubcopilot.com/mcp/readonly",
+      "headers": { "Authorization": "Bearer __GITHUB_PAT__" }
+    },
+    "vercel-connector": {
+      "name": "vercel-connector",
+      "type": "streamable-http",
+      "url": "https://perplexity-connector-savage-coo.vercel.app/mcp",
+      "headers": { "Authorization": "Bearer __CONNECTOR_API_KEY__" }
+    },
+    "deepwiki": {
+      "name": "deepwiki",
+      "type": "streamable-http",
+      "url": "https://mcp.deepwiki.com/mcp"
+    }
+  }
+}
