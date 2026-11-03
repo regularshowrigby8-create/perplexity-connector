@@ -32,8 +32,10 @@ free for every GitHub user when authenticated with your own PAT.
 ## Step 2 — get this repo locally
 
 ```bash
-git clone https://github.com/regularshowrigby8-create/perplexity-connector.git
+# the setup kit is on the arena branch (not main yet):
+git clone -b arena/13ca0619-perplexity-connector https://github.com/regularshowrigby8-create/perplexity-connector.git
 cd perplexity-connector/superassistant
+# later: git pull   to get updates
 ```
 
 ## Step 3 — hand the PAT to the launcher (never committed)
