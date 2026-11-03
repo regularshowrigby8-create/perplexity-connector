@@ -65,13 +65,34 @@ cd perplexity-connector/superassistant
 
 ## Step 3 — hand the PAT to the launcher (never committed)
 
-Any one of:
+Easiest (token taken from the **clipboard**, never typed into chat/history — it even
+extracts the `github_pat_...` part if you copied extra text around it):
+
+```bash
+./set-token.sh          # Mac/Linux   (Windows: .\set-token.bat)
+```
+
+Fallbacks, any one of:
 
 ```bash
 export GITHUB_PAT=github_pat_...                 # session-only
 echo github_pat_... > .github-pat                # gitignored file in superassistant/
+notepad .github-pat                              # Windows: paste token in Notepad, save
 mkdir -p ~/.config/perplexity-connector && echo github_pat_... > ~/.config/perplexity-connector/github-pat.txt
 ```
+
+## Changing / rotating the token (the easy way)
+
+The PAT lives in exactly **one** place: `superassistant/.github-pat` (git-ignored, chmod 600).
+It is never printed, never committed, never put in shell history or chat.
+
+- **Set or replace:** copy the new token (Ctrl+C), run `.\set-token.bat` (Windows) or
+  `./set-token.sh` (Mac/Linux), then restart the proxy (`.\start-proxy.bat` / `./start-proxy.sh`).
+  No other file ever changes.
+- The launcher pre-flights the token against `api.github.com` (prints only the HTTP status,
+  never the token), so a bad/expired token fails fast.
+- **Revoke old tokens** at https://github.com/settings/tokens (avatar → Settings → Developer
+  settings → Personal access tokens → Fine-grained tokens → Delete).
 
 ## Step 4 — start the local proxy
 

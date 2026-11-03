@@ -21,9 +21,9 @@ TEMPLATE="config.template.json"
 OUT=".generated-config.json"
 
 PAT="${GITHUB_PAT:-}"
-if [[ -z "$PAT" && -f .github-pat ]]; then PAT="$(tr -d '[:space:]' < .github-pat)"; fi
+if [[ -z "$PAT" && -f .github-pat ]]; then PAT="$(tr -d '[:space:]' < .github-pat | sed 's/^\xEF\xBB\xBF//')"; fi
 if [[ -z "$PAT" && -f "$HOME/.config/perplexity-connector/github-pat.txt" ]]; then
-  PAT="$(tr -d '[:space:]' < "$HOME/.config/perplexity-connector/github-pat.txt")"
+  PAT="$(tr -d '[:space:]' < "$HOME/.config/perplexity-connector/github-pat.txt" | sed 's/^\xEF\xBB\xBF//')"
 fi
 if [[ -z "$PAT" ]]; then
   echo "ERROR: no GitHub PAT found. Provide one via any of:" >&2

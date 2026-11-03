@@ -9,8 +9,9 @@ $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
 
 $pat = $env:GITHUB_PAT
-if (-not $pat -and (Test-Path .github-pat)) { $pat = (Get-Content .github-pat -Raw).Trim() }
-if (-not $pat -and (Test-Path "$HOME\.config\perplexity-connector\github-pat.txt")) { $pat = (Get-Content "$HOME\.config\perplexity-connector\github-pat.txt" -Raw).Trim() }
+if (-not $pat -and (Test-Path .github-pat)) { $pat = (Get-Content .github-pat -Raw) }
+if (-not $pat -and (Test-Path "$HOME\.config\perplexity-connector\github-pat.txt")) { $pat = (Get-Content "$HOME\.config\perplexity-connector\github-pat.txt" -Raw) }
+if ($pat) { $pat = $pat.Trim().TrimStart([char]0xFEFF) }   # strip whitespace/BOM (e.g. from Notepad)
 if (-not $pat) {
   Write-Host "ERROR: no GitHub PAT found." -ForegroundColor Red
   Write-Host "  Set it for this window:  `$env:GITHUB_PAT = 'github_pat_...'"

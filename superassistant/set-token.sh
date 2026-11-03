@@ -12,9 +12,14 @@ else
   printf 'Paste the PAT (input hidden), then press Enter: '
   read -rs t; echo
 fi
-t="$(printf '%s' "$t" | tr -d '[:space:]')"
+# extract the token even if the clipboard holds surrounding text
+t="$(printf '%s' "$t" | grep -o 'github_pat_[A-Za-z0-9_]\{30,\}' | head -1 || true)"
+[ -z "$t" ] && t="${GITHUB_PAT:-}"
+t="$(printf '%s' "$t" | tr -d '[:space:]' | sed 's/^\xEF\xBB\xBF//')"
 if [[ ! "$t" =~ ^github_pat_[A-Za-z0-9_]{30,}$ ]]; then
-  echo "ERROR: not a fine-grained PAT (github_pat_...). Copy the token first, then rerun." >&2
+  echo "ERROR: no fine-grained PAT (github_pat_...) found on the clipboard." >&2
+  echo "Copy the token (or any text containing it) and rerun, OR edit the file directly:" >&2
+  echo "  nano .github-pat   -> paste the token -> save" >&2
   exit 1
 fi
 printf '%s' "$t" > .github-pat
