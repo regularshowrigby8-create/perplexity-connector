@@ -235,6 +235,33 @@ Nothing in this setup depends on this chat or on any agent being online:
 - Your "SSE error 404 / Disconnected" is **not** a Perplexity patch — it is the
   extension↔local-proxy link (transport/URI). The proxy is the thing to fix (see below).
 
+### "Sidebar connects but the chat never reacts to tools" — diagnostics (2026-11-03)
+
+The sidebar working proves the content script runs on perplexity.ai. If no tool-call cards
+appear and the model claims it has no MCP tools, check in this order:
+
+1. **Only ONE extension enabled**: chrome://extensions — disable/remove the store
+   "MCP SuperAssistant" (v0.6.0). Two copies both inject content scripts on perplexity.ai and
+   fight each other (shadow-DOM conflicts, duplicate sidebars).
+2. **Did the instructions actually get into the chat?** Sidebar → Instructions → **Copy**
+   (not Insert), then click the Perplexity input box and Ctrl+V — the long text must be
+   *visibly* in the box. If "Insert in Chat" silently failed (stale textarea selector), paste
+   manually. Perplexity's prompt-injection filter (upstream #180) can strip auto-injected
+   text on submit — manually pasted text as your own message is the reliable route.
+3. **Console check**: on perplexity.ai press F12 → Console. The content script logs lines
+   starting with `[SuperAssistant]` / `[json-extractor]`. No such lines = content script not
+   running on that page (would indicate a real block). Lines present = script runs; the issue
+   is instructions/format.
+4. **Force the format once**: if the model answers in prose, follow up with:
+   > "Reply with ONLY the tool call in an ```xml code block:
+   > `<function_calls><invoke name=\"list_contents\"><parameter name=\"owner\">regularshowrigby8-create</parameter>...` —
+   > do not answer in prose."
+   The extension's extractor detects ```xml `<function_calls>` blocks (and ```json
+   `function_call_start` blocks) in the answer; Auto Execute then runs the card.
+5. If the model still refuses after instructions are visibly in the prompt, that is the #180
+   filter eating them — retry in a fresh thread with the instructions pasted as the first
+   user message.
+
 ## Troubleshooting
 
 - **Status stays "Disconnected"**: make sure `start-proxy.sh` is still running (terminal
