@@ -38,14 +38,31 @@ try {
 # Documented in the repo README (public auth for your own Vercel connector).
 $key = if ($env:CONNECTOR_API_KEY) { $env:CONNECTOR_API_KEY } else { 'ebc9973a4109f439485a7e562656eed428e9164733a90f8d' }
 
-$tpl = Get-Content config.template.json -Raw
-$out = $tpl.Replace('__GITHUB_PAT__', $pat).Replace('__CONNECTOR_API_KEY__', $key)
-$null = $out | ConvertFrom-Json   # validate JSON before writing
-[System.IO.File]::WriteAllText((Join-Path $PWD '.generated-config.json'), $out)  # UTF-8 no BOM
+# Generate the config with node (identical logic to start-proxy.sh). Secrets go via env
+# vars, never CLI args (those would be visible in the process list).
+$env:GEN_GITHUB_PAT = $pat
+$env:GEN_CONNECTOR_KEY = $key
+node -e '
+  const fs = require("fs");
+  let out = fs.readFileSync("config.template.json", "utf8")
+    .split("__GITHUB_PAT__").join(process.env.GEN_GITHUB_PAT)
+    .split("__CONNECTOR_API_KEY__").join(process.env.GEN_CONNECTOR_KEY);
+  const cfg = JSON.parse(out); // validate
+  // vercel-connector is OFF by default: the Vercel deployment sits behind Vercel
+  // Authentication (401). Enable with INCLUDE_VERCEL_CONNECTOR=1 after disabling
+  // Deployment Protection in the Vercel dashboard.
+  if (process.env.INCLUDE_VERCEL_CONNECTOR !== "1") delete cfg.mcpServers["vercel-connector"];
+  out = JSON.stringify(cfg, null, 2);
+  fs.writeFileSync(".generated-config.json", out);
+  console.log("Config OK. Servers: " + Object.keys(cfg.mcpServers).join(", "));
+'
+Remove-Item Env:GEN_GITHUB_PAT -ErrorAction SilentlyContinue
+Remove-Item Env:GEN_CONNECTOR_KEY -ErrorAction SilentlyContinue
 
 if ($env:DRY_RUN -eq '1') {
+  $gen = Get-Content .generated-config.json -Raw
   Write-Host "OK: .generated-config.json generated and valid. Contents (secrets masked):"
-  Write-Host ($out -replace 'Bearer [^"]+', 'Bearer ***')
+  Write-Host ($gen -replace 'Bearer [^"]+', 'Bearer ***')
   exit 0
 }
 
