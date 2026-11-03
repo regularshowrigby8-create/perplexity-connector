@@ -190,10 +190,16 @@ Nothing in this setup depends on this chat or on any agent being online:
 
 - **Status stays "Disconnected"**: make sure `start-proxy.sh` is still running (terminal
   open), then chrome://extensions → reload the extension, and re-enter the URL.
-- **"SSE error: Non-200 status code (404)"**: the extension is set to **SSE** but the proxy
-  runs in Streamable HTTP mode. In the sidebar set **Connection Type = Streamable HTTP** and
-  **Server URI = `http://localhost:3006/mcp`** (or start the proxy with `./start-proxy.sh sse`
-  and use `http://localhost:3006/sse`).
+- **"SSE error: Non-200 status code (404)"**: either the extension is still on **SSE** while
+  the proxy runs in Streamable HTTP mode, or the error text is stale from the previous attempt.
+  Fix: set **Connection Type = Streamable HTTP**, **Server URI = `http://localhost:3006/mcp`**,
+  then click the **circular refresh/reconnect button** in the sidebar (the "SSE error" text only
+  clears on a successful reconnect). If it still 404s, try the URI **without** the path
+  (`http://localhost:3006`) — some extension versions append `/mcp` themselves — or
+  `http://127.0.0.1:3006/mcp`. Verify the proxy first from another terminal:
+  `curl.exe -i -X POST http://localhost:3006/mcp -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"t","version":"0.1"}}}'`
+  — expect `HTTP/1.1 200` (a 404 means the proxy is in SSE mode: use `/sse`; connection refused
+  means the proxy is not running: rerun `start-proxy`).
 - **"Connected" but no tools / errors**: check the proxy terminal — if a server failed to
   connect, the PAT may be wrong/expired or lack scopes; re-check Step 1. `deepwiki` needs no
   auth and is a good canary.
