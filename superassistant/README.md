@@ -18,9 +18,11 @@ free for every GitHub user when authenticated with your own PAT.
    ```bash
    git clone -b arena/13ca0619-perplexity-connector https://github.com/regularshowrigby8-create/perplexity-connector.git
    cd perplexity-connector/superassistant
-   echo github_pat_... > .github-pat          # paste YOUR real token; this file is git-ignored
+   # save your token from the CLIPBOARD (never typed into chat/history):
+   ./set-token.sh          # Mac/Linux — or on Windows:  .\set-token.bat
    chmod +x start-proxy.sh && ./start-proxy.sh # keep this window open; wait for "Connected to server: github"
    ```
+   (Windows PowerShell equivalent: `.\set-token.bat` then `.\start-proxy.bat`)
    **Windows (PowerShell) instead of the last line:** `.\start-proxy.bat` — it does the same thing via `start-proxy.ps1`.
    (On Windows, run the `./doctor.sh` self-check inside **Git Bash**, which came with Git for Windows.)
    In a second terminal, optionally self-check: `./doctor.sh`
