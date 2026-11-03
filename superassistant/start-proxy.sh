@@ -49,21 +49,8 @@ fi
 # Documented in README.md (it is the public auth for your own Vercel connector).
 KEY="${CONNECTOR_API_KEY:-ebc9973a4109f439485a7e562656eed428e9164733a90f8d}"
 
-node -e '
-  const fs = require("fs");
-  const tpl = fs.readFileSync(process.argv[1], "utf8");
-  let out = tpl
-    .split("__GITHUB_PAT__").join(process.argv[2])
-    .split("__CONNECTOR_API_KEY__").join(process.argv[3]);
-  const cfg = JSON.parse(out); // validate
-  // vercel-connector is OFF by default (Vercel deployment is behind Vercel
-  // Authentication -> 401). Enable with INCLUDE_VERCEL_CONNECTOR=1 after
-  // disabling Deployment Protection in the Vercel dashboard.
-  if (process.env.INCLUDE_VERCEL_CONNECTOR !== "1") delete cfg.mcpServers["vercel-connector"];
-  out = JSON.stringify(cfg, null, 2);
-  JSON.parse(out);
-  fs.writeFileSync(process.argv[4], out);
-' "$TEMPLATE" "$PAT" "$KEY" "$OUT"
+# Generate the config via gen-config.cjs (secrets via env vars, never CLI args).
+GEN_GITHUB_PAT="$PAT" GEN_CONNECTOR_KEY="$KEY" node gen-config.cjs
 chmod 600 "$OUT"
 
 if [[ "${DRY_RUN:-0}" == "1" ]]; then

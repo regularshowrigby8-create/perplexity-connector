@@ -38,24 +38,11 @@ try {
 # Documented in the repo README (public auth for your own Vercel connector).
 $key = if ($env:CONNECTOR_API_KEY) { $env:CONNECTOR_API_KEY } else { 'ebc9973a4109f439485a7e562656eed428e9164733a90f8d' }
 
-# Generate the config with node (identical logic to start-proxy.sh). Secrets go via env
-# vars, never CLI args (those would be visible in the process list).
+# Generate the config via gen-config.cjs (avoids PS5.1 native-arg quote mangling of
+# node -e). Secrets go via env vars, never CLI args (those are visible in the process list).
 $env:GEN_GITHUB_PAT = $pat
 $env:GEN_CONNECTOR_KEY = $key
-node -e '
-  const fs = require("fs");
-  let out = fs.readFileSync("config.template.json", "utf8")
-    .split("__GITHUB_PAT__").join(process.env.GEN_GITHUB_PAT)
-    .split("__CONNECTOR_API_KEY__").join(process.env.GEN_CONNECTOR_KEY);
-  const cfg = JSON.parse(out); // validate
-  // vercel-connector is OFF by default: the Vercel deployment sits behind Vercel
-  // Authentication (401). Enable with INCLUDE_VERCEL_CONNECTOR=1 after disabling
-  // Deployment Protection in the Vercel dashboard.
-  if (process.env.INCLUDE_VERCEL_CONNECTOR !== "1") delete cfg.mcpServers["vercel-connector"];
-  out = JSON.stringify(cfg, null, 2);
-  fs.writeFileSync(".generated-config.json", out);
-  console.log("Config OK. Servers: " + Object.keys(cfg.mcpServers).join(", "));
-'
+node (Join-Path $PSScriptRoot 'gen-config.cjs')
 Remove-Item Env:GEN_GITHUB_PAT -ErrorAction SilentlyContinue
 Remove-Item Env:GEN_CONNECTOR_KEY -ErrorAction SilentlyContinue
 
