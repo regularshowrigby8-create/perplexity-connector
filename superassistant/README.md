@@ -127,9 +127,16 @@ Servers in `config.template.json`:
 build's broken Streamable HTTP client (upstream #189/#200) and the "0 tools when tools/list
 has outputSchema" bug (#191/#199, which GitHub's MCP triggers):
 
-1. Download https://github.com/munir-abbasi/MCP-SuperAssistant-updated/releases/download/v0.7.0/extension-20260925-083157.zip and unzip it.
+1. Download https://github.com/munir-abbasi/MCP-SuperAssistant-updated/releases/download/v0.7.0/extension-20260925-083157.zip
+   (the `.zip`, not the `.xpi`), then extract it, e.g.:
+   ```powershell
+   Expand-Archive "$env:USERPROFILE\Downloads\extension-20260925-083157.zip" "$env:USERPROFILE\Downloads\fork-ext" -Force
+   Get-ChildItem "$env:USERPROFILE\Downloads\fork-ext" -Recurse -Filter manifest.json | Select-Object -ExpandProperty DirectoryName
+   ```
+   That last command prints the exact folder that contains `manifest.json` — **that** is the folder to load.
 2. Chrome → `chrome://extensions` → enable **Developer mode** → **Load unpacked** → select the
-   unzipped folder (the one containing `manifest.json`; if the zip root only has `dist/`, select `dist`).
+   folder printed above (the zip root itself contains `manifest.json`; if it doesn't, select the
+   subfolder that does — e.g. `dist/`).
 3. Disable/remove the store version of "MCP SuperAssistant" to avoid two sidebars.
 
 **Fallback:** the Chrome Web Store build (https://chromewebstore.google.com/detail/kngiafgkdnlkgmefdafaibkibegkcaef,
