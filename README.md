@@ -20,7 +20,12 @@ All options use the same Perplexity UI: sidebar **Plugins → Add custom → Con
 4. **Platform:** works on the **web app (perplexity.ai in a browser) and Mac desktop app**; **not in the iOS/Android apps** (they show only prebuilt connectors) and **not in the Comet browser**.
 5. Perplexity also ships a **built-in GitHub connector** (Plugins → Discover → "GitHub" → Connect → authorize with your GitHub account) — also Pro/Max/Enterprise only.
 
-**Free-plan workarounds:** on Free, Perplexity's normal web search already browses public GitHub (github.com is indexed), so ask it to search GitHub directly — read-only, public repos. For full MCP access without paying for Perplexity, use any free MCP-capable client instead (e.g. Claude.ai allows one custom connector even on its Free plan) pointed at `https://api.githubcopilot.com/mcp/` with a GitHub PAT, or at this repo's self-hosted connector.
+**Free-plan workarounds (verified Nov 2026):** on Free there is **no** way to attach an MCP connector — custom connectors, the built-in GitHub connector, local MCP on the Mac app, and plugin import (plugins can bundle up to 15 remote MCP servers via `plugin.json` + `mcp.json` imported from a public GitHub repo) all require Perplexity Computer / Pro+ plans. What Free *can* do:
+
+1. **Public repo via web search (unlimited standard searches on Free):** paste `https://github.com/<owner>/<repo>` (or file URLs) and ask Perplexity to read/summarize — works because github.com is indexed. For whole-repo context, generate a flattened digest at `gitingest.com` (swap `hub` → `ingest` in any github.com URL) and paste that into the chat — more reliable than raw file fetching.
+2. **Upload the repo on Free:** ~3 file uploads/day, 25–40 MB each, up to 5 files per Space — upload a `.zip` of your repo into a Space (persistent) or a thread and chat with it there.
+3. **Write path without a connector:** ask Perplexity Free to produce a unified diff / PR description, then apply it via the GitHub web UI ("Edit file" / "Create pull request") or locally with `gh`.
+4. **Full MCP access free, outside Perplexity's UI:** use a free MCP client — e.g. claude.ai Free allows one custom connector — pointed at `https://api.githubcopilot.com/mcp/` with your GitHub PAT (API Key auth), or at this repo's self-hosted connector. Reverse direction: run `perplexity-web-mcp` locally with your free account's session cookies to expose Perplexity (free tier works) as MCP tools to your IDE.
 
 ### Option 1 — zero setup, full GitHub account access: GitHub's own hosted MCP server
 
