@@ -121,30 +121,34 @@ Servers in `config.template.json`:
 | `vercel-connector` | `https://perplexity-connector-savage-coo.vercel.app/mcp` | `Bearer <CONNECTOR_API_KEY>` | this repo's self-hosted connector (needs `GITHUB_TOKEN` set in the Vercel dashboard first) |
 | `deepwiki` | `https://mcp.deepwiki.com/mcp` | none | public-repo Q&A |
 
-## Step 5 — install the browser extension
+## Step 5 — install the browser extension (use the maintained fork)
 
-1. Chrome Web Store → search **"MCP SuperAssistant"** → Add to Chrome
-   (Firefox: addons.mozilla.org). MIT, free.
-   Source: https://github.com/srbhptl39/MCP-SuperAssistant
-   If the Perplexity adapter breaks after a Perplexity UI change, load a maintained fork
-   instead, e.g. https://github.com/munir-abbasi/MCP-SuperAssistant-updated (load unpacked:
-   chrome://extensions → Developer mode → Load unpacked → the `dist` folder of the release zip).
-2. If the store listing is gone, download the release zip from the repo's Releases page and
-   load it unpacked the same way.
+**Primary (recommended):** load the maintained fork **v0.7.0** unpacked — it fixes the store
+build's broken Streamable HTTP client (upstream #189/#200) and the "0 tools when tools/list
+has outputSchema" bug (#191/#199, which GitHub's MCP triggers):
+
+1. Download https://github.com/munir-abbasi/MCP-SuperAssistant-updated/releases/download/v0.7.0/extension-20260925-083157.zip and unzip it.
+2. Chrome → `chrome://extensions` → enable **Developer mode** → **Load unpacked** → select the
+   unzipped folder (the one containing `manifest.json`; if the zip root only has `dist/`, select `dist`).
+3. Disable/remove the store version of "MCP SuperAssistant" to avoid two sidebars.
+
+**Fallback:** the Chrome Web Store build (https://chromewebstore.google.com/detail/kngiafgkdnlkgmefdafaibkibegkcaef,
+upstream https://github.com/srbhptl39/MCP-SuperAssistant, unmaintained since 2026-02-09) —
+with it, use **SSE mode** (Step 6) and connect only once (see Troubleshooting for the
+reconnect crash).
 
 ## Step 6 — connect the extension to the proxy
 
 1. Open https://perplexity.ai and log in (Free account is fine).
 2. The extension adds a **sidebar** on the right of the page. Click the server status
    indicator (shows "Disconnected").
-3. **Use SSE — it is the known-good combo with the store build.** The store extension's
-   Streamable HTTP client is buggy (upstream issues #189/#200: "ignores SSE responses in
-   POST streamable HTTP", empty tools list). So:
-   - start the proxy in SSE mode: `./start-proxy.sh sse` (Windows: `.\start-proxy.bat sse`)
-   - in the sidebar: **Connection Type = SSE**, **Server URI = `http://localhost:3006/sse`**
-   - (alternatives: default streamableHttp → `http://localhost:3006/mcp`; ws → `ws://localhost:3006/message` —
-     but if the store build misbehaves on streamableHttp, switch to SSE as above; the
-     maintained fork munir-abbasi/MCP-SuperAssistant-updated fixes streamableHttp)
+3. **With the fork extension (recommended):** keep the proxy in default mode
+   (`./start-proxy.sh` / `.\start-proxy.bat` → streamableHttp) and in the sidebar set
+   **Connection Type = Streamable HTTP**, **Server URI = `http://localhost:3006/mcp`**.
+   **With the store build:** use SSE instead — start the proxy with `./start-proxy.sh sse`
+   (Windows: `.\start-proxy.bat sse`) and set **Connection Type = SSE**,
+   **Server URI = `http://localhost:3006/sse`**. Connect **once** — do not keep clicking
+   refresh (the upstream proxy crashes on SSE reconnect, see Troubleshooting).
 4. Click **Connect** / the ↻ refresh button. Status should turn green and list the tools from all servers
    (e.g. `search_repositories`, `get_file_contents`, `create_or_update_file`, `push_files`,
    `create_pull_request`…).
