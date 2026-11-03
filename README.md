@@ -8,32 +8,44 @@ A **free, self-hosted MCP connector** that you import into **Perplexity** so Per
 Perplexity ──MCP over HTTPS──▶ this connector (Vercel, free) ──REST──▶ api.github.com (your PAT, free)
 ```
 
-## How to import it into Perplexity (web / desktop app)
+## Import into Perplexity — three free options (no Perplexity API key / Sonar billing on any of them)
 
-1. Deploy the connector (see below) and copy its URL, e.g. `https://perplexity-connector-abc123.vercel.app/mcp`
-2. In Perplexity: **your avatar → Account settings → Connectors**
-3. Click **+ Custom connector** (top right) → choose **Remote**
-4. Fill in:
-   - **Name:** `GitHub (full access)`
-   - **MCP Server URL:** `https://<your-deployment>.vercel.app/mcp`
-   - *(Advanced)* **Authentication:** `API Key` → paste the `CONNECTOR_API_KEY` you set in Vercel env vars
-   - *(Advanced)* **Transport:** `Streamable HTTP`
-5. Tick the data-sharing acknowledgement → **Add**, then click the connector card to enable it.
-6. In any thread, turn the connector on under **Sources**, then just ask, e.g.:
-   - *"Search my GitHub repos for `perplexity-connector`, read its README and summarize it"*
-   - *"In `<owner>/<repo>`, create a branch `fix/thing`, commit a fix to `src/x.ts`, and open a PR into `main`"*
-   - *"List open issues in `<owner>/<repo>` and file a new one about the bug I describe"*
+All options use the same Perplexity UI: **your avatar → Account settings → Connectors → + Custom connector (top right) → Remote**, fill in Name / MCP Server URL / Authentication / Transport (**Streamable HTTP**), tick the acknowledgement → **Add** → click the card to enable → turn it on under **Sources** in a thread. (Use the web/desktop app; Comet doesn't support custom connectors. On the consumer app, custom connectors currently require a **Pro / Max / Enterprise** plan — Enterprise admins may need to allow members to add connectors. No `pplx-` key is involved, so nothing is billed to Perplexity.)
 
-> Notes: use the **web or desktop app** (Comet does not support custom connectors yet). Perplexity currently gates *custom connectors* on the consumer app to **Pro / Max / Enterprise** plans — but the connector itself costs nothing: no `pplx-` API key is used anywhere, so there is zero per-request Perplexity billing. On Enterprise accounts an admin may need to allow members to add custom connectors (*Enterprise settings → Permissions → Connectors permissions*).
+### Option 1 — zero setup, full GitHub account access: GitHub's own hosted MCP server
 
-### Zero-setup read-only alternative (public repos)
+GitHub hosts the official [`github-mcp-server`](https://github.com/github/github-mcp-server) remotely and, per GitHub's docs, it is **available to all GitHub users regardless of plan** (no Copilot subscription needed for the standard repos/issues/PRs/files tools; read-only variant at `/mcp/readonly`, toolset paths like `/mcp/x/repos`, `/mcp/x/all`).
 
-If you only need Perplexity to *read* any **public** GitHub repo, you can additionally import the hosted **[GitMCP](https://github.com/idosal/git-mcp)** server — free, no keys, Streamable HTTP, auth `None`:
+- **Name:** `GitHub`
+- **MCP Server URL:** `https://api.githubcopilot.com/mcp/`
+- **Authentication:** `API Key` → paste a GitHub PAT (create a fine-grained one at github.com/settings/tokens, scoped to the repos you want; Perplexity sends the key as a `Authorization: Bearer` header, which is exactly what this server expects) — or choose `OAuth 2.0` and sign in with GitHub
+- **Transport:** `Streamable HTTP`
 
-- **MCP Server URL:** `https://gitmcp.io/docs` (any public repo on demand) or `https://gitmcp.io/{owner}/{repo}` (pinned repo)
-- Tools: `search_generic_code`, `search_generic_documentation`, `fetch_generic_documentation`, `fetch_url_content`
+You get the full official toolset — read **and** write on your account (private repos included, per PAT scopes): `search_code`, `get_file_contents`, `push_files`, `create_or_update_file`, `create_pull_request`, `create_issue`, `list_issues`, …
 
-Same steps as above with **Authentication: None**. (Read-only, public repos only; be aware of prompt-injection risk when feeding repo content to an LLM.)
+### Option 2 — fully self-controlled: this repo deployed on Vercel (free)
+
+If you'd rather not route through GitHub's hosted endpoint (or need GHES / custom tools), deploy this repo (see "Deploy to Vercel" below). The connector is live at `https://perplexity-connector.vercel.app/mcp`:
+
+- **Name:** `GitHub (self-hosted)`
+- **MCP Server URL:** `https://<your-deployment>.vercel.app/mcp`
+- **Authentication:** `API Key` → the `CONNECTOR_API_KEY` env var you set in Vercel
+- **Transport:** `Streamable HTTP`
+
+It needs a `GITHUB_TOKEN` env var in Vercel (your own PAT, pasted in the Vercel dashboard — never in chat/git) plus a redeploy; check `https://<your-deployment>.vercel.app/health` for `githubTokenConfigured: true`.
+
+### Option 3 — zero setup, read-only, public repos only, no auth at all
+
+- **DeepWiki MCP** — URL `https://mcp.deepwiki.com/mcp`, Authentication `None`. Tools: `ask_question`, `read_wiki_contents`, `read_wiki_structure` for any public repo indexed on DeepWiki.
+- **GitMCP** — URL `https://gitmcp.io/docs` (any public repo) or `https://gitmcp.io/{owner}/{repo}`, Authentication `None`. Tools: `search_generic_code`, `search_generic_documentation`, `fetch_generic_documentation`, `fetch_url_content`.
+
+(Read-only, public repos only; be aware of prompt-injection risk when feeding repo content to an LLM.)
+
+### Example things to ask once a connector is enabled under Sources
+
+- *"Search my GitHub repos for `perplexity-connector`, read its README and summarize it"*
+- *"In `<owner>/<repo>`, create a branch `fix/thing`, commit a fix to `src/x.ts`, and open a PR into `main`"*
+- *"List open issues in `<owner>/<repo>` and file a new one about the bug I describe"*
 
 ## Deploy to Vercel (free)
 
