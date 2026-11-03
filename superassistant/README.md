@@ -186,6 +186,26 @@ Nothing in this setup depends on this chat or on any agent being online:
 ./uninstall-autostart.sh     # remove autostart again
 ```
 
+## "Did Perplexity patch/block the extension?" (checked 2026-11-03)
+
+- Upstream `srbhptl39/MCP-SuperAssistant`: last code commit **2026-02-09** (v0.6.0, which
+  already contained a "Perplexity UI Update fix"). Known Perplexity-side breakages, all from
+  **Feb 2026 or earlier**: issue #177 (input-box layout change hid the button — fixed in
+  v0.6.0), #59 ("Could not find a suitable insertion point" after the Labs button), and
+  **#180: Perplexity added prompt-injection detection that blocks the extension's injected
+  "SuperAssistant Operational Instructions"** ("Prompt Injection Attack Detected and
+  Blocked"). Our flow does NOT need that injected prompt — just ask naturally in the thread.
+- **No Perplexity-specific breakage reports in Oct/Nov 2026** (recent upstream activity is
+  ChatGPT-adapter only). But upstream is unmaintained since Feb 2026, so newer silent UI
+  changes are possible.
+- Watch out for upstream issues #191/#199: **"connected but 0 tools" when tools/list includes
+  `outputSchema`** — GitHub's MCP tools do include it. The maintained fork
+  `munir-abbasi/MCP-SuperAssistant-updated` (active through **2026-10-18**, v0.7.0) fixes this
+  plus Streamable HTTP handling — if you connect but see no tools, load the fork unpacked
+  (chrome://extensions → Developer mode → Load unpacked → its `dist`).
+- Your "SSE error 404 / Disconnected" is **not** a Perplexity patch — it is the
+  extension↔local-proxy link (transport/URI). The proxy is the thing to fix (see below).
+
 ## Troubleshooting
 
 - **Status stays "Disconnected"**: make sure `start-proxy.sh` is still running (terminal
