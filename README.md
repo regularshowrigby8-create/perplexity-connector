@@ -10,7 +10,17 @@ Perplexity ──MCP over HTTPS──▶ this connector (Vercel, free) ──RES
 
 ## Import into Perplexity — three free options (no Perplexity API key / Sonar billing on any of them)
 
-All options use the same Perplexity UI: **your avatar → Account settings → Connectors → + Custom connector (top right) → Remote**, fill in Name / MCP Server URL / Authentication / Transport (**Streamable HTTP**), tick the acknowledgement → **Add** → click the card to enable → turn it on under **Sources** in a thread. (Use the web/desktop app; Comet doesn't support custom connectors. On the consumer app, custom connectors currently require a **Pro / Max / Enterprise** plan — Enterprise admins may need to allow members to add connectors. No `pplx-` key is involved, so nothing is billed to Perplexity.)
+All options use the same Perplexity UI: sidebar **Plugins → Add custom → Connector → Add MCP connector → Remote** (if Plugins hasn't rolled out to your account yet, the old path still works: **Account settings / Customize → Connectors → + Custom connector (top right) → Remote**; old links redirect). Fill in **Name**, **MCP Server URL** (must be `https://`), under **Advanced** set **Authentication** (None / API Key / OAuth) and **Transport** (**Streamable HTTP**), tick the risk-acknowledgement checkbox (**Add stays greyed out until you tick it**) → **Add** → click the connector card to run the auth flow and enable it → turn it on under **Sources** in a thread. No `pplx-` key is involved, so nothing is billed to Perplexity.
+
+### Why "+ Custom connector" is missing or locked (as of Nov 2026)
+
+1. **Free plan → the option does not exist at all.** Custom (MCP) connectors are a paid-tier feature: **Pro, Max, Enterprise** only (Perplexity help center, quoted in third-party docs through Oct 2026). On Free, the Connectors/Plugins page shows only Perplexity's built-in catalog — the button is absent *by design*, not hidden. There is no public Pro free-trial; occasional programs (students → Education Pro, veterans, carrier partnerships) grant Pro.
+2. **The menu moved in October 2026:** "Customize" became **Plugins**. Use **Plugins → Add custom → Connector → Add MCP connector → Remote**, or **Customize → Connectors** if Plugins isn't showing yet.
+3. **Enterprise org:** an admin must enable **"Allow members to add custom connectors"** (off by default) under *Enterprise settings → Permissions → Connectors permissions*.
+4. **Platform:** works on the **web app (perplexity.ai in a browser) and Mac desktop app**; **not in the iOS/Android apps** (they show only prebuilt connectors) and **not in the Comet browser**.
+5. Perplexity also ships a **built-in GitHub connector** (Plugins → Discover → "GitHub" → Connect → authorize with your GitHub account) — also Pro/Max/Enterprise only.
+
+**Free-plan workarounds:** on Free, Perplexity's normal web search already browses public GitHub (github.com is indexed), so ask it to search GitHub directly — read-only, public repos. For full MCP access without paying for Perplexity, use any free MCP-capable client instead (e.g. Claude.ai allows one custom connector even on its Free plan) pointed at `https://api.githubcopilot.com/mcp/` with a GitHub PAT, or at this repo's self-hosted connector.
 
 ### Option 1 — zero setup, full GitHub account access: GitHub's own hosted MCP server
 
