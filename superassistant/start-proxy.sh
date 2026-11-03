@@ -32,6 +32,19 @@ if [[ -z "$PAT" ]]; then
   echo "  mkdir -p ~/.config/perplexity-connector && echo github_pat_... > ~/.config/perplexity-connector/github-pat.txt" >&2
   exit 1
 fi
+if [[ ! "$PAT" =~ ^github_pat_[A-Za-z0-9_]{30,}$ ]]; then
+  echo "ERROR: '$PAT' is not a real fine-grained PAT (must start with github_pat_, long token, no '...' placeholders)." >&2
+  exit 1
+fi
+# Pre-flight: ask GitHub if the token is valid (prints only the HTTP status, never the token)
+if command -v curl >/dev/null 2>&1; then
+  code="$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $PAT" https://api.github.com/user || echo 000)"
+  if [[ "$code" != "200" ]]; then
+    echo "ERROR: api.github.com rejected this token (HTTP $code). Regenerate it (fine-grained; needs Metadata read + Contents read/write) and retry." >&2
+    exit 1
+  fi
+  echo "GitHub token OK (HTTP $code)."
+fi
 
 # Documented in README.md (it is the public auth for your own Vercel connector).
 KEY="${CONNECTOR_API_KEY:-ebc9973a4109f439485a7e562656eed428e9164733a90f8d}"

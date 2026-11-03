@@ -17,10 +17,20 @@ if (-not $pat) {
   Write-Host "  or save it in this folder:  echo github_pat_... > .github-pat   (git-ignored)"
   exit 1
 }
-if ($pat.Contains('...')) {
-  Write-Host "ERROR: the PAT still contains the '...' placeholder. Put your REAL token (it starts with github_pat_) in .github-pat or `$env:GITHUB_PAT." -ForegroundColor Red
+if ($pat -notmatch '^github_pat_[A-Za-z0-9_]{30,}$') {
+  Write-Host "ERROR: '$pat' is not a real fine-grained PAT (must start with github_pat_ and be a long token, no '...' placeholders)." -ForegroundColor Red
+  Write-Host "Create one at: github.com -> your avatar -> Settings -> Developer settings -> Personal access tokens -> Fine-grained tokens -> Generate new token"
   exit 1
 }
+
+# Pre-flight: ask GitHub if the token is valid (prints only the HTTP status, never the token)
+$code = curl.exe -s -o $null -w '%{http_code}' -H "Authorization: Bearer $pat" https://api.github.com/user
+if ($code -ne '200') {
+  Write-Host "ERROR: api.github.com rejected this token (HTTP $code)." -ForegroundColor Red
+  Write-Host "Regenerate it (fine-grained, needs 'Metadata: Read-only' + 'Contents: Read and write') and overwrite .github-pat."
+  exit 1
+}
+Write-Host "GitHub token OK (HTTP $code)."
 
 # Documented in the repo README (public auth for your own Vercel connector).
 $key = if ($env:CONNECTOR_API_KEY) { $env:CONNECTOR_API_KEY } else { 'ebc9973a4109f439485a7e562656eed428e9164733a90f8d' }
