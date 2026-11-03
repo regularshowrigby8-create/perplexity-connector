@@ -14,13 +14,15 @@ free for every GitHub user when authenticated with your own PAT.
 
 0. **Install 3 things:** Git (git-scm.com), Node.js 18+ (nodejs.org → download **LTS**), Google Chrome.
 1. **Make a GitHub key (PAT):** github.com → your avatar → **Settings** → **Developer settings** → **Personal access tokens** → **Fine-grained tokens** → **Generate new token**. Name it `perplexity-mcp`, Repository access → your repos, Permissions → **Contents: Read and write**, **Pull requests: Read and write**, **Issues: Read and write** (Metadata is auto). Generate → **copy the `github_pat_...` value immediately (shown only once)**.
-2. **Terminal** (Mac: Applications → Utilities → Terminal; Windows: the **Git Bash** app that came with Git). Run:
+2. **Terminal** (Mac: Applications → Utilities → Terminal; Windows: **PowerShell**). Run:
    ```bash
    git clone -b arena/13ca0619-perplexity-connector https://github.com/regularshowrigby8-create/perplexity-connector.git
    cd perplexity-connector/superassistant
-   echo github_pat_... > .github-pat          # paste YOUR token; this file is git-ignored
+   echo github_pat_... > .github-pat          # paste YOUR real token; this file is git-ignored
    chmod +x start-proxy.sh && ./start-proxy.sh # keep this window open; wait for "Connected to server: github"
    ```
+   **Windows (PowerShell) instead of the last line:** `.\start-proxy.bat` — it does the same thing via `start-proxy.ps1`.
+   (On Windows, run the `./doctor.sh` self-check inside **Git Bash**, which came with Git for Windows.)
    In a second terminal, optionally self-check: `./doctor.sh`
 3. **Chrome:** install the **MCP SuperAssistant** extension from the Chrome Web Store
    (https://chromewebstore.google.com/detail/kngiafgkdnlkgmefdafaibkibegkcaef).
