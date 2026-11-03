@@ -164,12 +164,25 @@ reconnect crash).
 
 ## Step 7 — talk to your repo from Perplexity Free
 
-In a new Perplexity thread, be explicit (Free runs Sonar, which sometimes needs a nudge to
-emit tool calls):
+Perplexity-specific settings first (from the extension's own docs):
 
-> "You have MCP tools available in the SuperAssistant sidebar (servers: github,
-> github-readonly). Use the github-readonly tools to list the files in
-> regularshowrigby8-create/perplexity-connector and summarize the README."
+1. **Turn OFF Search mode** — in the input box at the bottom, the mode must not be "Search"
+   (switch to the other mode, e.g. the plain/Computer mode). Search mode derails tool calls.
+2. **Use a reasoning-capable model** in the Model dropdown if available.
+3. In the sidebar, open the **Instructions** tab and click **Insert** (or copy the MCP working
+   instructions and paste them into the chat first). Without these, the model doesn't know the
+   function-call format and will try Perplexity's own connector registry instead
+   ("Unknown source_id").
+4. Make sure **Auto Execute** and **Auto Submit** are ON (Settings tab → Automation Features).
+
+Then in a new Perplexity thread, be explicit:
+
+> "Use the github-readonly MCP tool `list_contents` with owner=regularshowrigby8-create,
+> repo=perplexity-connector (root), then fetch README.md with `get_file_contents` and
+> summarize it."
+
+The model should answer with a ```json function-call block; the extension turns it into a
+tool-call card and (Auto Execute) runs it against the proxy and submits the result.
 
 Then for writes, switch to the full server:
 
