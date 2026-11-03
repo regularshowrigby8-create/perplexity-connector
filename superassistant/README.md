@@ -137,11 +137,15 @@ Servers in `config.template.json`:
 1. Open https://perplexity.ai and log in (Free account is fine).
 2. The extension adds a **sidebar** on the right of the page. Click the server status
    indicator (shows "Disconnected").
-3. Enter the proxy URL matching the transport you started:
-   - `./start-proxy.sh` (default) → `http://localhost:3006/mcp`
-   - `./start-proxy.sh sse` → `http://localhost:3006/sse`
-   - `./start-proxy.sh ws` → `ws://localhost:3006/message`
-4. Click **Connect**. Status should turn green and list the tools from all four servers
+3. **Use SSE — it is the known-good combo with the store build.** The store extension's
+   Streamable HTTP client is buggy (upstream issues #189/#200: "ignores SSE responses in
+   POST streamable HTTP", empty tools list). So:
+   - start the proxy in SSE mode: `./start-proxy.sh sse` (Windows: `.\start-proxy.bat sse`)
+   - in the sidebar: **Connection Type = SSE**, **Server URI = `http://localhost:3006/sse`**
+   - (alternatives: default streamableHttp → `http://localhost:3006/mcp`; ws → `ws://localhost:3006/message` —
+     but if the store build misbehaves on streamableHttp, switch to SSE as above; the
+     maintained fork munir-abbasi/MCP-SuperAssistant-updated fixes streamableHttp)
+4. Click **Connect** / the ↻ refresh button. Status should turn green and list the tools from all servers
    (e.g. `search_repositories`, `get_file_contents`, `create_or_update_file`, `push_files`,
    `create_pull_request`…).
 5. In the extension settings, enable **Auto-Execute** and **Auto-Submit** so detected tool
