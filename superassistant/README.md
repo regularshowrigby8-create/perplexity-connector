@@ -166,9 +166,10 @@ reconnect crash).
 
 Perplexity-specific settings first (from the extension's own docs):
 
-1. **Turn OFF Search mode** — in the input box at the bottom, the mode must not be "Search"
-   (switch to the other mode, e.g. the plain/Computer mode). Search mode derails tool calls.
-2. **Use a reasoning-capable model** in the Model dropdown if available.
+1. **Mode selector**: the docs say turn OFF Search mode, but on Perplexity **Free** Search is the
+   only mode (Computer/agent is Pro) — that's OK, stay in Search. The mode is not the blocker;
+   missing instructions are. If you ever get Pro, switch to the non-search mode for cleaner calls.
+2. **Use a reasoning-capable model** in the Model dropdown if available on Free.
 3. In the sidebar, open the **Instructions** tab and click **Insert** (or copy the MCP working
    instructions and paste them into the chat first). Without these, the model doesn't know the
    function-call format and will try Perplexity's own connector registry instead
