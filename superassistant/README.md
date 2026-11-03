@@ -190,6 +190,10 @@ Nothing in this setup depends on this chat or on any agent being online:
 
 - **Status stays "Disconnected"**: make sure `start-proxy.sh` is still running (terminal
   open), then chrome://extensions → reload the extension, and re-enter the URL.
+- **"SSE error: Non-200 status code (404)"**: the extension is set to **SSE** but the proxy
+  runs in Streamable HTTP mode. In the sidebar set **Connection Type = Streamable HTTP** and
+  **Server URI = `http://localhost:3006/mcp`** (or start the proxy with `./start-proxy.sh sse`
+  and use `http://localhost:3006/sse`).
 - **"Connected" but no tools / errors**: check the proxy terminal — if a server failed to
   connect, the PAT may be wrong/expired or lack scopes; re-check Step 1. `deepwiki` needs no
   auth and is a good canary.
