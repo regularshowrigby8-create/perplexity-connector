@@ -24,14 +24,16 @@ if ($pat -notmatch '^github_pat_[A-Za-z0-9_]{30,}$') {
   exit 1
 }
 
-# Pre-flight: ask GitHub if the token is valid (prints only the HTTP status, never the token)
-$code = curl.exe -s -o $null -w '%{http_code}' -H "Authorization: Bearer $pat" https://api.github.com/user
-if ($code -ne '200') {
+# Pre-flight: ask GitHub if the token is valid (prints only HTTP status + login, never the token)
+try {
+  $me = Invoke-RestMethod -Uri https://api.github.com/user -Headers @{ Authorization = "Bearer $pat" } -Method Get
+  Write-Host "GitHub token OK (HTTP 200, login: $($me.login))."
+} catch {
+  $code = if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode } else { 0 }
   Write-Host "ERROR: api.github.com rejected this token (HTTP $code)." -ForegroundColor Red
-  Write-Host "Regenerate it (fine-grained, needs 'Metadata: Read-only' + 'Contents: Read and write') and overwrite .github-pat."
+  Write-Host "Regenerate it (fine-grained, needs 'Metadata: Read-only' + 'Contents: Read and write') and rerun .\set-token.bat."
   exit 1
 }
-Write-Host "GitHub token OK (HTTP $code)."
 
 # Documented in the repo README (public auth for your own Vercel connector).
 $key = if ($env:CONNECTOR_API_KEY) { $env:CONNECTOR_API_KEY } else { 'ebc9973a4109f439485a7e562656eed428e9164733a90f8d' }
