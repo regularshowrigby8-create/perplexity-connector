@@ -60,4 +60,7 @@ Write-Host "In the browser extension, connect the sidebar to: http://localhost:3
 Write-Host "NOTE: at info level this proxy prints the Authorization header at startup - once connected, run 'cls'; don't screenshot the log. Set PROXY_LOGLEVEL=none to silence. Rotate the PAT when done."
 $proxyArgs = @('-y', '@srbhptl39/mcp-superassistant-proxy@latest', '--config', '.generated-config.json', '--outputTransport', $transport, '--port', '3006')
 if ($env:PROXY_LOGLEVEL) { $proxyArgs += @('--logLevel', $env:PROXY_LOGLEVEL) }
+# Default binds 'localhost' which on Windows may resolve to IPv6 ::1 only (then 127.0.0.1
+# fails). Set PROXY_HOST=0.0.0.0 to listen on all interfaces, or 127.0.0.1 for IPv4 loopback.
+if ($env:PROXY_HOST) { $proxyArgs += @('--host', $env:PROXY_HOST) }
 npx @proxyArgs

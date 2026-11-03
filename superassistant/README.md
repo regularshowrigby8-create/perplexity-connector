@@ -190,6 +190,11 @@ Nothing in this setup depends on this chat or on any agent being online:
 
 - **Status stays "Disconnected"**: make sure `start-proxy.sh` is still running (terminal
   open), then chrome://extensions → reload the extension, and re-enter the URL.
+- **`EADDRINUSE ::1:3006` / "address already in use"**: an old proxy instance still holds the
+  port. Kill it: `netstat -ano | findstr :3006` → note the PID → `taskkill /F /PID <pid>`,
+  then start once. Note the proxy binds `localhost`, which on Windows can be IPv6 `::1` only —
+  then `127.0.0.1` fails while `localhost` works. To listen on all interfaces:
+  `PROXY_HOST=0.0.0.0 ./start-proxy.sh` (Windows: `$env:PROXY_HOST='0.0.0.0'; .\start-proxy.bat`).
 - **"SSE error: Non-200 status code (404)"**: either the extension is still on **SSE** while
   the proxy runs in Streamable HTTP mode, or the error text is stale from the previous attempt.
   Fix: set **Connection Type = Streamable HTTP**, **Server URI = `http://localhost:3006/mcp`**,

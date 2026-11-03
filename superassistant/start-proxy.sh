@@ -69,4 +69,10 @@ esac
 
 echo "Starting MCP SuperAssistant proxy on http://localhost:3006 (transport: $TRANSPORT)"
 echo "In the browser extension, connect the sidebar to: http://localhost:3006$EP"
-exec npx -y @srbhptl39/mcp-superassistant-proxy@latest --config "$OUT" --outputTransport "$TRANSPORT" --port 3006
+echo "NOTE: at info level this proxy prints the Authorization header at startup - once connected, run 'clear'; don't screenshot the log. Set PROXY_LOGLEVEL=none to silence. Rotate the PAT when done."
+LL_ARGS=()
+if [[ -n "${PROXY_LOGLEVEL:-}" ]]; then LL_ARGS+=(--logLevel "$PROXY_LOGLEVEL"); fi
+# Default binds 'localhost' which may resolve to IPv6 ::1 only (then 127.0.0.1 fails).
+# Set PROXY_HOST=0.0.0.0 to listen on all interfaces, or 127.0.0.1 for IPv4 loopback.
+if [[ -n "${PROXY_HOST:-}" ]]; then LL_ARGS+=(--host "$PROXY_HOST"); fi
+exec npx -y @srbhptl39/mcp-superassistant-proxy@latest --config "$OUT" --outputTransport "$TRANSPORT" --port 3006 ${LL_ARGS[@]+"${LL_ARGS[@]}"}
