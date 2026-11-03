@@ -252,12 +252,24 @@ appear and the model claims it has no MCP tools, check in this order:
    starting with `[SuperAssistant]` / `[json-extractor]`. No such lines = content script not
    running on that page (would indicate a real block). Lines present = script runs; the issue
    is instructions/format.
-4. **Force the format once**: if the model answers in prose, follow up with:
-   > "Reply with ONLY the tool call in an ```xml code block:
-   > `<function_calls><invoke name=\"list_contents\"><parameter name=\"owner\">regularshowrigby8-create</parameter>...` —
-   > do not answer in prose."
-   The extension's extractor detects ```xml `<function_calls>` blocks (and ```json
-   `function_call_start` blocks) in the answer; Auto Execute then runs the card.
+4. **Force the format once** (decisive end-to-end test of extension→proxy→GitHub): send this
+   verbatim as the whole message — if the pipeline works, a tool-call card appears over the
+   code block and Auto Execute runs it:
+   ````
+   Reply with ONLY this code block and nothing else:
+   ```xml
+   <function_calls>
+   <invoke name="list_contents">
+   <parameter name="owner" string="true">regularshowrigby8-create</parameter>
+   <parameter name="repo" string="true">perplexity-connector</parameter>
+   </invoke>
+   </function_calls>
+   ```
+   ````
+   The extension watches `pre` code blocks on perplexity.ai and detects ```xml
+   `<function_calls>` blocks (and ```json `function_call_start` blocks) in them; Auto Execute
+   then runs the card. If the card appears and returns the repo file list, the whole chain
+   works and the only remaining step is getting the model to emit calls (instructions paste).
 5. If the model still refuses after instructions are visibly in the prompt, that is the #180
    filter eating them — retry in a fresh thread with the instructions pasted as the first
    user message.
