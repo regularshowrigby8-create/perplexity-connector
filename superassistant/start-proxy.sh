@@ -52,10 +52,16 @@ KEY="${CONNECTOR_API_KEY:-ebc9973a4109f439485a7e562656eed428e9164733a90f8d}"
 node -e '
   const fs = require("fs");
   const tpl = fs.readFileSync(process.argv[1], "utf8");
-  const out = tpl
+  let out = tpl
     .split("__GITHUB_PAT__").join(process.argv[2])
     .split("__CONNECTOR_API_KEY__").join(process.argv[3]);
-  JSON.parse(out); // validate before writing
+  const cfg = JSON.parse(out); // validate
+  // vercel-connector is OFF by default (Vercel deployment is behind Vercel
+  // Authentication -> 401). Enable with INCLUDE_VERCEL_CONNECTOR=1 after
+  // disabling Deployment Protection in the Vercel dashboard.
+  if (process.env.INCLUDE_VERCEL_CONNECTOR !== "1") delete cfg.mcpServers["vercel-connector"];
+  out = JSON.stringify(cfg, null, 2);
+  JSON.parse(out);
   fs.writeFileSync(process.argv[4], out);
 ' "$TEMPLATE" "$PAT" "$KEY" "$OUT"
 chmod 600 "$OUT"

@@ -103,8 +103,12 @@ DRY_RUN=1 ./start-proxy.sh        # optional: generate + validate config, secret
 # variants: ./start-proxy.sh sse   (connect to /sse)   ./start-proxy.sh ws  (connect to /message)
 ```
 
-You should see `Connected to server: github` (and `github-readonly`, `vercel-connector`,
-`deepwiki`) in the log. Leave this terminal running. The generated
+You should see `Connected to server: github`, `github-readonly` and `deepwiki` in the log
+(`vercel-connector` is skipped unless you opt in — see the table below). **The PowerShell
+prompt will NOT come back — the proxy keeps running in that window.** Leave it open.
+⚠️ At info level the proxy prints the `Authorization` header once at startup — once you see
+`Connected to server: github`, run `cls` and don't screenshot the log; rotate the PAT when
+done. `PROXY_LOGLEVEL=none` silences it. The generated
 `superassistant/.generated-config.json` contains the real PAT — it is gitignored and
 chmod 600; do not commit or paste it.
 
