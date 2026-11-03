@@ -10,6 +10,27 @@ free for every GitHub user when authenticated with your own PAT.
 > automated access as misuse; use at your own discretion. Keep the PAT in a gitignored file
 > only — never commit it.
 
+## 60-second quickstart (beginner)
+
+0. **Install 3 things:** Git (git-scm.com), Node.js 18+ (nodejs.org → download **LTS**), Google Chrome.
+1. **Make a GitHub key (PAT):** github.com → your avatar → **Settings** → **Developer settings** → **Personal access tokens** → **Fine-grained tokens** → **Generate new token**. Name it `perplexity-mcp`, Repository access → your repos, Permissions → **Contents: Read and write**, **Pull requests: Read and write**, **Issues: Read and write** (Metadata is auto). Generate → **copy the `github_pat_...` value immediately (shown only once)**.
+2. **Terminal** (Mac: Applications → Utilities → Terminal; Windows: the **Git Bash** app that came with Git). Run:
+   ```bash
+   git clone -b arena/13ca0619-perplexity-connector https://github.com/regularshowrigby8-create/perplexity-connector.git
+   cd perplexity-connector/superassistant
+   echo github_pat_... > .github-pat          # paste YOUR token; this file is git-ignored
+   chmod +x start-proxy.sh && ./start-proxy.sh # keep this window open; wait for "Connected to server: github"
+   ```
+   In a second terminal, optionally self-check: `./doctor.sh`
+3. **Chrome:** install the **MCP SuperAssistant** extension from the Chrome Web Store
+   (https://chromewebstore.google.com/detail/kngiafgkdnlkgmefdafaibkibegkcaef).
+4. **Connect:** open https://perplexity.ai and log in (Free is fine) → the extension adds a sidebar on the right → click the **Disconnected** status → paste `http://localhost:3006/mcp` → **Connect** → turn on **Auto-Execute** and **Auto-Submit**.
+5. **First test (read-only):** in a new Perplexity thread type:
+   *"Use the github-readonly MCP tools to list the files in regularshowrigby8-create/perplexity-connector and summarize the README."*
+6. **When that works, writes:** *"Using the github MCP tools, create a branch, edit a file, push it, and open a pull request in regularshowrigby8-create/perplexity-connector."*
+
+To make the proxy start automatically at login (so you never run step 2's last command by hand): `./install-autostart.sh`.
+
 ## What you need
 
 - A browser with the extension store (Chrome/Edge/Brave or Firefox)
