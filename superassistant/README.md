@@ -113,6 +113,27 @@ The flow: Perplexity emits a tool call → the extension detects it → the loca
 against `api.githubcopilot.com/mcp` with your PAT → the result is inserted back into the
 chat → Perplexity continues. Everything happens inside the normal Perplexity Free UI.
 
+## Runs without the agent — self-contained
+
+Nothing in this setup depends on this chat or on any agent being online:
+
+- **This repo clone** contains everything (template config, launcher, guide).
+- **`./doctor.sh`** — self-check run anytime: Node version, PAT presence, config
+  generation, live proxy endpoint + visible tool list, upstream reachability.
+  Override the port with `PROXY_URL=http://localhost:3999/mcp ./doctor.sh`.
+- **`./install-autostart.sh`** — auto-starts the proxy at login (macOS launchd agent /
+  Linux systemd user unit), so you never have to remember to run `start-proxy.sh`.
+  Undo with `./uninstall-autostart.sh`.
+- **The moving parts live on infra that outlives any session**: the extension and proxy
+  run on your machine, GitHub's MCP on GitHub's servers, and the optional
+  `vercel-connector` on Vercel's servers (deployment stays up on its own).
+
+```bash
+./doctor.sh                  # diagnose anytime
+./install-autostart.sh       # start proxy automatically at every login
+./uninstall-autostart.sh     # remove autostart again
+```
+
 ## Troubleshooting
 
 - **Status stays "Disconnected"**: make sure `start-proxy.sh` is still running (terminal
