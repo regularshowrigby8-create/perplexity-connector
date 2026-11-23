@@ -233,6 +233,9 @@ def find_deadline(text: str, explicit: str | None = None, today: date | None = N
             continue
         for pat in DATE_PATTERNS:
             for match in pat.finditer(sentence):
+                lead = sentence[max(0, match.start() - 34):match.start()].lower()
+                if re.search(r"(modified|updated|published|created|last[- ]modified|posted|uploaded)", lead):
+                    continue
                 when = _parse_date(match.group(1), today.year)
                 if not when:
                     continue

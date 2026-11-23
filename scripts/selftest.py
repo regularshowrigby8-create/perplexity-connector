@@ -9,13 +9,19 @@ from __future__ import annotations
 import asyncio
 import functools
 import http.server
+import os
 import socketserver
 import sys
+import tempfile
 import threading
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "apps" / "api"))
+
+# keep the self-test away from your real vault
+_TMP = Path(tempfile.mkdtemp(prefix="nighthawk-selftest-"))
+os.environ["NH_DATA_DIR"] = str(_TMP)
 
 from app import fixtures, local_index  # noqa: E402
 from app.crawl import CrawlRequest, FusionCrawler  # noqa: E402

@@ -447,8 +447,6 @@ class FusionCrawler:
             from .extract import human_size
 
             snippet_bits.append(human_size(size) or "")
-        if head.get("modified"):
-            snippet_bits.append(f"modified {head['modified']}")
         if text:
             snippet_bits.append(truncate(text, 320))
         hit = Hit(
@@ -584,6 +582,10 @@ class FusionCrawler:
         hits = sorted(self.files.values(), key=lambda h: (-h.depth, -h.score))
         pages = sorted(self.page_hits.values(), key=lambda h: (-h.depth, -h.score))
         everything = [*hits, *pages]
+        try:
+            local_index.upsert_hits(everything)   # crawl discoveries join the vault
+        except Exception:
+            pass
         await self._send("done", stats=stats,
                          files=[h.model_dump() for h in everything[:400]],
                          seeds=[{"url": u, "source": s} for u, s in seeds[:50]])
