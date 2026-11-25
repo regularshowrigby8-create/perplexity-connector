@@ -979,6 +979,27 @@ async def main() -> int:
     ok &= check("and nothing is lost when it is moved", len(_ranked) == 4,
                 str(len(_ranked)))
 
+    from app.orchestrator import is_chatter as _is_chatter, type_tier as _type_tier
+
+    _commit = Hit(url="https://github.com/a/b/issues/1", title="Reminders: passports",
+                  provider="github-issues", provider_name="GitHub", kind="issue",
+                  domain="github.com", words_hit=2)
+    _official = Hit(url="https://www.usa.gov/renew-adult-passport", title="Renew a passport",
+                    provider="bing-rss", provider_name="Bing", kind="page",
+                    domain="usa.gov", words_hit=2, published="2026-11-22T00:00:00Z")
+    ok &= check("a commit is not an answer to a how-to question",
+                _is_chatter(_commit, "how to renew a passport in south africa")
+                and not _is_chatter(_commit, "github actions npm build error"))
+    _ordered = [h.domain for h in _rank([_commit, _official], "accuracy",
+                                        query_text="how to renew a passport in south africa")]
+    ok &= check("so the official page leads it", _ordered[0] == "usa.gov", str(_ordered))
+    ok &= check("a file that is the asked type beats a page offering one",
+                _type_tier(Hit(url="https://x/signal.apk", title="s", provider="p",
+                               provider_name="P", kind="file", file_ext="apk"), ["apk"]) == 0
+                and _type_tier(Hit(url="https://x/download", title="s", provider="p",
+                                   provider_name="P", kind="page", tags=["offers-type"]),
+                               ["apk"]) == 1)
+
     print("\n▸ 16. the engine reads the question before it fetches anything")
     from app import understand
 

@@ -408,6 +408,36 @@ def verbatim_key(hit: Hit) -> tuple:
     return (0 if hit.exact else 1, proximity)
 
 
+# Result kinds and sources that answer a code question and get in the way of
+# every other kind of question. A commit is the answer to "why does this build
+# fail"; it is never the answer to "how do I renew a passport".
+CHATTER_KINDS = {"commit", "issue", "pull", "status", "toot", "post", "comment"}
+CHATTER_PROVIDERS = {"mastodon", "github-issues", "github-commits"}
+CODE_CUES = ("github", "git ", " api", "sdk", "library", "package", "npm", "pip", "python",
+             "javascript", "typescript", " rust", " golang", "java ", " code", "repo",
+             "repository", "bug", "error", "exception", "install", "docker", "kubernetes",
+             "cli", "server", "android", "ios", " apk", "plugin", "framework")
+
+
+def is_chatter(hit: Hit, query_text: str) -> bool:
+    if hit.kind in CHATTER_KINDS or hit.provider in CHATTER_PROVIDERS:
+        lowered = f" {query_text.lower()} "
+        return not any(cue in lowered for cue in CODE_CUES)
+    return False
+
+
+def type_tier(hit: Hit, types: list[str]) -> int:
+    """0 = the thing asked for, 1 = a page offering it, 2 = neither."""
+    if not types:
+        return 0
+    ext = (hit.file_ext or "").lower()
+    if ext and ext in {t.lower() for t in types}:
+        return 0
+    if "offers-type" in (hit.tags or []):
+        return 1
+    return 2
+
+
 def spread(hits: list[Hit], per_domain: int = 2, within: int = 10) -> tuple[list[Hit], int]:
     """Stop one site from owning the answer.
 
@@ -441,7 +471,8 @@ def spread(hits: list[Hit], per_domain: int = 2, within: int = 10) -> tuple[list
     return [*head, *tail], moved
 
 
-def rank(hits: list[Hit], sort: str, verbatim: bool = True) -> list[Hit]:
+def rank(hits: list[Hit], sort: str, verbatim: bool = True,
+         query_text: str = "", types: list[str] | None = None) -> list[Hit]:
     now = freshness.utcnow()
     if sort == "depth":
         hits.sort(key=lambda h: (h.junk, -h.depth, -h.score))
@@ -467,7 +498,8 @@ def rank(hits: list[Hit], sort: str, verbatim: bool = True) -> list[Hit]:
             # words the result actually carries: a page with all three words beats
             # a dated commit that happens to share one, and the date only decides
             # between results that are equally about the question.
-            return (hit.off_topic, hit.junk, band, proximity, -int(hit.words_hit or 0),
+            return (hit.off_topic, hit.junk, is_chatter(hit, query_text), band, proximity,
+                    -int(hit.words_hit or 0), type_tier(hit, types or []),
                     date_tier, date_value, -hit.score, -hit.depth)
 
         hits.sort(key=accuracy_key)
@@ -661,7 +693,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                 rows = [h for h in rows if h.exact]
             if asked.types:
                 rows, _ = query_intent.filter_by_type(rows, asked.types)
-            return rank(rows, req.sort, verbatim=bool(phrase))
+            return rank(rows, req.sort, verbatim=bool(phrase), query_text=search_text,
+                        types=file_types)
 
         dropped = 0
         last_frame = 0.0
@@ -902,7 +935,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
             if "launcher" not in launcher.tags:
                 launcher.tags = [*(launcher.tags or []), "launcher"]
 
-    fused = rank(fused, req.sort, verbatim=bool(phrase))
+    fused = rank(fused, req.sort, verbatim=bool(phrase), query_text=search_text,
+                 types=file_types)
     if asked.hosts:
         # after ranking too, so a named host leads the newest-first order instead
         # of being buried under it
@@ -933,6 +967,7 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         cut_older_matches=int(cut_older_matches),
         off_site=int(off_site),
         same_site=sum(1 for h in fused if "same-site" in (h.tags or [])),
+        chatter=sum(1 for h in fused if is_chatter(h, search_text)),
         fresh_seconds=sum(1 for h in fused if h.age_seconds is not None and h.age_seconds < 60),
         fresh_minutes=sum(1 for h in fused if h.age_seconds is not None and 60 <= h.age_seconds < 3600),
         fresh_hours=sum(1 for h in fused if h.age_seconds is not None and 3600 <= h.age_seconds < 86400),

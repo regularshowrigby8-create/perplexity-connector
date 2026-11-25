@@ -2895,6 +2895,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (stats.off_topic) note.push(stats.off_topic + " contain none of your words, sorted last");
     if (stats.off_site) note.push(stats.off_site + " were not on " + (report.site || "that site") + ", set aside");
     if (stats.same_site) note.push(stats.same_site + " more from a site already in the first ten, moved below them");
+    if (stats.chatter) note.push(stats.chatter + " commits and posts, kept but sorted after the answers");
     if (stats.hop_pages) {
       note.push("opened " + stats.hop_pages + " page" + (stats.hop_pages === 1 ? "" : "s") +
         " and took " + (stats.hop_found || 0) + " file" + ((stats.hop_found || 0) === 1 ? "" : "s") +

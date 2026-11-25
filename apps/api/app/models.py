@@ -152,6 +152,9 @@ class HuntStats(BaseModel):
     off_site: int = 0
     # results moved below the first ten because one site already had two there
     same_site: int = 0
+    # commits, issues and social posts that answer a code question and get in the
+    # way of every other one: kept, sorted after the answers, counted here
+    chatter: int = 0
     # freshness ledger — second granularity for the first minute
     fresh_seconds: int = 0      # < 60s
     fresh_minutes: int = 0      # < 60m
