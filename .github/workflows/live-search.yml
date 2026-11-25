@@ -1,0 +1,99 @@
+name: live search
+
+# A real test environment: a GitHub runner has an open network, so the engines
+# this repo talks to can actually answer. This starts the API from the branch,
+# asks it a question a person would type, and prints what came back — the same
+# answer the page would render, with the ledger attached.
+
+on:
+  workflow_dispatch:
+    inputs:
+      q:
+        description: "what to search for"
+        required: false
+        default: "diary of a wimpy kid pdf"
+      limit:
+        description: "how many results to ask for (0 = no limit)"
+        required: false
+        default: "40"
+  push:
+    paths:
+      - ".github/workflows/live-search.yml"
+
+concurrency:
+  group: live-search
+  cancel-in-progress: true
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: apps/api/requirements.txt
+
+      - name: install the engine
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r apps/api/requirements.txt
+
+      - name: start the API
+        run: |
+          cd apps/api
+          NH_DATA_DIR="$RUNNER_TEMP/nh-data" nohup python -m uvicorn app.main:app \
+            --host 127.0.0.1 --port 8000 > "$RUNNER_TEMP/api.log" 2>&1 &
+          echo "started $!"
+
+      - name: wait for it to answer
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8000/api/v1/health > /dev/null 2>&1; then
+              echo "up after ${i} tries"; exit 0
+            fi
+            sleep 2
+          done
+          echo "the API did not start:"; tail -40 "$RUNNER_TEMP/api.log"; exit 1
+
+      - name: ask a real question
+        run: |
+          python scripts/live_search.py \
+            --base http://127.0.0.1:8000 \
+            --q "${{ github.event.inputs.q || 'diary of a wimpy kid pdf' }}" \
+            --limit "${{ github.event.inputs.limit || '40' }}" \
+            --json "$RUNNER_TEMP/answer.json" \
+            --markdown "$RUNNER_TEMP/answer.md" | tee "$RUNNER_TEMP/answer.txt"
+          cat "$RUNNER_TEMP/answer.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: which sources answered
+        if: always()
+        run: |
+          python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json, os
+          path = os.path.join(os.environ["RUNNER_TEMP"], "answer.json")
+          if not os.path.exists(path):
+              print("no answer file"); raise SystemExit(0)
+          report = json.load(open(path))
+          rows = sorted(report.get("providers") or [], key=lambda p: (p["status"], p["id"]))
+          print("\n| source | status | hits | note |\n|---|---|---|---|")
+          for p in rows:
+              if p["status"] in ("ok", "empty") and not p["count"] and p["status"] == "empty":
+                  continue
+              print(f"| {p['id']} | {p['status']} | {p['count']} | {(p.get('message') or '')[:60]} |")
+          PY
+
+      - name: keep the answer
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: answer
+          path: |
+            ${{ runner.temp }}/answer.json
+            ${{ runner.temp }}/answer.md
+            ${{ runner.temp }}/answer.txt
+            ${{ runner.temp }}/api.log
+          retention-days: 14
