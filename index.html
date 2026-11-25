@@ -1204,22 +1204,22 @@
   <section class="wrap section">
     <div class="head"><h2>Seven ways in</h2><span class="rule"></span><span class="tiny">hunt and crawl run on this page · the rest are the engine’s own endpoints</span></div>
     <div class="grid">
-      <a class="card" href="/hunt" data-route="hunt">
+      <a class="card" href="#live" data-route="hunt">
         <div class="top"><span class="pill lime">federated</span></div>
         <h3>Hunt</h3>
         <p>One query fans out to every reachable engine, folds near-duplicates into the richest record, then fuses by reciprocal rank — funder, amount, location and closing date attached.</p>
       </a>
-      <a class="card" href="/crawl" data-route="crawl">
+      <a class="card" href="#live" data-route="crawl">
         <div class="top"><span class="pill cyan">primary</span></div>
         <h3>Fusion crawler</h3>
         <p>Point it at seeds or a query. It harvests, walks the frontier, opens PDFs and spreadsheets, and indexes the text.</p>
       </a>
-      <a class="card" href="/arsenal" data-route="arsenal">
+      <a class="card" href="#arsenal-link" data-route="arsenal">
         <div class="top"><span class="pill violet">86 engines</span></div>
         <h3>Arsenal</h3>
         <p>Crawlee, Scrapy, Katana, hakrawler, gau, ffuf, trafilatura, pypdf — probed live, dispatched by role.</p>
       </a>
-      <a class="card" href="/vault" data-route="vault">
+      <a class="card" href="#vault-link" data-route="vault">
         <div class="top"><span class="pill amber">local</span></div>
         <h3>Vault</h3>
         <p>SQLite FTS5 + Whoosh + Tantivy over metadata and extracted full text. Works with the network unplugged.</p>
@@ -1229,12 +1229,12 @@
         <h3>Deep crawl</h3>
         <p>Paste exact URLs a search engine never crawled — portal notices, unlinked annexes, sitemap-only pages — and get a report of why nothing else could reach them.</p>
       </a>
-      <a class="card" href="/hunts" data-route="hunts">
+      <a class="card" href="#hunts-link" data-route="hunts">
         <div class="top"><span class="pill">diffing</span></div>
         <h3>Watchers</h3>
         <p>Save a hunt, run it again later — it only reports URLs it has genuinely never seen before.</p>
       </a>
-      <a class="card" href="/api/docs" data-route="api/docs">
+      <a class="card" href="#api-link" data-route="api/docs">
         <div class="top"><span class="pill cyan">rest</span></div>
         <h3>API</h3>
         <p>POST /hunt, /hunt/stream, /crawl/stream, /vault. SSE events for every page, file and block.</p>
@@ -1305,7 +1305,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     <div class="row" style="margin-top:13px">
       <button class="btn btn-primary" type="button" id="practice-btn">Run practice crawl →</button>
       <button class="btn" type="button" id="practice-deep" title="This page is linked from nowhere, so only a pasted URL can reach it">Deep-crawl the unlinked page →</button>
-      <a class="btn" href="/vault" data-route="vault">Open vault</a>
+      <a class="btn" href="#vault-link" data-route="vault">Vault (engine JSON)</a>
     </div>
   </section>
 
@@ -1348,12 +1348,12 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
 <footer>
   <div class="wrap foot">
-    <span class="mono">NIGHTHAWK v1.0</span>
+    <span class="mono">NIGHTHAWK v1.1 · inline hunt</span>
     <span class="dim">·</span>
     <span>119 remote engines · 86 arsenal engines · 54 portals · verbatim &amp; unrestricted</span>
     <span class="dim">·</span>
-    <a href="/api/docs" data-route="api/docs">API</a>
-    <a href="/arsenal" data-route="arsenal">Engine status</a>
+    <a href="#api-link" data-route="api/docs">API</a>
+    <a href="#arsenal-link" data-route="arsenal">Engine status</a>
     <span style="margin-left:auto" class="mono">crawl responsibly — you own the targets you point it at</span>
   </div>
 </footer>
@@ -1501,11 +1501,9 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       var route = node.getAttribute("data-route");
       var dest = ROUTES.hasOwnProperty(route) ? ROUTES[route] : "/api/v1/" + route;
       if (dest === "") {
+        // the delegated listener below runs the hunt; a per-node handler as well
+        // would fire twice and hunt twice
         node.setAttribute("href", "#live");
-        node.onclick = function (event) {
-          event.preventDefault();
-          if (this.getAttribute("data-route") === "crawl") { runCrawl(); } else { runHunt(); }
-        };
         node.removeAttribute("target");
       } else if (dest.charAt(0) === "#") {
         node.setAttribute("href", dest);
@@ -1522,6 +1520,33 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     var openApp = document.getElementById("open-app");
     if (openApp) openApp.setAttribute("href", url("/api/docs"));
   }
+
+  // Wired at load, not after a successful probe: a free instance can take 30s to
+  // wake, and until the probe answered these links were whatever the markup said
+  // — /hunt, /crawl, /vault — which is exactly how clicking Hunt produced
+  // {"detail":"Not Found"} on a host that has no such pages. This listener is
+  // installed first and survives anything the probe does afterwards.
+  document.addEventListener("click", function (event) {
+    var node = event.target.closest ? event.target.closest("[data-route]") : null;
+    if (!node) return;
+    var route = node.getAttribute("data-route");
+    event.preventDefault();
+    if (route === "hunt") { runHunt(); return; }
+    if (route === "crawl") { runCrawl(); return; }
+    if (!online) {
+      toast("engine offline — wake it with retry, then try again");
+      return;
+    }
+    var dest = ROUTES.hasOwnProperty(route) ? ROUTES[route] : "/api/v1/" + route;
+    if (dest.charAt(0) === "#") {
+      var target = document.querySelector(dest);
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    window.open(url(dest), "_blank", "noopener");
+  }, true);
+
+  wireRoutes();
 
   // ------------------------------------------------------------------- probe
   function setStatus(state, text) {
@@ -1544,7 +1569,10 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
   function tryBase(base) {
     var controller = new AbortController();
-    var timer = setTimeout(function () { controller.abort(); }, 3500);
+    // 3.5s was fine on a laptop and wrong on a free host: the first request to
+    // a sleeping instance legitimately takes 30-60s, and aborting that just
+    // painted "engine offline" over a working deployment.
+    var timer = setTimeout(function () { controller.abort(); }, 15000);
     return fetch(trimBase(base) + "/api/v1/health", {
       signal: controller.signal, cache: "no-store"
     }).then(function (res) {
@@ -1555,7 +1583,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   }
 
   function probe() {
-    setStatus("", "checking engine");
+    setStatus("", "checking engine (free hosts wake in ~30s)");
     triedBases = [];
     var list = candidates();
 
@@ -1826,9 +1854,22 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     toast("unlinked page loaded — run the deep crawl");
   });
 
+  // The practice target is on the engine, so crawl it from here. This used to
+  // navigate to /crawl?seeds=… — a Next.js page that does not exist on a
+  // one-container deploy, which is another way to land on {"detail":"Not Found"}.
   document.getElementById("practice-btn").addEventListener("click", function () {
-    location.href = url("/crawl?seeds=" + encodeURIComponent(demoBase() + "/demo/index.html")
-      + "&q=climate%20grant");
+    var seed = demoBase() + "/demo/index.html";
+    var headline = "Practice crawl · " + seed;
+    document.getElementById("live-title").textContent = headline;
+    post("/api/v1/crawl", {
+      seeds: [seed], query: "climate grant", depth: 2, max_pages: 16,
+      max_files: 16, serp_engines: [], keep_pages: true, extract_files: true
+    }).then(function (report) {
+      renderReport(report, headline);
+      toast((report.hits || []).length + " pages, including the fixtures");
+    }).catch(function (err) {
+      toast("practice crawl failed · " + err.message);
+    });
   });
 
   document.getElementById("banner-retry").addEventListener("click", function () {

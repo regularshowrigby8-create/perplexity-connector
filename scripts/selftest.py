@@ -254,6 +254,9 @@ async def main() -> int:
     launch = await api_main.launch()
     ok &= check("GET /launch is the same file",
                 isinstance(launch, FileResponse) and Path(launch.path) == Path(served.path))
+    ok &= check("the page is never cached, so a redeploy is visible",
+                served.headers.get("cache-control") == "no-store"
+                and launch.headers.get("cache-control") == "no-store")
 
     dockerfile = (ROOT / "Dockerfile.api").read_text(encoding="utf-8")
     ok &= check("the image ships the page with the crawler",
@@ -303,6 +306,18 @@ async def main() -> int:
                 and 'location.href = url("/" + mode' not in launcher)
     ok &= check("its route links target engine endpoints, not app pages",
                 "api/v1/arsenal" in launcher and "api/v1/hunts" in launcher)
+    app_pages = [f'href="/{page}"' for page in ("hunt", "crawl", "vault", "hunts", "arsenal")]
+    ok &= check("no markup link points at a page that only exists in the web app",
+                not any(needle in launcher for needle in app_pages),
+                str([n for n in app_pages if n in launcher]))
+    ok &= check("route clicks are handled by one delegated listener, at load",
+                'document.addEventListener("click"' in launcher
+                and launcher.index("wireRoutes();") > launcher.index("function wireRoutes"))
+    ok &= check("the practice button crawls inline instead of navigating",
+                'location.href = url("/crawl' not in launcher
+                and '"/api/v1/crawl"' in launcher)
+    ok &= check("a sleeping free instance is not painted as offline",
+                "15000" in launcher and "free hosts wake in" in launcher)
     hosts = {
         "render.yaml": "Dockerfile.api",
         "fly.toml": "Dockerfile.api",

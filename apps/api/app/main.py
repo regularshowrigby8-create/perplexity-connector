@@ -89,7 +89,10 @@ async def index() -> Response:
     page = launcher_path()
     if page is None:
         return RedirectResponse("/api/docs")
-    return FileResponse(page, media_type="text/html")
+    # no-store: a redeploy must show the new page, not the browser's copy of the
+    # old one. "It is still the same error" is usually a cached launcher.
+    return FileResponse(page, media_type="text/html",
+                        headers={"Cache-Control": "no-store", "Pragma": "no-cache"})
 
 
 @app.get("/launch", include_in_schema=False)
@@ -102,6 +105,7 @@ async def launch(download: bool = False) -> FileResponse:
         page,
         media_type="text/html",
         filename="nighthawk-index.html" if download else None,
+        headers={"Cache-Control": "no-store", "Pragma": "no-cache"},
     )
 
 
