@@ -33,6 +33,10 @@ services:
         value: /tmp/nighthawk
       - key: NH_RATE_LIMIT_PER_MIN
         value: "120"
+      # a search answers with what has arrived after this long instead of
+      # waiting on the slowest of 125 engines (that wait was the whole lag)
+      - key: NH_HUNT_BUDGET_MS
+        value: "2500"
       - key: NH_USER_AGENT
         value: "Nighthawk/1.0 (+https://github.com/regularshowrigby8-create/perplexity-connector)"
     # disk:

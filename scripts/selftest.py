@@ -495,6 +495,53 @@ async def main() -> int:
                 {"/api/v1/continuous", "/api/v1/continuous/seeds",
                  "/api/v1/continuous/stop"} <= paths)
 
+    print("\n\u25b8 11. a search answers on a clock, not on the slowest engine")
+    import app.orchestrator as orch
+    from app.config import settings as cfg
+
+    real_runner = orch._run_provider
+    stall = {"n": 0, "ids": set()}
+
+    async def stalling_runner(provider, ctx):
+        stall["n"] += 1
+        if stall["n"] <= 6:                     # six hosts that never answer
+            stall["ids"].add(provider.id)
+            await asyncio.sleep(30)
+        return provider, [], 5.0, None
+
+    try:
+        orch._run_provider = stalling_runner
+        began = time.perf_counter()
+        timed = await orch.hunt(HuntRequest(q="budget probe", limit=10, budget_ms=1200),
+                                use_cache=False)
+        took = time.perf_counter() - began
+    finally:
+        orch._run_provider = real_runner
+
+    ok &= check("a hung engine cannot hold the page hostage",
+                took < 6.0, f"{took:.2f}s with six 30s engines")
+    ok &= check("the response names the budget it answered on",
+                timed.stats.budget_ms == 1200, str(timed.stats.budget_ms))
+    ok &= check("the engines it cut off are counted, not hidden",
+                timed.stats.slow_providers >= 6, str(timed.stats.slow_providers))
+    slow_rows = [row for row in timed.providers if row.get("status") == "slow"]
+    ok &= check("each one is listed by name with the reason",
+                len(slow_rows) >= 6 and all("budget" in row["message"] for row in slow_rows),
+                (slow_rows[0]["message"] if slow_rows else "none"))
+    ok &= check("every engine is accounted for — ok, failed, empty, key or slow",
+                len(timed.providers) >= timed.stats.slow_providers,
+                f"{len(timed.providers)} rows")
+    ok &= check("the server default budget is a couple of seconds, not a timeout",
+                300 <= cfg.hunt_budget_ms <= 5000, str(cfg.hunt_budget_ms))
+    ok &= check("repeat questions are answered from the cache",
+                cfg.cache_ttl >= 30, str(cfg.cache_ttl))
+    launcher_now = (ROOT / "index.html").read_text(encoding="utf-8")
+    ok &= check("the page no longer forces a fresh hunt on every click",
+                "fresh: true" not in launcher_now and "fresh: !!forceFresh" in launcher_now)
+    ok &= check("the page says it is searching, and offers 'ask again'",
+                "searching every working source" in launcher_now
+                and "ask again" in launcher_now)
+
     httpd.shutdown()
     print("\n" + ("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED"))
     return 0 if ok else 1

@@ -91,6 +91,7 @@ async def health() -> dict[str, Any]:
         "portals": len(PORTALS),
         "vault": local_index.vault_stats(),
         "cache_ttl": settings.cache_ttl,
+        "hunt_budget_ms": settings.hunt_budget_ms,
         "policy": {
             "purpose": "surface what typical engines filter out",
             "popularity_ranking": False,

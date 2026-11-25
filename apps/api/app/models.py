@@ -88,6 +88,9 @@ class HuntRequest(BaseModel):
     # no dedup folding, no junk removal, no diversity penalty, no truncation
     unrestricted: bool = True
     fresh: bool = False
+    # how long to wait for engines before answering with what has arrived;
+    # 0 means "use the server's budget" (2.5 s by default)
+    budget_ms: int = Field(default=0, ge=0, le=60000)
     # session-supplied optional credentials — used for this request only, never stored
     keys: dict[str, str] = Field(default_factory=dict)
 
@@ -135,6 +138,10 @@ class HuntStats(BaseModel):
     newest_age_human: str | None = None
     took_ms: int = 0
     cached: bool = False
+    # the clock the answer was given against: engines still working when it
+    # ran out are reported as "slow", never silently dropped
+    budget_ms: int = 0
+    slow_providers: int = 0
 
 
 class HuntResponse(BaseModel):

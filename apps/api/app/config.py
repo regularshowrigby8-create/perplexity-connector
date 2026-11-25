@@ -68,8 +68,12 @@ class Settings(BaseSettings):
     cdx_limit: int = 250
     provider_result_cap: int = 40
 
+    # search budget: answer with what has arrived after this long instead of
+    # waiting on the slowest of 119 engines (which was the whole lag)
+    hunt_budget_ms: int = 2500
+
     # cache
-    cache_ttl: int = 300
+    cache_ttl: int = 60
     cache_max: int = 400
 
     # optional credentials (never required)

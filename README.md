@@ -173,6 +173,40 @@ The offline practice target has the case built in: `demo/forms/` links to four s
 seed finds its siblings, that `solar` keeps exactly one of them and reports the other three as
 rejected, and that an impossible phrase matches nothing while still listing the shape.
 
+## Speed — the answer is on a clock
+
+A search used to wait for **every** engine, so the slowest of 125 set the latency: an 11-second
+provider timeout meant an 11-second wait, and a page that looked frozen. Two things changed.
+
+**A budget, not a race.** `hunt` now waits `hunt_budget_ms` (default **2500 ms**, env
+`NH_HUNT_BUDGET_MS`) and then answers with what has arrived. Engines still working are cancelled and
+reported as `slow` by name, with the reason — never dropped and never hidden:
+
+```json
+{"stats": {"took_ms": 2210, "budget_ms": 2500, "slow_providers": 9, "cached": false},
+ "providers": [..., {"id": "wayback", "status": "slow", "ms": 2500,
+                     "message": "still working when the 2500 ms budget ran out"}]}
+```
+
+The trade is stated plainly: an engine that needs four seconds does not appear in that answer. Ask
+again — it will.
+
+**A cache that is actually used.** The page used to send `fresh: true` on every search, which skipped
+the cache entirely. It no longer does: the same question inside `cache_ttl` (**60 s**) comes back in
+milliseconds with `cached: true`, and the answer offers **ask again** when you want a real fresh pass.
+
+**The page says what it is doing.** Pressing Search paints *searching every working source* straight
+away, then *still gathering* if a slow source is being waited on, then the rows. A hung engine can no
+longer make the page look broken.
+
+Measured here against the full engine list:
+
+| | before | after |
+|---|---|---|
+| first search, 6 engines hanging 30 s | never returns (30 s+) | **2.6 s**, six reported `slow` |
+| repeat of the same search | 1.4–3.5 s every time | **13 ms** (`cached`) |
+| the page on click | nothing until the last engine answered | a line saying it is searching |
+
 ## Typing a file type means that file type
 
 `apk` used to be read as the word "apk": you got papers about water that happened to contain those

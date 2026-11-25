@@ -2007,7 +2007,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
 <footer>
   <div class="wrap foot">
-    <span class="mono">NIGHTHAWK v1.4</span>
+    <span class="mono">NIGHTHAWK v1.5</span>
     <span class="dim">·</span>
     <a data-route="api/docs">API</a>
     <a data-route="arsenal">Crawlers</a>
@@ -2475,7 +2475,20 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (policy.verbatim_only) note.push("verbatim only");
     if (stats.took_ms !== undefined && stats.took_ms !== null) note.push(stats.took_ms + " ms");
     if (stats.cached) note.push("cached");
-    document.getElementById("live-note").textContent = note.join(" · ");
+    if (stats.slow_providers) note.push(stats.slow_providers + " still answering");
+    var noteEl = document.getElementById("live-note");
+    noteEl.textContent = note.join(" · ");
+    if (stats.cached) {
+      // a cached answer is a real answer, but it is not a fresh one
+      var again = document.createElement("button");
+      again.type = "button";
+      again.className = "link-btn";
+      again.style.marginLeft = "8px";
+      again.textContent = "ask again";
+      again.title = "skip the cache and go back out to the engines";
+      again.addEventListener("click", function () { runHunt(true); });
+      noteEl.appendChild(again);
+    }
 
     var bar = document.getElementById("live-counts");
     bar.innerHTML = "";
@@ -2502,6 +2515,11 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (stats.noise_retained) tick("noise kept", stats.noise_retained, "kept, not dropped");
     if (stats.undated) tick("undated", stats.undated, "no date anywhere — kept, last");
     if (stats.newest_age_human) tick("newest", stats.newest_age_human, "age of the newest result");
+    if (stats.slow_providers) {
+      tick("still answering", stats.slow_providers,
+        "engines that had not answered when the " + (stats.budget_ms || 2500) +
+        " ms budget ran out — reported, not hidden; ask again for a fresh look");
+    }
 
     var box = document.getElementById("live-hits");
     box.innerHTML = "";
@@ -2523,18 +2541,42 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     return value;
   }
 
-  function runHunt() {
+  // The engine answers within its own budget (2.5 s by default) with whatever
+  // arrived, and the browser says what it is doing the moment you press Search
+  // instead of looking frozen. Repeat searches inside a minute come back from
+  // the engine's cache in milliseconds; "again" asks for a real fresh hunt.
+  function searchingState(label, detail) {
+    var bar = document.getElementById("live-counts");
+    if (bar) {
+      bar.innerHTML = '<span class="tick"><b>…</b> ' + label + "</span>";
+    }
+    var note = document.getElementById("live-note");
+    if (note) note.textContent = detail;
+    document.getElementById("live").hidden = false;
+    hidePanels();
+  }
+
+  function runHunt(forceFresh) {
     var q = inputValue();
     if (!q) return;
     var headline = "Hunt · " + q;
     document.getElementById("live-title").textContent = headline;
+    searchingState("searching every working source",
+      "the fast ones answer first; slow ones are cut off at the budget");
+    var nudge = setTimeout(function () {
+      var note = document.getElementById("live-note");
+      if (note) note.textContent = "still gathering — a slow source does not hold the whole page";
+    }, 900);
     post("/api/v1/hunt", {
       q: q, lens: lens, limit: 0, sort: "newest", match: "exact",
-      only_exact: false, unrestricted: true, fresh: true
+      only_exact: false, unrestricted: true, fresh: !!forceFresh
     }).then(function (report) {
+      clearTimeout(nudge);
       renderReport(report, headline);
-      toast((report.hits || []).length + " results");
+      var slow = (report.stats || {}).slow_providers || 0;
+      toast((report.hits || []).length + " results" + (slow ? " · " + slow + " still answering" : ""));
     }).catch(function (err) {
+      clearTimeout(nudge);
       toast("hunt failed · " + err.message);
     });
   }
@@ -2549,6 +2591,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     }
     var headline = "Crawl · " + q;
     document.getElementById("live-title").textContent = headline;
+    searchingState("crawling " + q, "walking the site, then reading what it finds");
     post("/api/v1/crawl", {
       seeds: [q], query: "", depth: 2, max_pages: 40, max_files: 40,
       serp_engines: [], keep_pages: true, extract_files: true

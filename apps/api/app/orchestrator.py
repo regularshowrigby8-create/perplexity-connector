@@ -480,35 +480,71 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
             async with gate:
                 return await _run_provider(provider, ctx)
 
+        # The clock. Waiting for all 119 engines meant one slow host set the
+        # latency of the whole hunt (11 s provider timeout, so that is what a
+        # search could cost before it showed anything). Now the fast ones answer
+        # and the stragglers are reported as "slow" — cut off, not hidden.
+        budget_ms = req.budget_ms or settings.hunt_budget_ms
+        deadline = time.perf_counter() + max(0.2, budget_ms / 1000.0)
         tasks = [asyncio.create_task(_gated(p)) for p in providers]
+        owner = {task: provider for task, provider in zip(tasks, providers)}
         collected: list[Hit] = []
         statuses: list[dict[str, Any]] = [
             {"id": p.id, "name": p.name, "status": "needs_key", "count": 0, "ms": 0,
              "message": "credentials not set"} for p in waiting
         ]
         dropped = 0
-        for finished in asyncio.as_completed(tasks):
-            provider, raws, ms, error = await finished
-            batch: list[Hit] = []
-            for index, raw in enumerate(raws):
-                hit = build_hit(raw, provider, index + 1, plan.lens, terms, phrase,
-                                req.unrestricted)
-                if hit:
-                    batch.append(hit)
-                else:
-                    dropped += 1
-            collected.extend(batch)
-            statuses.append({"id": provider.id, "name": provider.name,
-                             "status": "error" if error else ("empty" if not raws else "ok"),
-                             "count": len(batch), "ms": int(ms),
-                             "message": error or ""})
-            if emit and batch:
-                preview = rank(batch, req.sort)[:12]
-                await emit({"type": "results", "final": False,
-                            "provider": provider.id, "provider_name": provider.name,
-                            "hits": [h.model_dump() for h in preview]})
-            elif emit:
-                await emit({"type": "provider", **statuses[-1]})
+        pending: set[asyncio.Task] = set(tasks)
+        while pending:
+            left = deadline - time.perf_counter()
+            if left <= 0:
+                break
+            done, pending = await asyncio.wait(pending, timeout=left,
+                                               return_when=asyncio.FIRST_COMPLETED)
+            if not done:
+                break
+            for finished in done:
+                provider = owner[finished]
+                try:
+                    provider, raws, ms, error = finished.result()
+                except asyncio.CancelledError:
+                    continue
+                except Exception as exc:          # a provider that raised is still reported
+                    statuses.append({"id": provider.id, "name": provider.name,
+                                     "status": "error", "count": 0, "ms": 0,
+                                     "message": f"{type(exc).__name__}: {exc}"[:160]})
+                    continue
+                batch: list[Hit] = []
+                for index, raw in enumerate(raws):
+                    hit = build_hit(raw, provider, index + 1, plan.lens, terms, phrase,
+                                    req.unrestricted)
+                    if hit:
+                        batch.append(hit)
+                    else:
+                        dropped += 1
+                collected.extend(batch)
+                statuses.append({"id": provider.id, "name": provider.name,
+                                 "status": "error" if error else ("empty" if not raws else "ok"),
+                                 "count": len(batch), "ms": int(ms),
+                                 "message": error or ""})
+                if emit and batch:
+                    preview = rank(batch, req.sort)[:12]
+                    await emit({"type": "results", "final": False,
+                                "provider": provider.id, "provider_name": provider.name,
+                                "hits": [h.model_dump() for h in preview]})
+                elif emit:
+                    await emit({"type": "provider", **statuses[-1]})
+
+        slow = 0
+        if pending:
+            for task in pending:
+                provider = owner[task]
+                task.cancel()
+                slow += 1
+                statuses.append({"id": provider.id, "name": provider.name, "status": "slow",
+                                 "count": 0, "ms": budget_ms,
+                                 "message": f"still working when the {budget_ms} ms budget ran out"})
+            await asyncio.gather(*pending, return_exceptions=True)
 
     fused = merge_hits(collected)
     before = len(fused)
@@ -598,6 +634,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         truncated=truncated,
         took_ms=int((time.perf_counter() - started) * 1000),
         cached=False,
+        budget_ms=int(budget_ms),
+        slow_providers=int(slow),
     )
     intent_meta = asked.as_meta()
     intent_meta.update({
