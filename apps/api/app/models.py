@@ -144,6 +144,9 @@ class HuntStats(BaseModel):
     # ran out are reported as "slow", never silently dropped
     budget_ms: int = 0
     slow_providers: int = 0
+    # time spent after the last source answered (dedupe report, ranking, index)
+    post_ms: int = 0
+    copies_scanned: int = 0
 
 
 class HuntResponse(BaseModel):

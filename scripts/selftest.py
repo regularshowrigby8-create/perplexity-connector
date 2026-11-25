@@ -604,6 +604,81 @@ async def main() -> int:
     ok &= check("the stream route exists on the API",
                 "/api/v1/hunt/stream" in {getattr(route, "path", "") for route in router.routes})
 
+    print("\n▸ 13. a pasted link is read live, and a dead site explains itself")
+    live_events: list[dict] = []
+    live_stamps: list[float] = []
+    crawl_began = time.perf_counter()
+
+    async def crawl_collect(event):
+        live_events.append(event)
+        live_stamps.append(time.perf_counter() - crawl_began)
+
+    await FusionCrawler(CrawlRequest(
+        seeds=[f"http://127.0.0.1:{PORT}/demo/index.html"], query="", depth=2,
+        max_pages=10, max_files=10, serp_engines=[], keep_pages=True, delay=0.0,
+        label="live-crawl"), crawl_collect).run()
+    crawl_total = time.perf_counter() - crawl_began
+    first_result = next((live_stamps[i] for i, event in enumerate(live_events)
+                         if event["type"] in ("pagehit", "file")), None)
+    ok &= check("the crawler shows its first result while it is still reading",
+                first_result is not None and first_result < crawl_total * 0.75,
+                f"{first_result:.2f}s of {crawl_total:.2f}s" if first_result else "no results")
+    ok &= check("each page it reads is announced as it is read",
+                sum(1 for event in live_events if event["type"] == "page") >= 3,
+                str(sum(1 for event in live_events if event["type"] == "page")))
+    ok &= check("the crawl ends with a done event carrying everything found",
+                any(event["type"] == "done" for event in live_events))
+
+    dead_events: list[dict] = []
+
+    async def dead_collect(event):
+        dead_events.append(event)
+
+    dead_report = await FusionCrawler(CrawlRequest(
+        seeds=[f"http://127.0.0.1:{PORT}/demo/nope-404.html"], query="", depth=1,
+        max_pages=4, max_files=4, serp_engines=[], keep_pages=True, delay=0.0,
+        label="dead"), dead_collect).run()
+    ok &= check("a link that answers nothing returns nothing — and says so",
+                dead_report["files"] == [] and dead_report["stats"]["errors"] >= 1,
+                str(dead_report["stats"]))
+    ok &= check("the failure is in the stream too, not only the final report",
+                any(event["type"] == "error" for event in dead_events))
+
+    ok &= check("the page crawls a pasted link instead of searching for the URL",
+                "that is a link" in launcher_now and "/api/v1/crawl/stream" in launcher_now)
+    ok &= check("an empty crawl explains robots, HTTP errors and JS-only pages",
+                "robots.txt asks crawlers" in launcher_now
+                and "403, 404, 429" in launcher_now)
+    ok &= check("the greys are blended, not stacked",
+                "--panel2: #0f1218" in launcher_now and "one surface, one hairline" in launcher_now)
+
+    print("\n▸ 14. the answer is not held up by its own bookkeeping")
+    import app.near_dup as near_dup_mod
+    seen_sizes: list[int] = []
+    real_cluster = near_dup_mod.cluster
+
+    def counting_cluster(records, *args, **kwargs):
+        seen_sizes.append(len(records))
+        return real_cluster(records, *args, **kwargs)
+
+    near_dup_mod.cluster = counting_cluster
+    try:
+        timed_report = await orch.hunt(HuntRequest(q="water fittings report", limit=0,
+                                                   sort="accuracy", budget_ms=1500),
+                                       use_cache=False)
+    finally:
+        near_dup_mod.cluster = real_cluster
+    ok &= check("the duplicate report only scans the top rows, not the whole set",
+                all(size <= cfg.cluster_cap for size in seen_sizes), str(seen_sizes))
+    ok &= check("the response says how many rows were compared",
+                timed_report.stats.copies_scanned <= cfg.cluster_cap,
+                str(timed_report.stats.copies_scanned))
+    ok &= check("post-processing is a small tail, not a second search",
+                timed_report.stats.post_ms < 2000, f"{timed_report.stats.post_ms} ms")
+    ok &= check("the answer reports its own budget and slow count",
+                timed_report.stats.budget_ms == 1500
+                and timed_report.stats.slow_providers >= 0)
+
     httpd.shutdown()
     print("\n" + ("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED"))
     return 0 if ok else 1

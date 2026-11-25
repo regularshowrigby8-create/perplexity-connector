@@ -35,6 +35,20 @@ UNDATED_KINDS_SAFE = {"page", "document", "file", "dataset", "opportunity", "app
 _cache: dict[str, tuple[float, HuntResponse]] = {}
 
 
+def _persist_vault(hits: list[Hit]) -> None:
+    """Index the answer for later searches without holding the response."""
+    def write() -> None:
+        try:
+            local_index.upsert_hits(hits)
+        except Exception:
+            pass
+
+    try:
+        asyncio.get_running_loop().run_in_executor(None, write)
+    except RuntimeError:
+        write()
+
+
 def _cache_key(req: HuntRequest) -> str:
     blob = json.dumps(req.model_dump(exclude={"keys", "fresh"}), sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()
@@ -594,6 +608,7 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                         "total": len(collected),
                         "hits": [h.model_dump() for h in ordered[:80]]})
 
+        after_sources = time.perf_counter()
         slow = 0
         if pending:
             for task in pending:
@@ -603,21 +618,37 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                 statuses.append({"id": provider.id, "name": provider.name, "status": "slow",
                                  "count": 0, "ms": budget_ms,
                                  "message": f"still working when the {budget_ms} ms budget ran out"})
-            await asyncio.gather(*pending, return_exceptions=True)
+            # A cancelled fetch in some libraries only unwinds on its own
+            # timeout. Give cancellations a moment, then stop waiting — the
+            # answer must not inherit a socket's timeout.
+            try:
+                await asyncio.wait(pending, timeout=0.3)
+            except Exception:
+                pass
+            for task in pending:
+                if not task.done():
+                    task.add_done_callback(
+                        lambda t: t.cancelled() or t.exception())
 
     fused = merge_hits(collected)
     before = len(fused)
     collapsed = 0
+    scanned = 0
     if req.unrestricted:
-        # near-duplicate detection still runs — it just reports instead of deleting
+        # near-duplicate detection still runs — it just reports instead of deleting.
+        # Only the top `cluster_cap` rows are compared: the count is a report, and
+        # clustering thousands of rows cost seconds of CPU on a small instance.
+        sample = fused[: settings.cluster_cap]
+        scanned = len(sample)
         try:
-            _kept, collapsed = near_dup.cluster([hit.model_copy(deep=True) for hit in fused])
+            _kept, collapsed = near_dup.cluster([hit.model_copy(deep=True) for hit in sample])
         except Exception:
             collapsed = 0
         for hit in fused:
             hit.near_dupes = 0
     else:
         fused, collapsed = near_dup.cluster(fused)
+        scanned = len(fused)
         for hit in fused:
             hit.near_dupes = int((hit.meta or {}).get("near_dupes") or 0)
     _ = before
@@ -660,10 +691,9 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     if launchers:
         fused = [*fused, *rank(launchers, req.sort, verbatim=False)[:5]]
 
-    try:
-        local_index.upsert_hits(fused)
-    except Exception:
-        pass
+    # Writing every hit into the vault is not part of the answer: it is
+    # bookkeeping for later searches, so it happens off the response path.
+    _persist_vault(list(fused))
 
     stats = HuntStats(
         hits=sum(s["count"] for s in statuses),
@@ -695,6 +725,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         cached=False,
         budget_ms=int(budget_ms),
         slow_providers=int(slow),
+        post_ms=int((time.perf_counter() - after_sources) * 1000),
+        copies_scanned=int(scanned),
     )
     intent_meta = asked.as_meta()
     intent_meta.update({

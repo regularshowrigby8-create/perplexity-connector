@@ -1724,6 +1724,344 @@
     .panel-page .head { flex-wrap: wrap; }
   }
 
+  /* ---- polish: one surface, one hairline, nothing boxed twice ---------------
+     The first pass still stacked greys: a panel on the page, a field on the
+     panel, a chip on every label. This pass blends them into a single surface
+     and lets type and spacing do the work — closest to how a search page
+     should feel. */
+
+  :root {
+    --bg: #0b0d11;
+    --bg2: #0c0f14;
+    --panel: #0f1218;
+    --panel2: #0f1218;
+    --line: #1a1f28;
+    --line2: #232a35;
+    --ink: #eef1f6;
+    --ink2: #c3cad5;
+    --muted: #8a94a3;
+    --dim: #6b7481;
+    --accent: #dcb684;
+    --accent-ink: #17120a;
+  }
+
+  /* the search card: a hairline, not a slab */
+  #hunt.panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: none;
+    padding: 8px;
+  }
+
+  .field {
+    background: transparent;
+    border: 1px solid var(--line);
+  }
+
+  #hunt .field:focus-within {
+    border-color: var(--line2);
+    background: var(--bg2);
+  }
+
+  .btn {
+    background: transparent;
+    border: 1px solid var(--line2);
+    color: var(--ink);
+  }
+
+  .btn:hover {
+    background: var(--bg2);
+    border-color: var(--line2);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .btn-primary:hover {
+    background: #e6c496;
+    border-color: #e6c496;
+  }
+
+  /* filters / engine settings: plain words under the box, no strip */
+  .sub-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin: 10px 4px 2px;
+    padding: 0;
+  }
+
+  .link-btn {
+    margin-left: 0;
+    font-family: inherit;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--muted);
+    padding: 4px 0;
+  }
+
+  .link-btn:hover {
+    color: var(--ink);
+  }
+
+  /* counts: numbers with labels, no pills */
+  .deep-counts {
+    gap: 0;
+    align-items: baseline;
+    margin-top: 16px;
+  }
+
+  .deep-counts .tick {
+    border: 0;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: 12.5px;
+    color: var(--muted);
+    gap: 5px;
+  }
+
+  .deep-counts .tick + .tick::before {
+    content: "·";
+    margin: 0 10px;
+    color: var(--line2);
+  }
+
+  .deep-counts .tick b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* results: a list with hairlines between rows, not a stack of cards */
+  .deep-results {
+    gap: 0;
+    margin-top: 10px;
+    border-top: 1px solid var(--line);
+  }
+
+  .deep-row {
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    padding: 16px 4px 15px;
+  }
+
+  .deep-row:hover {
+    background: rgba(255, 255, 255, .016);
+  }
+
+  .deep-row .t {
+    gap: 10px;
+    align-items: baseline;
+  }
+
+  .deep-row a {
+    font-size: 15.5px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: #dfe6f2;
+  }
+
+  .deep-row a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .deep-row .u {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #7f8b9b;
+  }
+
+  .deep-row .s {
+    margin-top: 7px;
+    font-size: 13.5px;
+    color: #a6b0bf;
+    line-height: 1.6;
+  }
+
+  /* metadata labels: quiet uppercase text, no grey boxes */
+  .pill {
+    border: 0;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    color: var(--dim);
+    font-size: 10.5px;
+    letter-spacing: .07em;
+  }
+
+  .deep-row .t .pill + .pill::before {
+    content: "· ";
+    color: var(--line2);
+  }
+
+  .pill.reason {
+    background: none;
+    border: 0;
+    color: var(--accent);
+  }
+
+  .pill.reason.amber {
+    background: none;
+    border: 0;
+    color: #c79f6a;
+  }
+
+  .pill.lime,
+  .pill.cyan,
+  .pill.amber,
+  .pill.violet {
+    background: none;
+    border: 0;
+    color: var(--dim);
+  }
+
+  /* lenses and types are a row of words, not a row of buttons */
+  .lens {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 5px 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: var(--muted);
+  }
+
+  .lens + .lens {
+    margin-left: 16px;
+  }
+
+  .lens:hover {
+    color: var(--ink);
+    border: 0;
+  }
+
+  .lens[aria-pressed="true"] {
+    background: none;
+    border: 0;
+    color: var(--accent);
+  }
+
+  .lens-row {
+    gap: 0;
+    margin-top: 6px;
+  }
+
+  #filters {
+    padding: 4px 4px 6px;
+    border-top: 1px solid var(--line);
+    margin-top: 10px;
+  }
+
+  /* section heads: a title, a hairline, the count */
+  .head {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 10px;
+  }
+
+  .head h2 {
+    font-size: 25px;
+  }
+
+  .head .tiny,
+  .head .rule {
+    color: var(--dim);
+    font-size: 12px;
+  }
+
+  .head .rule {
+    display: none;
+  }
+
+  /* the live crawl / deep log reads like terminal output, quietly */
+  .deep-log {
+    background: none;
+    border-left: 1px solid var(--line);
+    border-radius: 0;
+    padding: 2px 0 2px 12px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--dim);
+    max-height: 180px;
+  }
+
+  /* inside panels, keep the same single surface */
+  .panel-page .panel,
+  .panel-page .stats {
+    background: var(--panel);
+    border-color: var(--line);
+  }
+
+  .panel-page .step {
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    padding: 14px 0 4px;
+  }
+
+  .panel-page .step h4 {
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+
+  .cmds .cmd {
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+  }
+
+  /* feed: pages read while a crawl is running */
+  .live-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--dim);
+  }
+
+  .live-feed span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .empty-note {
+    margin-top: 12px;
+    color: var(--ink2);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .empty-note ul {
+    margin: 10px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .empty-note li {
+    margin-bottom: 4px;
+  }
+
+  .empty-note .mono {
+    color: var(--ink2);
+  }
+
+  footer .foot {
+    border-top: 1px solid var(--line);
+  }
+
 </style>
 </head>
 <body>
@@ -1769,7 +2107,7 @@
   <section class="hero" id="search">
     <div class="wrap hero-in">
       <h1 class="title">Find the files search engines bury.</h1>
-      <p class="lede">Documents, forms, notices and data that ordinary search skips. Exact words, newest first, nothing removed.</p>
+      <p class="lede">Documents, forms, notices and data that ordinary search skips. Exact words, best match first, newest upload inside each band, nothing removed.</p>
 
       <div class="panel" id="hunt">
         <form class="row" id="hunt-form" autocomplete="off">
@@ -2007,7 +2345,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
 <footer>
   <div class="wrap foot">
-    <span class="mono">NIGHTHAWK v1.6</span>
+    <span class="mono">NIGHTHAWK v1.7</span>
     <span class="dim">·</span>
     <a data-route="api/docs">API</a>
     <a data-route="arsenal">Crawlers</a>
@@ -2547,8 +2885,8 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   // waiting for the slowest one. Each frame is already ordered server-side:
   // accuracy first (the literal phrase, then how far apart the words are), and
   // the newest upload inside each accuracy band.
-  function streamHunt(body, onFrame) {
-    return fetch(url("/api/v1/hunt/stream"), {
+  function streamPost(path, body, onEvent) {
+    return fetch(url(path), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -2573,12 +2911,9 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
           } catch (e) {
             return;
           }
-          if (payload.type === "results") {
-            frames += 1;
-            if (onFrame) onFrame(payload);
-          } else if (payload.type === "done") {
-            report = payload;
-          }
+          frames += 1;
+          if (onEvent) onEvent(payload);
+          if (payload.type === "done") report = payload;
         });
       }
 
@@ -2598,6 +2933,14 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       }
 
       return pump();
+    });
+  }
+
+  // The hunt stream sends a whole ordered list per frame; the crawl stream sends
+  // one event per page read. Same reader, two consumers.
+  function streamHunt(body, onFrame) {
+    return streamPost("/api/v1/hunt/stream", body, function (payload) {
+      if (payload.type === "results") onFrame(payload);
     });
   }
 
@@ -2673,6 +3016,41 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     });
   }
 
+  // --------------------------------------------------------------- crawl, live
+  // A pasted link is read page by page and each page is painted the moment it is
+  // parsed — you see the crawl working, not a spinner. If the site gives nothing
+  // back, the page says what it actually met (robots, 403, JS-only, no links)
+  // instead of an empty "0 results" and a shrug.
+  var crawlRows = [];
+  var crawlErrors = [];
+
+  function crawlOrder(rows) {
+    return rows.slice().sort(function (a, b) {
+      return (b.depth || 0) - (a.depth || 0) || (b.score || 0) - (a.score || 0);
+    });
+  }
+
+  function crawlPaint() {
+    var box = document.getElementById("live-hits");
+    if (!box) return;
+    box.innerHTML = "";
+    crawlOrder(crawlRows).slice(0, 200).forEach(function (hit) {
+      box.appendChild(hitRow(hit));
+    });
+  }
+
+  function crawlCounts(state) {
+    var bar = document.getElementById("live-counts");
+    if (!bar) return;
+    var bits = [[state.hits, "found"], [state.pages, "pages read"]];
+    if (state.blocked) bits.push([state.blocked, "blocked by robots"]);
+    if (state.errors) bits.push([state.errors, "errors"]);
+    bits.push(["…", "still crawling"]);
+    bar.innerHTML = bits.map(function (bit) {
+      return '<span class="tick"><b>' + bit[0] + "</b> " + bit[1] + "</span>";
+    }).join("");
+  }
+
   function runCrawl() {
     var q = inputValue();
     if (!q) return;
@@ -2682,21 +3060,160 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       return;
     }
     var headline = "Crawl · " + q;
+    var state = { hits: 0, pages: 0, files: 0, blocked: 0, errors: 0 };
+    crawlRows = [];
+    crawlErrors = [];
     document.getElementById("live-title").textContent = headline;
-    searchingState("crawling " + q, "walking the site, then reading what it finds");
-    post("/api/v1/crawl", {
+    document.getElementById("live-hits").innerHTML = "";
+    searchingState("opening " + q, "reading the first pages — results appear as soon as they are found");
+    crawlCounts(state);
+
+    var body = {
       seeds: [q], query: "", depth: 2, max_pages: 40, max_files: 40,
       serp_engines: [], keep_pages: true, extract_files: true
-    }).then(function (report) {
-      renderReport(report, headline);
-    }).catch(function (err) {
-      toast("crawl failed · " + err.message);
+    };
+
+    function onEvent(event) {
+      if (event.type === "page") {
+        state.pages += 1;
+        var note = document.getElementById("live-note");
+        if (note) note.textContent = "reading " + (event.url || "");
+      } else if (event.type === "pagehit" || event.type === "file") {
+        if (event.hit) {
+          crawlRows.push(event.hit);
+          state.hits = crawlRows.length;
+          crawlPaint();
+        }
+      } else if (event.type === "blocked") {
+        state.blocked += 1;
+        crawlErrors.push("robots.txt blocked " + (event.url || ""));
+      } else if (event.type === "error") {
+        state.errors += 1;
+        crawlErrors.push((event.url ? event.url + " — " : "") + (event.message || "error"));
+      } else if (event.type === "progress") {
+        state.pages = Math.max(state.pages, event.pages || 0);
+      }
+      crawlCounts(state);
+    }
+
+    streamPost("/api/v1/crawl/stream", body, onEvent).then(function (out) {
+      renderCrawlDone(out.report || {}, headline, state);
+    }).catch(function () {
+      // no stream (buffering proxy, older engine): one plain request
+      post("/api/v1/crawl", body).then(function (report) {
+        renderCrawlDone({ stats: report.stats, files: report.files }, headline, state);
+      }).catch(function (err) {
+        toast("crawl failed · " + err.message);
+      });
     });
+  }
+
+  function renderCrawlDone(data, headline, state) {
+    var stats = data.stats || {};
+    var hits = data.files || [];
+    var pages = stats.pages || state.pages || 0;
+    var blocked = stats.blocked_by_robots || state.blocked || 0;
+    var errors = stats.errors || state.errors || 0;
+
+    document.getElementById("live").hidden = false;
+    hidePanels();
+    document.getElementById("live-title").textContent = headline;
+
+    var note = ["crawl finished", pages + " pages read"];
+    if (stats.files) note.push(stats.files + " files");
+    if (blocked) note.push(blocked + " blocked by robots");
+    if (errors) note.push(errors + " errors");
+    if (stats.took_ms) note.push(stats.took_ms + " ms");
+    document.getElementById("live-note").textContent = note.join(" · ");
+
+    var bar = document.getElementById("live-counts");
+    bar.innerHTML =
+      '<span class="tick"><b>' + hits.length + "</b> found</span>" +
+      '<span class="tick"><b>' + pages + "</b> pages read</span>" +
+      (blocked ? '<span class="tick"><b>' + blocked + "</b> blocked by robots</span>" : "") +
+      (errors ? '<span class="tick"><b>' + errors + "</b> errors</span>" : "") +
+      (stats.docs_indexed ? '<span class="tick"><b>' + stats.docs_indexed + "</b> documents read</span>" : "");
+
+    crawlRows = hits;
+    crawlPaint();
+    if (!hits.length) showCrawlEmpty(pages, blocked, errors);
+    toast(hits.length + " results");
+  }
+
+  // Nothing is filtered to get here, so an empty crawl has to explain itself.
+  function showCrawlEmpty(pages, blocked, errors) {
+    var box = document.getElementById("live-hits");
+    box.innerHTML = "";
+    var wrap = document.createElement("div");
+    wrap.className = "empty-note";
+
+    var head = document.createElement("p");
+    head.innerHTML = pages
+      ? "The crawler read <b>" + pages + "</b> page" + (pages === 1 ? "" : "s") +
+        " and found nothing it could list."
+      : "The crawler could not read a single page from that link.";
+    wrap.appendChild(head);
+
+    var why = document.createElement("p");
+    why.textContent = "Nothing was filtered — this is what the site actually returned. The usual reasons:";
+    wrap.appendChild(why);
+
+    var list = document.createElement("ul");
+    [
+      "robots.txt asks crawlers to stay out" + (blocked ? " (" + blocked + " blocked)" : ""),
+      "an HTTP error in place of the page — 403, 404, 429 or a login wall" + (errors ? " (" + errors + " errors)" : ""),
+      "the content is drawn by JavaScript, so the HTML is empty",
+      "the link is a file or a redirect, with no HTML to follow"
+    ].forEach(function (line) {
+      var item = document.createElement("li");
+      item.textContent = line;
+      list.appendChild(item);
+    });
+    wrap.appendChild(list);
+
+    if (crawlErrors.length) {
+      var log = document.createElement("p");
+      log.className = "dim";
+      log.style.marginTop = "12px";
+      log.textContent = "What it met: " + crawlErrors.slice(0, 6).join(" · ");
+      wrap.appendChild(log);
+    }
+
+    var row = document.createElement("div");
+    row.className = "row";
+    row.style.marginTop = "14px";
+    var deep = document.createElement("button");
+    deep.type = "button";
+    deep.className = "btn btn-sm";
+    deep.textContent = "Paste exact links instead";
+    deep.addEventListener("click", function () {
+      var seeds = document.getElementById("deep-seeds");
+      var box = document.getElementById("q");
+      if (seeds && !seeds.value.trim() && box) seeds.value = box.value.trim();
+      showPanel("deep");
+    });
+    var again = document.createElement("button");
+    again.type = "button";
+    again.className = "btn btn-sm";
+    again.textContent = "Try the crawl again";
+    again.addEventListener("click", function () { runCrawl(); });
+    row.appendChild(deep);
+    row.appendChild(again);
+    wrap.appendChild(row);
+    box.appendChild(wrap);
   }
 
   // ------------------------------------------------------------------ actions
   function go(mode) {
     if (mode === "crawl") { runCrawl(); return; }
+    var typed = (document.getElementById("q").value || "").trim();
+    if (/^https?:\/\/\S+$/i.test(typed)) {
+      // a pasted link is a site to read, not a phrase to search for — searching
+      // for the URL itself is how a paste used to end in "0 results"
+      toast("that is a link — reading the site instead of searching for it");
+      runCrawl();
+      return;
+    }
     runHunt();
   }
 

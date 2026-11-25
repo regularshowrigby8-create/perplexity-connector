@@ -594,8 +594,9 @@ class FusionCrawler:
             return []
         self.stats.bump(fetch_engine)
         if status >= 400:
-            await self._send("error", url=url, message=f"HTTP {status}")
-            return []
+            self.stats.errors += 1        # an HTTP failure is an error too, and
+            await self._send("error", url=url, message=f"HTTP {status}")   # the
+            return []                      # report has to say so, not just the log
         self.stats.bytes += len(body)
         is_html = "html" in ctype.lower() or (not ctype and b"<html" in body[:600].lower())
         if not is_html:

@@ -247,6 +247,19 @@ does not contain the phrase — which is the point of ordering by accuracy befor
 The page falls back to a plain `POST /api/v1/hunt` if a proxy buffers SSE, so nothing depends on
 streaming being available.
 
+
+**The answer is not held up by its own bookkeeping.** Two things used to run inside the response
+after the last source answered: the near-duplicate report (MinHash over *every* row) and writing every
+hit into the vault. On a small instance those cost more than the search itself — it is how a 2.5-second
+budget still produced an 11-second answer. Now:
+
+| | |
+|---|---|
+| duplicate report | compares the top `cluster_cap` rows (400) instead of the whole set, and says so in `stats.copies_scanned` |
+| vault write | off the response path (`run_in_executor`), so later searches still see the hits without the current one waiting |
+| what is left | `stats.post_ms` — the tail after the last source, normally tens of milliseconds |
+| stragglers | cancelled engines get 0.3 s to unwind, then the answer goes out anyway |
+
 ## Typing a file type means that file type
 
 `apk` used to be read as the word "apk": you got papers about water that happened to contain those
@@ -336,6 +349,35 @@ Offline proof that each one parses and dates its hits: `python3 scripts/check_so
 (50/50 engines, plus the ordering contract).
 
 ---
+
+## Paste a link and it starts reading
+
+Typing a URL used to be a mistake: it went to the search engines as a *phrase*, matched nothing, and the
+page said **0 results**. Now a pasted link is recognised on submit and sent to the crawler instead.
+
+The crawl is streamed, page by page (`POST /api/v1/crawl/stream`): every page that is read is announced,
+every page or file that is kept is painted immediately, and the list fills in on screen while the crawl
+is still running.
+
+```
+page      http://example.org/         ← read
+pagehit   http://example.org/         ← kept, painted at 0.1 s
+page      http://example.org/about    ← read next
+file      http://example.org/x.pdf
+done      {stats, files, seeds}
+```
+
+Measured on the fixture site: **first result at 0.11 s**, complete at 2.6 s.
+
+### When a site gives nothing back
+
+A crawl that finds nothing now explains itself instead of shrugging. The page names the page count, then
+the four things that actually cause it — `robots.txt`, an HTTP error in place of the page (403/404/429 or
+a login wall), content drawn by JavaScript so the HTML is empty, or a link with no HTML to follow — plus
+the literal lines the crawler met (`what it met: … — HTTP 403`). It also offers the way out: paste exact
+links (deep crawl) or run the crawl again.
+
+`stats.errors` counts HTTP failures as well as transport failures, so that explanation is never a guess.
 
 ## Why this exists
 
@@ -595,8 +637,11 @@ Live crawl, Pasted links, Status, Settings, the sample site, the deploy commands
 in the top bar, one panel at a time, and each panel has a *back to search* line. Filters and the engine
 URL are two small links under the box, folded away until you want them. Type chips are inside filters.
 
-The look follows the same rule: a serif heading face, one warm accent, no gradients, no card wall, no
-pitch banner, no numbers strip on the front page. Google is simple because the thing you came to do is
+The look follows the same rule: a serif heading face, one warm accent, **one surface** — the panel, the
+field, the chips and the rows are one blended grey with hairlines instead of a stack of boxes, and result
+metadata (`verbatim`, `in title`, `paper`) is quiet uppercase text rather than grey pills. Results read as
+a list, not a deck of cards. No gradients, no card wall, no pitch banner, no numbers strip on the front
+page. Google is simple because the thing you came to do is
 in front of you and the rest is one click away; that is the whole idea here.
 
 If the page is the half you already deployed to Netlify or Vercel, give that deployment an engine

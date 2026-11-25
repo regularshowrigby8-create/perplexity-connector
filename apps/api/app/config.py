@@ -72,6 +72,11 @@ class Settings(BaseSettings):
     # waiting on the slowest of 119 engines (which was the whole lag)
     hunt_budget_ms: int = 2500
 
+    # how many of the top results the duplicate report looks at — clustering
+    # every row was seconds of CPU on a small instance, for a number nobody
+    # reads past the first screen
+    cluster_cap: int = 400
+
     # cache
     cache_ttl: int = 60
     cache_max: int = 400
