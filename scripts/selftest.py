@@ -257,6 +257,8 @@ async def main() -> int:
     dockerfile = (ROOT / "Dockerfile.api").read_text(encoding="utf-8")
     ok &= check("the image ships the page with the crawler",
                 "COPY index.html" in dockerfile and "NH_DATA_DIR=/data" in dockerfile)
+    ok &= check("the image listens on the port the host hands it",
+                "${PORT:-8000}" in dockerfile and "EXPOSE 8000" in dockerfile)
     hosts = {
         "render.yaml": "Dockerfile.api",
         "fly.toml": "Dockerfile.api",
