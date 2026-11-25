@@ -196,6 +196,35 @@ async def main() -> int:
     ok &= check("no duplicate canonical URLs",
                 len({h.url for h in response.hits}) == len(response.hits))
 
+    print("\n▸ 5. deep links: the page nothing links to")
+    from app.deep import DeepRequest, deep_crawl
+
+    unlinked = f"http://127.0.0.1:{PORT}/demo/annex/off-cycle-notice.html"
+    deep = await deep_crawl(DeepRequest(
+        seeds=[unlinked], query="climate resilience grant", depth=2,
+        max_pages=10, max_files=10, respect_robots=False))
+    titles = [hit["title"] for hit in deep["hits"]]
+    reasons = {tuple(hit["meta"].get("deep_reasons") or []) for hit in deep["hits"]}
+    ok &= check("deep crawl reaches a pasted, unlinked page",
+                any("Off-cycle notice" in title for title in titles), str(len(titles)))
+    ok &= check("it says why nothing else could find it",
+                any("pasted" in group and "not-linked" in group for group in reasons),
+                str(sorted(reasons)))
+    ok &= check("attachments are flagged as attachments",
+                any("attachment" in group for group in reasons))
+    ok &= check("deep query is matched verbatim",
+                any(hit["exact"] for hit in deep["hits"]),
+                str(deep["stats"]["verbatim"]))
+    ok &= check("deep report keeps everything it found",
+                deep["stats"]["kept"] == len(deep["hits"]) and not deep["policy"]["result_removal"])
+    ok &= check("deep crawl documents are indexed in the vault",
+                deep["stats"].get("docs_indexed", 0) >= 1, str(deep["stats"].get("docs_indexed")))
+
+    linked = await deep_crawl(DeepRequest(seeds=[f"http://127.0.0.1:{PORT}/demo/index.html"],
+                                          query="", depth=1, max_pages=6, max_files=6))
+    ok &= check("a normal crawl does not magically find the unlinked page",
+                not any("off-cycle" in hit["url"] for hit in linked["hits"]))
+
     httpd.shutdown()
     print("\n" + ("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED"))
     return 0 if ok else 1

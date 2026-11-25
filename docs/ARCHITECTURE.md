@@ -202,7 +202,23 @@ it is off unless the caller asks.
 
 The filtered path still exists — it is one flag away — but it is not what the default hunt does.
 
-### 8.4 Clean results, not cleaner filters
+### 8.4 Deep-link crawling (`deep.py`)
+
+A "deep" result is one with no discovery path: unlinked from every crawled page, listed only in a
+sitemap, reachable only through an archive index, or a query-parameter URL built by a portal form.
+The crawler already tracks what it needs — `FusionCrawler.inbound` (links seen pointing at each
+canonical URL) and `FusionCrawler.via` (how each seed was obtained) — so `deep_crawl()` can run a
+generous crawl from pasted seeds (`keep_pages`, cross-host, sitemaps, archives, no SERP seeds) and
+then label each hit with `reasons_for()`:
+
+`pasted` · `not-linked` · `sitemap-only` · `archive-only` · `query-url` · `attachment` · `deep`
+
+Hits are ordered by evidence weight (`pasted` 4.0 → `deep` 1.5), then verbatim, then newest. The
+deep path reuses the verbatim matcher and the freshness clocks, and it inherits the no-removal
+policy; `policy` in the response reports `result_removal: false` and whether robots was advisory.
+Every crawled document is still indexed into the vault, so a deep report becomes searchable text.
+
+### 8.5 Clean results, not cleaner filters
 
 `quality.py` is the second half: `ftfy` repair, language detection (`py3langid`, label only when
 the margin is decisive), stopword ratio, link density, keyword stuffing and gibberish scoring.

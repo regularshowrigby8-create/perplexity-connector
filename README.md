@@ -94,6 +94,35 @@ that contain the phrase word for word. The `/api/v1/health` policy block publish
 (`constraints: {result_removal: false, result_cap: false, dedup: "reported, not applied", …}`)
 so an integration can assert it rather than trust the copy.
 
+## Deep links — results you can only get by pasting the URL
+
+Some material has no discovery path: a portal's `notice.cfm?notice_id=48213`, an annex nothing links
+to, a sitemap entry that never made it into an index, an attachment behind a JavaScript handler, the
+page the site deleted. No engine can rank what it never crawled, so the only way in is the exact link.
+
+`POST /api/v1/deep` takes those links, crawls **from** them (`depth` 4, other hosts, sitemaps,
+archives, every page kept, no search engine involved) and reports, per result, why nothing else
+could have found it:
+
+| reason | meaning |
+|---|---|
+| `pasted` | one of your seeds — you supplied the only route in |
+| `not-linked` | no crawled page links to it (inbound 0) |
+| `sitemap-only` | the site listed it; no page links to it |
+| `archive-only` | surfaced from an archive index, not the live site |
+| `query-url` | built from parameters (ids, downloads, portal searches) |
+| `attachment` | a file, not a page |
+| `deep` | three or more hops from the seed |
+
+Each hit is still matched **verbatim** against your phrase, still carries its publication clock, and is
+still never removed — the report is the same policy as the hunt, applied to links you chose.
+`/api/v1/deep/stream` emits the same report as SSE with every page, file and block in between.
+
+The launcher (`index.html`, also `/launch`) has the panel: paste links, pick depth, run, and watch the
+reasons arrive. The offline practice target includes a page that is linked from nowhere
+(`demo/annex/off-cycle-notice.html`) so the feature can be proven without the internet — the self-test
+asserts that a normal crawl cannot find it and a pasted deep crawl can.
+
 ## Newest first, to the second
 
 `sort=newest` is the **default**. It is not a guess at what is fresh — every engine in the
@@ -260,6 +289,8 @@ and can be enabled with an environment variable *or* a per-request key that is n
 ```
 POST /api/v1/hunt            federated search (verbatim, newest-first, nothing removed)
 POST /api/v1/hunt/stream     same, as Server-Sent Events
+POST /api/v1/deep            crawl pasted exact links + why each hit is deep-only
+POST /api/v1/deep/stream     same, as SSE
 POST /api/v1/crawl           run the crawler to completion
 POST /api/v1/crawl/stream    live crawl events (page, file, pagehit, blocked, done)
 GET  /api/v1/engines         remote engines + status

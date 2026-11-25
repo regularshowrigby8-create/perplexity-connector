@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from . import arsenal, local_index, registry
 from .config import settings
 from .crawl import CrawlRequest, FusionCrawler
+from .deep import DeepRequest, deep_crawl
 from .change import content_hash, diff as diff_text
 from .extract import canonical_url
 from .models import HuntRequest
@@ -207,6 +208,24 @@ async def post_crawl(payload: CrawlRequest, request: Request) -> dict[str, Any]:
     crawler = FusionCrawler(payload)
     result = await crawler.run()
     return result
+
+
+@router.post("/deep")
+async def post_deep(payload: DeepRequest, request: Request) -> dict[str, Any]:
+    """Crawl pasted exact links and explain why nothing else could have found them."""
+    rate_limit(request)
+    return await deep_crawl(payload)
+
+
+@router.post("/deep/stream")
+async def post_deep_stream(payload: DeepRequest, request: Request) -> StreamingResponse:
+    rate_limit(request)
+
+    async def producer(emit):
+        result = await deep_crawl(payload, emit)
+        await emit({"type": "report", **result})
+
+    return sse_stream(producer)
 
 
 @router.post("/crawl/stream")

@@ -10,18 +10,19 @@ const LINKS = [
   { href: "/arsenal", label: "Arsenal" },
   { href: "/vault", label: "Vault" },
   { href: "/hunts", label: "Watchers" },
+  { href: "/launch#deep", label: "Deep links" },
 ];
 
 export function Nav() {
   const path = usePathname();
-  const [counts, setCounts] = useState({ remote: 66, arsenal: 86 });
+  const [counts, setCounts] = useState({ remote: 120, arsenal: 86 });
 
   useEffect(() => {
     fetch("/api/v1/health")
       .then((r) => r.json())
       .then((d) =>
         setCounts({
-          remote: (d.engines_remote ?? 66) + 1,
+          remote: (d.engines_remote ?? 119) + 1,
           arsenal: d.engines_arsenal ?? 86,
         }),
       )
@@ -43,7 +44,10 @@ export function Nav() {
             <Link
               key={link.href}
               href={link.href}
-              data-active={path === link.href || (link.href !== "/" && path.startsWith(link.href))}
+              data-active={
+                path === link.href.split("#")[0] ||
+                (link.href !== "/" && path.startsWith(link.href.split("#")[0]))
+              }
             >
               {link.label}
             </Link>
@@ -52,6 +56,9 @@ export function Nav() {
         <div className="nav-right">
           <span className="count-chip">
             <b>{counts.remote}</b> remote · <b>{counts.arsenal}</b> arsenal
+          </span>
+          <span className="chip-warn" title="Matches are literal and no result is removed: junk is labelled, duplicates reported.">
+            verbatim
           </span>
           <span className="chip-warn" title="Nighthawk does not demote results for being old, ugly, unlinked or machine-generated.">
             buried-first

@@ -88,6 +88,37 @@
     background:rgba(255,182,72,.16);color:var(--amber);font-family:var(--mono);font-size:12px;font-weight:700}
   .chip-warn{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;
     border-radius:6px;white-space:nowrap;color:var(--amber);border:1px solid rgba(255,182,72,.34);background:rgba(255,182,72,.08)}
+  .caps{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
+  .cap{display:inline-flex;gap:7px;align-items:center;font-size:12.2px;color:#9aa7b8;padding:6px 11px;
+    border:1px solid var(--line2);border-radius:999px;background:rgba(255,255,255,.02)}
+  .cap b{color:var(--lime);font-weight:600}
+  .deep textarea{width:100%;min-height:104px;resize:vertical;border-radius:11px;padding:12px 13px;
+    border:1px solid var(--line2);background:var(--panel2);color:var(--fg);font-family:var(--mono);
+    font-size:12.5px;line-height:1.65}
+  .deep textarea::placeholder{color:#5f6b7d}
+  .deep-controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:10px}
+  .deep-controls label{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:#9aa7b8}
+  .deep-controls select,.deep-controls input[type=number]{border-radius:9px;padding:6px 8px;
+    border:1px solid var(--line2);background:var(--panel2);color:var(--fg);font-family:var(--mono);font-size:12px}
+  .deep-log{margin-top:12px;max-height:190px;overflow:auto;border:1px solid var(--line2);border-radius:10px;
+    background:#080a0e;padding:10px 12px;font-family:var(--mono);font-size:11.6px;line-height:1.7;color:#8d9aac;display:none}
+  .deep-log.show{display:block}
+  .deep-log .ok{color:var(--lime)} .deep-log .warn{color:var(--amber)} .deep-log .bad{color:#ff7b72}
+  .deep-counts{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .deep-counts .tick{display:inline-flex;gap:6px;align-items:center;padding:4px 10px;border-radius:999px;
+    border:1px solid var(--line2);font-size:11.6px;color:#9aa7b8;font-variant-numeric:tabular-nums}
+  .deep-counts .tick b{color:var(--fg)}
+  .deep-results{margin-top:14px;display:flex;flex-direction:column;gap:9px}
+  .deep-row{border:1px solid var(--line2);border-radius:11px;padding:12px 13px;background:var(--panel2)}
+  .deep-row .t{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .deep-row a{color:var(--fg);font-weight:600;font-size:13.6px;text-decoration:none}
+  .deep-row a:hover{color:var(--lime)}
+  .deep-row .u{margin-top:4px;font-family:var(--mono);font-size:11px;color:#6f7d90;word-break:break-all}
+  .deep-row .s{margin-top:6px;font-size:12.4px;color:#a9b4c4;line-height:1.55}
+  .deep-row mark{background:rgba(194,255,61,.16);color:var(--fg);border-bottom:1px solid rgba(194,255,61,.5)}
+  .deep-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .pill.reason{border-color:rgba(194,255,61,.4);color:var(--lime);background:rgba(194,255,61,.07);font-size:10.5px}
+  .pill.reason.amber{border-color:rgba(255,182,72,.45);color:var(--amber);background:rgba(255,182,72,.08)}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;padding:12px 18px;font-weight:600;font-size:14px;border:1px solid var(--line2);background:var(--panel2);cursor:pointer;white-space:nowrap;transition:transform .12s,background .15s,border-color .15s}
   .btn:hover{background:#171d26}
   .btn:active{transform:translateY(1px)}
@@ -176,6 +207,7 @@
     </a>
     <nav class="nav-links">
       <a href="#hunt">Hunt</a>
+      <a href="#deep">Deep links</a>
       <a href="#launch">Launch</a>
       <a href="#practice">Practice target</a>
       <a href="#deploy">Deploy</a>
@@ -213,6 +245,13 @@
             sorted last. Sort order can change; that policy does not.
           </p>
         </div>
+      </div>
+
+      <div class="caps" role="list" aria-label="What this engine promises">
+        <span class="cap" role="listitem"><b>verbatim</b> word for word, no stemming</span>
+        <span class="cap" role="listitem"><b>newest first</b> to the second</span>
+        <span class="cap" role="listitem"><b>nothing removed</b> junk labelled, copies reported</span>
+        <span class="cap" role="listitem"><b>deep links</b> crawl pages only a pasted URL can reach</span>
       </div>
 
       <div class="panel" id="hunt">
@@ -261,14 +300,53 @@
   </section>
 
   <section class="wrap section">
-    <div class="head"><h2>Six ways in</h2><span class="rule"></span><span class="tiny">all proxied through one origin</span></div>
+    <div class="head"><h2>Seven ways in</h2><span class="rule"></span><span class="tiny">all proxied through one origin</span></div>
     <div class="grid">
       <a class="card" href="/hunt" data-route="hunt"><div class="top"><span class="pill lime">federated</span></div><h3>Hunt</h3><p>One query fans out to every reachable engine, folds near-duplicates into the richest record, then fuses by reciprocal rank — funder, amount, location and closing date attached.</p></a>
       <a class="card" href="/crawl" data-route="crawl"><div class="top"><span class="pill cyan">primary</span></div><h3>Fusion crawler</h3><p>Point it at seeds or a query. It harvests, walks the frontier, opens PDFs and spreadsheets, and indexes the text.</p></a>
       <a class="card" href="/arsenal" data-route="arsenal"><div class="top"><span class="pill violet">86 engines</span></div><h3>Arsenal</h3><p>Crawlee, Scrapy, Katana, hakrawler, gau, ffuf, trafilatura, pypdf — probed live, dispatched by role.</p></a>
       <a class="card" href="/vault" data-route="vault"><div class="top"><span class="pill amber">local</span></div><h3>Vault</h3><p>SQLite FTS5 + Whoosh + Tantivy over metadata and extracted full text. Works with the network unplugged.</p></a>
+      <a class="card" href="#deep"><div class="top"><span class="pill lime">deep links</span></div><h3>Deep crawl</h3><p>Paste exact URLs a search engine never crawled — portal notices, unlinked annexes, sitemap-only pages — and get a report of why nothing else could reach them.</p></a>
       <a class="card" href="/hunts" data-route="hunts"><div class="top"><span class="pill">diffing</span></div><h3>Watchers</h3><p>Save a hunt, run it again later — it only reports URLs it has genuinely never seen before.</p></a>
       <a class="card" href="/api/docs" data-route="api/docs"><div class="top"><span class="pill cyan">rest</span></div><h3>API</h3><p>POST /hunt, /hunt/stream, /crawl/stream, /vault. SSE events for every page, file and block.</p></a>
+    </div>
+  </section>
+
+  <section class="wrap section deep" id="deep">
+    <div class="head"><h2>Deep links — the results only a pasted URL can reach</h2><span class="rule"></span><span class="tiny">no search engine involved</span></div>
+    <p class="dim" style="max-width:86ch;margin:0 0 14px">
+      A portal’s search form, an unlinked annex, a sitemap entry nothing points at, an attachment behind
+      a JavaScript link, a page the site deleted — none of that can be ranked by an engine that never
+      crawled it. Paste the exact links and Nighthawk crawls <b>from</b> them and then tells you, per
+      result, <b>why nothing else could have found it</b>. Same rules as the rest of the engine: matches
+      are verbatim, ordering is newest-first, and nothing is removed.
+    </p>
+
+    <div class="panel">
+      <label class="tiny" for="deep-seeds" style="display:block;margin-bottom:6px">exact links (one per line)</label>
+      <textarea id="deep-seeds" spellcheck="false" placeholder="https://portal.example.org/procurement/notice.cfm?notice_id=48213
+https://example.org/uploads/2019/03/annex-b-budget.pdf
+https://example.org/annex/off-cycle-notice.html"></textarea>
+
+      <div class="deep-controls">
+        <div class="field" style="max-width:320px;flex:1 1 260px">
+          <span class="glyph">⌕</span>
+          <input id="deep-q" type="search" placeholder="phrase to match verbatim (optional)" aria-label="Deep query" />
+        </div>
+        <label>depth <select id="deep-depth"><option>2</option><option selected>4</option><option>6</option><option>8</option></select></label>
+        <label>pages <input id="deep-pages" type="number" value="150" min="0" step="50" style="width:74px" /></label>
+        <label><input id="deep-external" type="checkbox" /> other hosts</label>
+        <label><input id="deep-sitemaps" type="checkbox" checked /> sitemaps</label>
+        <label><input id="deep-archive" type="checkbox" checked /> archives</label>
+        <label><input id="deep-pages-all" type="checkbox" checked /> every page</label>
+        <label title="robots.txt is advisory here; you chose the target"><input id="deep-robots" type="checkbox" /> obey robots.txt</label>
+        <button class="btn btn-primary" type="button" id="deep-run">Deep crawl →</button>
+        <button class="btn" type="button" id="deep-export" disabled>export .json</button>
+      </div>
+
+      <div class="deep-counts" id="deep-counts"></div>
+      <div class="deep-log" id="deep-log" aria-live="polite"></div>
+      <div class="deep-results" id="deep-results"></div>
     </div>
   </section>
 
@@ -281,6 +359,7 @@
     </div>
     <div class="row" style="margin-top:13px">
       <button class="btn btn-primary" type="button" id="practice-btn">Run practice crawl →</button>
+      <button class="btn" type="button" id="practice-deep" title="This page is linked from nowhere, so only a pasted URL can reach it">Deep-crawl the unlinked page →</button>
       <a class="btn" href="/vault" data-route="vault">Open vault</a>
     </div>
   </section>
@@ -306,7 +385,7 @@
   <div class="wrap foot">
     <span class="mono">NIGHTHAWK v1.0</span>
     <span class="dim">·</span>
-    <span>119 remote engines · 86 arsenal engines · 54 portals</span>
+    <span>119 remote engines · 86 arsenal engines · 54 portals · verbatim &amp; unrestricted</span>
     <span class="dim">·</span>
     <a href="/api/docs" data-route="api/docs">API</a>
     <a href="/arsenal" data-route="arsenal">Engine status</a>
@@ -436,6 +515,13 @@
   });
   document.getElementById("crawl-btn").addEventListener("click", function () { go("crawl"); });
 
+  document.getElementById("practice-deep").addEventListener("click", function () {
+    deepEl("deep-seeds").value = "http://127.0.0.1:8000/demo/annex/off-cycle-notice.html";
+    deepEl("deep-q").value = "climate resilience grant";
+    document.getElementById("deep").scrollIntoView({ behavior: "smooth", block: "start" });
+    toast("unlinked page loaded — run the deep crawl");
+  });
+
   document.getElementById("practice-btn").addEventListener("click", function () {
     location.href = url("/crawl?seeds=" + encodeURIComponent("http://127.0.0.1:8000/demo/index.html")
       + "&q=climate%20grant");
@@ -490,6 +576,270 @@
       document.getElementById("q").focus();
     }
   });
+
+
+  // ------------------------------------------------------------- deep links
+  var deepReport = null;
+
+  function deepEl(id) { return document.getElementById(id); }
+
+  function deepLog(line, tone) {
+    var box = deepEl("deep-log");
+    box.classList.add("show");
+    var row = document.createElement("div");
+    if (tone) row.className = tone;
+    row.textContent = line;
+    box.appendChild(row);
+    box.scrollTop = box.scrollHeight;
+    while (box.childNodes.length > 400) box.removeChild(box.firstChild);
+  }
+
+  function deepSeeds() {
+    return deepEl("deep-seeds").value.split(/[\n,\s]+/)
+      .map(function (value) { return value.trim(); })
+      .filter(function (value) {
+        return !!value && (value.indexOf("://") > 0 || /^[\w.-]+\.[a-z]{2,}/i.test(value));
+      });
+  }
+
+  function reasonChip(reason, legend) {
+    var span = document.createElement("span");
+    span.className = "pill reason" + (reason === "pasted" || reason === "not-linked" ? "" : " amber");
+    span.textContent = reason;
+    span.title = (legend && legend[reason]) || reason;
+    return span;
+  }
+
+  function renderDeep(report) {
+    deepReport = report;
+    var hits = report.hits || [];
+    var stats = report.stats || {};
+    var counts = report.counts || {};
+    var legend = report.legend || {};
+
+    var bar = deepEl("deep-counts");
+    bar.innerHTML = "";
+    var ticks = [
+      ["deep-only", stats.deep_only || 0, "nothing on the crawled pages links to these"],
+      ["pasted", counts.pasted || 0, "one of your seeds"],
+      ["not linked", counts["not-linked"] || 0, "no inbound link found"],
+      ["sitemap only", counts["sitemap-only"] || 0, "listed, never linked"],
+      ["query URLs", counts["query-url"] || 0, "built from ids and parameters"],
+      ["attachments", stats.attachments || 0, "files, not pages"],
+      ["verbatim", stats.verbatim || 0, "matches the phrase word for word"],
+      ["kept", stats.kept || hits.length, "nothing removed"]
+    ];
+    ticks.forEach(function (item) {
+      var tick = document.createElement("span");
+      tick.className = "tick";
+      tick.title = item[2];
+      tick.innerHTML = "<b>" + item[1] + "</b> " + item[0];
+      bar.appendChild(tick);
+    });
+
+    var box = deepEl("deep-results");
+    box.innerHTML = "";
+    if (!hits.length) {
+      var empty = document.createElement("div");
+      empty.className = "note";
+      empty.textContent = "No results yet — paste at least one exact link and run the crawl.";
+      box.appendChild(empty);
+      return;
+    }
+    hits.slice(0, 300).forEach(function (hit) {
+      var row = document.createElement("article");
+      row.className = "deep-row";
+
+      var top = document.createElement("div");
+      top.className = "t";
+      var link = document.createElement("a");
+      link.href = hit.url;
+      link.target = "_blank";
+      link.rel = "noreferrer noopener";
+      link.textContent = hit.title || hit.url;
+      top.appendChild(link);
+      if (hit.exact) {
+        var v = document.createElement("span");
+        v.className = "pill lime";
+        v.textContent = "verbatim" + (hit.occurrences > 1 ? " ×" + hit.occurrences : "");
+        v.title = "the phrase appears word for word";
+        top.appendChild(v);
+      } else if (hit.proximity !== null && hit.proximity !== undefined) {
+        var p = document.createElement("span");
+        p.className = "pill";
+        p.textContent = hit.proximity + " words apart";
+        top.appendChild(p);
+      }
+      row.appendChild(top);
+
+      var url = document.createElement("div");
+      url.className = "u";
+      url.textContent = hit.url;
+      row.appendChild(url);
+
+      if (hit.snippet) {
+        var snip = document.createElement("div");
+        snip.className = "s";
+        var span = hit.match_span;
+        if (hit.match_where === "snippet" && span) {
+          snip.innerHTML = "";
+          snip.appendChild(document.createTextNode(hit.snippet.slice(0, span[0])));
+          var mark = document.createElement("mark");
+          mark.textContent = hit.snippet.slice(span[0], span[1]);
+          snip.appendChild(mark);
+          snip.appendChild(document.createTextNode(hit.snippet.slice(span[1])));
+        } else {
+          snip.textContent = hit.snippet;
+        }
+        row.appendChild(snip);
+      }
+
+      var badges = document.createElement("div");
+      badges.className = "deep-badges";
+      (hit.meta && hit.meta.deep_reasons || []).forEach(function (reason) {
+        badges.appendChild(reasonChip(reason, legend));
+      });
+      if (hit.file_ext) {
+        var ext = document.createElement("span");
+        ext.className = "pill cyan";
+        ext.textContent = hit.file_ext.toUpperCase();
+        badges.appendChild(ext);
+      }
+      if (hit.age_human) {
+        var age = document.createElement("span");
+        age.className = "pill" + (hit.age_source === "first_seen" ? " muted" : "");
+        age.textContent = hit.age_human + (hit.age_source === "first_seen" ? " · first seen" : "");
+        badges.appendChild(age);
+      }
+      if (hit.meta && hit.meta.inbound !== undefined) {
+        var inbound = document.createElement("span");
+        inbound.className = "pill muted";
+        inbound.title = "links from crawled pages to this URL";
+        inbound.textContent = hit.meta.inbound + " inbound";
+        badges.appendChild(inbound);
+      }
+      row.appendChild(badges);
+      box.appendChild(row);
+    });
+    deepEl("deep-export").disabled = false;
+  }
+
+  function runDeep() {
+    var seeds = deepSeeds();
+    if (!seeds.length) {
+      toast("paste at least one exact link");
+      deepEl("deep-seeds").focus();
+      return;
+    }
+    var query = deepEl("deep-q").value.trim();
+    var body = {
+      seeds: seeds,
+      query: query,
+      depth: parseInt(deepEl("deep-depth").value, 10) || 4,
+      max_pages: parseInt(deepEl("deep-pages").value, 10),
+      max_files: Math.max(50, parseInt(deepEl("deep-pages").value, 10) * 2),
+      same_host: !deepEl("deep-external").checked,
+      use_sitemaps: deepEl("deep-sitemaps").checked,
+      use_archive: deepEl("deep-archive").checked,
+      keep_every_page: deepEl("deep-pages-all").checked,
+      respect_robots: deepEl("deep-robots").checked,
+      extract_files: true,
+      limit: 400
+    };
+    if (!body.max_pages || body.max_pages < 0) body.max_pages = 0;
+
+    var log = deepEl("deep-log");
+    log.innerHTML = "";
+    log.classList.add("show");
+    deepEl("deep-results").innerHTML = "";
+    deepEl("deep-counts").innerHTML = "";
+    deepEl("deep-export").disabled = true;
+    var button = deepEl("deep-run");
+    button.disabled = true;
+    button.textContent = "crawling…";
+    deepLog("seeds: " + seeds.length + " · depth " + body.depth + " · pages " + (body.max_pages || "∞"));
+
+    var started = Date.now();
+    fetch(url("/api/v1/deep/stream"), {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "text/event-stream", "accept-encoding": "identity" },
+      body: JSON.stringify(body)
+    }).then(function (response) {
+      if (!response.ok || !response.body) throw new Error("HTTP " + response.status);
+      var reader = response.body.getReader();
+      var decoder = new TextDecoder();
+      var buffer = "";
+      function pump() {
+        return reader.read().then(function (chunk) {
+          if (chunk.done) return null;
+          buffer += decoder.decode(chunk.value, { stream: true });
+          var parts = buffer.split("\n\n");
+          buffer = parts.pop();
+          parts.forEach(function (part) {
+            var line = part.replace(/^data:\s*/, "").trim();
+            if (!line) return;
+            var event;
+            try { event = JSON.parse(line); } catch (e) { return; }
+            if (event.type === "report") {
+              renderDeep(event);
+              var stats = event.stats || {};
+              deepLog("report: " + (event.hits || []).length + " results · " +
+                (stats.deep_only || 0) + " deep-only · " +
+                (stats.attachments || 0) + " attachments · " +
+                (stats.docs_indexed || 0) + " docs indexed", "ok");
+              return;
+            }
+            if (event.type === "page") {
+              deepLog("page " + event.status + " · d" + event.depth + " · " + (event.title || event.url), "");
+            } else if (event.type === "file") {
+              deepLog("file · " + ((event.hit && event.hit.file_ext) || "?") + " · " + (event.hit && event.hit.url || ""), "ok");
+            } else if (event.type === "blocked") {
+              deepLog("blocked · robots · " + event.url, "warn");
+            } else if (event.type === "listing") {
+              deepLog("directory listing · " + event.url, "warn");
+            } else if (event.type === "error") {
+              deepLog("error · " + (event.url || "") + " " + (event.message || ""), "bad");
+            } else if (event.type === "progress") {
+              deepLog("progress · pages " + event.pages + " · files " + event.files +
+                " · queued " + event.queued, "");
+            } else if (event.type === "status") {
+              deepLog("status · " + (event.message || ""), "");
+            } else if (event.type === "done") {
+              deepLog("crawl finished in " + ((Date.now() - started) / 1000).toFixed(1) + "s", "ok");
+            }
+          });
+          return pump();
+        });
+      }
+      return pump();
+    }).catch(function (error) {
+      deepLog("failed: " + error.message, "bad");
+      toast("deep crawl failed");
+    }).then(function () {
+      button.disabled = false;
+      button.textContent = "Deep crawl →";
+    });
+  }
+
+  deepEl("deep-run").addEventListener("click", runDeep);
+  deepEl("deep-export").addEventListener("click", function () {
+    if (!deepReport) return;
+    var blob = new Blob([JSON.stringify(deepReport, null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "nighthawk-deep-report.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast("deep report exported");
+  });
+  (function seedDeepFromHash() {
+    var prefill = new URLSearchParams(location.hash.replace(/^#/, ""));
+    var seedList = prefill.get("seeds");
+    if (!seedList) return;
+    deepEl("deep-seeds").value = seedList.split(",").join("\n");
+    deepEl("deep-q").value = prefill.get("q") || "";
+    location.hash = "#deep";
+  })();
 
   renderLenses();
   wireRoutes();

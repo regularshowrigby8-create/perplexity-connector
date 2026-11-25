@@ -57,6 +57,7 @@ class CrawlRequest(BaseModel):
     use_archive: bool = False
     file_types: list[str] = Field(default_factory=list)
     extract_files: bool = True
+    keep_pages: bool = False        # keep every crawled page as a result (deep mode)
     fetch_engine: str = "httpx"
     max_bytes: int = Field(default=6_000_000, ge=100_000, le=30_000_000)
     delay: float = Field(default=0.35, ge=0, le=5)
@@ -131,6 +132,9 @@ class FusionCrawler:
         self.page_hits: dict[str, Hit] = {}
         self._pdf_titles: dict[str, str] = {}
         self.lastmod: dict[str, str] = {}
+        # provenance for the deep report: who links here, and how we found it
+        self.inbound: dict[str, int] = {}
+        self.via: dict[str, str] = {}
         self.robots: dict[str, Any] = {}
         self.gates: dict[str, float] = {}
         self.pages_lock = asyncio.Lock()
@@ -339,6 +343,10 @@ class FusionCrawler:
                 break
         return out
 
+    def _note_inbound(self, url: str) -> None:
+        canon = canonical_url(url)
+        self.inbound[canon] = self.inbound.get(canon, 0) + 1
+
     def _remember_lastmod(self, xml: str) -> None:
         """Keep ``<url><loc>…</loc><lastmod>…</lastmod></url>`` pairs.
 
@@ -458,6 +466,8 @@ class FusionCrawler:
                 await self._send("serp", engine="wayback", found=0, status="error",
                                  message="CDX unavailable")
 
+        for url, source in seeds:
+            self.via.setdefault(canonical_url(url), source)
         for url, _ in seeds[:12]:
             self.allowed_hosts.add(safe_domain(url))
         await self._send("seeds", total=len(seeds),
@@ -533,7 +543,10 @@ class FusionCrawler:
             file_ext=ext, mime=head.get("mime") or mime, domain=domain,
             deadline=deadline, tags=("crawled", ext or "file") + (("text-indexed",) if text else ()),
             archive=False, meta={"referrer": referrer, "size": size, "text_engine": text_engine,
-                                 "chars": len(text), "sniffed": sniffed},
+                                 "chars": len(text), "sniffed": sniffed,
+                                 "via": self.via.get(canonical_url(url), "link"),
+                                 "inbound": self.inbound.get(canonical_url(url), 0),
+                                 "crawl_depth": depth},
         )
         hit.size = int(size) if size and str(size).isdigit() else None
         hit.sniffed = sniffed
@@ -638,13 +651,13 @@ class FusionCrawler:
             deadline = explicit_deadline
         opps = opportunity_tags(f"{title} {text[:3000]}")
         structured = bool(best)
-        if (deadline or len(opps) >= 2 or structured) and canon not in self.page_hits:
+        if (self.req.keep_pages or deadline or len(opps) >= 2 or structured) and canon not in self.page_hits:
             self.stats.opportunities += 1
             page_hit = Hit(
                 url=url, title=title or url,
                 snippet=truncate(text, 340),
                 provider="crawler", provider_name="Fusion Crawler",
-                kind="opportunity" if (deadline or structured) else "page",
+                kind="opportunity" if (deadline or structured or len(opps) >= 2) else "page",
                 file_ext=None, mime="text/html", domain=safe_domain(url),
                 deadline=deadline,
                 funder=(best or {}).get("organization") or None,
@@ -657,6 +670,9 @@ class FusionCrawler:
                     + ([best["type"]] if best and best.get("type") else [])
                     + ([best["keywords"].split(",")[0].strip()] if best and best.get("keywords") else []))),
                 meta={"text_engine": text_engine, "chars": len(text),
+                      "via": self.via.get(canon, "link"),
+                      "inbound": self.inbound.get(canon, 0),
+                      "crawl_depth": depth, "listing": listing,
                       "structured": records[:3],
                       "organization": (best or {}).get("organization"),
                       "amount": (best or {}).get("amount"),
@@ -689,6 +705,7 @@ class FusionCrawler:
         terms = [t for t in self.req.query.lower().split() if len(t) > 3][:5]
         for link in links:
             target = link["url"]
+            self._note_inbound(target)
             if FILE_EXT_RE.search(target):
                 await self._register_file(target, url, depth + 1)
                 continue

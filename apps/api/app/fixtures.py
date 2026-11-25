@@ -142,6 +142,16 @@ Allow: /
 Disallow: /demo/private/
 Sitemap: http://127.0.0.1:{port}/demo/sitemap.xml
 """,
+    # deliberately unlinked: no page, no sitemap entry, no robots reference — the
+    # only way to reach it is to paste the exact URL (the deep-link test target)
+    "annex/off-cycle-notice.html": """<!doctype html><html><head><title>Off-cycle notice — climate resilience grant addendum</title>
+<meta name="description" content="Addendum to the climate resilience grant: an additional USD 120,000 for coastal districts.">
+</head><body>
+<h1>Off-cycle notice: climate resilience grant addendum</h1>
+<p>An additional <b>USD 120,000</b> is available under the climate resilience grant for
+coastal districts. Applications close <time datetime="2026-04-30">30 April 2026</time>.</p>
+<p>Full terms are in the <a href="/demo/files/tender-notice-2026.pdf">tender notice (PDF)</a>.</p>
+</body></html>""",
     "private/internal-notes.html": """<!doctype html><html><head><title>Internal notes</title></head><body>
 <h1>Internal — do not distribute</h1><p>Draft negotiation notes and unredacted figures.</p>
 <p><a href="/demo/files/internal-dump.sql">export.sql</a></p></body></html>""",
