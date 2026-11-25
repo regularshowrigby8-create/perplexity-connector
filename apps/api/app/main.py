@@ -67,11 +67,15 @@ async def api_root() -> RedirectResponse:
 
 
 @app.get("/launch", include_in_schema=False)
-async def launch() -> FileResponse:
-    """Serve the standalone launcher page straight from the API host."""
+async def launch(download: bool = False) -> FileResponse:
+    """Serve the standalone launcher page (or send it as a download)."""
     if not LAUNCHER.exists():
         raise HTTPException(status_code=404, detail="launcher not found")
-    return FileResponse(LAUNCHER, media_type="text/html")
+    return FileResponse(
+        LAUNCHER,
+        media_type="text/html",
+        filename="nighthawk-index.html" if download else None,
+    )
 
 
 @app.get("/healthz")
