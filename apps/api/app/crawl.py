@@ -26,6 +26,7 @@ from .extract import (FILE_MAP, canonical_url, depth_score, fingerprint, find_de
                       human_size, opportunity_tags, pretty_name, safe_domain, truncate)
 from .magic import pdf_title, sniff
 from .priority import score as url_priority
+from .keyterms import keyphrases
 from .schemaorg import extract as schema_extract, guess_fields
 from .models import Hit
 from .textkit import extract_text, file_text, meta_extract, parse_links_rich
@@ -498,6 +499,11 @@ class FusionCrawler:
         hit.sniffed = sniffed
         hit.mime = head.get("mime") or mime
         hit.schema_type = None  # files carry no schema.org type of their own
+        if text:
+            try:
+                hit.keyphrases = await asyncio.to_thread(keyphrases, text, 5)
+            except Exception:
+                hit.keyphrases = []
         hit.depth = depth_score(url, ext, False, text[:2000])
         hit.score = 40 + hit.depth * 0.5
         self.files[canon] = hit
