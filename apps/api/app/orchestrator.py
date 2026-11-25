@@ -823,6 +823,23 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     type_dropped = 0
     if asked.types:
         fused, type_dropped = query_intent.filter_by_type(fused, asked.types)
+    # A site search is a site search. `site:` used to only *aim* the engines at the
+    # domain, so a search for tender documents on gov.za answered with the EU's
+    # tender portal — the engines were asked nicely and nobody checked. Now the
+    # domain is enforced and the results it sets aside are counted.
+    off_site = 0
+    if plan.site:
+        wanted = plan.site.lower().strip().rstrip("/")
+        wanted = wanted[4:] if wanted.startswith("www.") else wanted
+
+        def _on_site(hit: Any) -> bool:
+            domain = (getattr(hit, "domain", "") or "").lower()
+            return bool(domain) and (domain == wanted or domain.endswith("." + wanted))
+
+        on_site = [h for h in fused if _on_site(h)]
+        off_site = len(fused) - len(on_site)
+        fused = on_site
+
     host_lifted = 0
     if asked.hosts:
         fused, host_lifted = query_intent.boost_hosts(fused, asked.hosts)
@@ -868,6 +885,7 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         hop_found=int(hop_stats.get("found") or 0),
         hop_skipped=int(hop_stats.get("skipped") or 0),
         cut_older_matches=int(cut_older_matches),
+        off_site=int(off_site),
         fresh_seconds=sum(1 for h in fused if h.age_seconds is not None and h.age_seconds < 60),
         fresh_minutes=sum(1 for h in fused if h.age_seconds is not None and 60 <= h.age_seconds < 3600),
         fresh_hours=sum(1 for h in fused if h.age_seconds is not None and 3600 <= h.age_seconds < 86400),

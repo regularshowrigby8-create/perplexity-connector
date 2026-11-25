@@ -942,6 +942,18 @@ async def main() -> int:
     ok &= check("and reads only the head of it, not the whole document",
                 _discover.MAX_BYTES <= 600_000, str(_discover.MAX_BYTES))
 
+    print("\n▸ 15e. a site search stays on the site")
+    from app.models import Hit as _H
+    from app import plays as _plays
+
+    _plan = _plays.build_plan("tender documents", "all", "gov.za", [])
+    ok &= check("the plan keeps the site", _plan.site == "gov.za", str(_plan.site))
+    _site_hunt = await hunt(HuntRequest(q="annual report", site="vault", limit=0, fresh=True),
+                            use_cache=False)
+    ok &= check("results from anywhere else are set aside and counted",
+                all((h.domain or "").endswith("vault") for h in _site_hunt.hits),
+                str(sorted({h.domain for h in _site_hunt.hits}))[:80])
+
     print("\n▸ 16. the engine reads the question before it fetches anything")
     from app import understand
 

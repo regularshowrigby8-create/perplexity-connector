@@ -9,13 +9,13 @@ on:
   workflow_dispatch:
     inputs:
       q:
-        description: "what to search for"
+        description: "one question to ask; leave empty to ask the whole suite (one per mode)"
         required: false
-        default: "diary of a wimpy kid pdf"
+        default: ""
       limit:
         description: "how many results to ask for (0 = no limit)"
         required: false
-        default: "40"
+        default: "8"
   push:
     paths:
       - ".github/workflows/live-search.yml"
@@ -67,14 +67,26 @@ jobs:
           done
           echo "the API did not start:"; tail -40 "$RUNNER_TEMP/api.log"; exit 1
 
-      - name: ask a real question
+      # One question proves one question. The suite asks one per mode — a plain
+      # how-to, something that must be fresh, an apk, a grant, a learnership, a
+      # dataset, open data, and a site search — so a pass is about the engine and
+      # not about a lucky query.
+      - name: ask real questions
         run: |
-          python scripts/live_search.py \
-            --base http://127.0.0.1:8000 \
-            --q "${{ github.event.inputs.q || 'diary of a wimpy kid pdf' }}" \
-            --limit "${{ github.event.inputs.limit || '40' }}" \
-            --json "$RUNNER_TEMP/answer.json" \
-            --markdown "$RUNNER_TEMP/answer.md" | tee "$RUNNER_TEMP/answer.txt"
+          if [ -n "${{ github.event.inputs.q }}" ]; then
+            python scripts/live_search.py \
+              --base http://127.0.0.1:8000 \
+              --q "${{ github.event.inputs.q }}" \
+              --limit "${{ github.event.inputs.limit || '10' }}" \
+              --json "$RUNNER_TEMP/answer.json" \
+              --markdown "$RUNNER_TEMP/answer.md" | tee "$RUNNER_TEMP/answer.txt"
+          else
+            python scripts/live_search.py \
+              --base http://127.0.0.1:8000 --suite \
+              --limit "${{ github.event.inputs.limit || '8' }}" \
+              --json "$RUNNER_TEMP/answer.json" \
+              --markdown "$RUNNER_TEMP/answer.md" | tee "$RUNNER_TEMP/answer.txt"
+          fi
           cat "$RUNNER_TEMP/answer.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: which sources answered
@@ -86,7 +98,11 @@ jobs:
           if not os.path.exists(path):
               print("no answer file"); raise SystemExit(0)
           report = json.load(open(path))
-          rows = sorted(report.get("providers") or [], key=lambda p: (p["status"], p["id"]))
+          reports = report.get("suite") or [report]
+          rows = []
+          for one in reports:
+              rows.extend(one.get("providers") or [])
+          rows = sorted(rows, key=lambda p: (p["status"], p["id"]))
           print("\n| source | status | hits | note |\n|---|---|---|---|")
           for p in rows:
               if p["status"] in ("ok", "empty") and not p["count"] and p["status"] == "empty":
@@ -116,7 +132,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "nothing to record"
           else
-            git commit -m "live search: ${{ github.event.inputs.q || 'diary of a wimpy kid pdf' }}"
+            git commit -m "live search: ${{ github.event.inputs.q || 'the suite (one query per mode)' }}"
             git push
           fi
 

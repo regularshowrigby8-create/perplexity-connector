@@ -147,6 +147,9 @@ class HuntStats(BaseModel):
     # because that is the cut most likely to hurt: a 2007 archive.org item is
     # still the book that was asked for.
     cut_older_matches: int = 0
+    # a site search means that site: results from anywhere else are set aside,
+    # counted, and the count is reported like every other cut
+    off_site: int = 0
     # freshness ledger — second granularity for the first minute
     fresh_seconds: int = 0      # < 60s
     fresh_minutes: int = 0      # < 60m

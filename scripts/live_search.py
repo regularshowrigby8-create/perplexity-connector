@@ -88,10 +88,81 @@ def render(report: dict, query: str) -> str:
     return "\n".join(lines)
 
 
+# The mission is "a search returns what was asked for" — not "this one book
+# query works". Five of the six modes can only be judged by a query that needs
+# them, so the live test asks one of each, plus the three things a person does
+# most often: a plain question, a fresh local one, and a site search.
+SUITE = [
+    {"q": "how to renew a passport in south africa", "lens": "all",
+     "why": "a plain how-to: does it fetch the instructions, or a pile of noise"},
+    {"q": "load shedding schedule today", "lens": "all",
+     "why": "freshness: the answer has to be from this week, not 2019"},
+    {"q": "signal apk", "lens": "files",
+     "why": "files mode with a type word that is not pdf: does an apk come back"},
+    {"q": "small business grant south africa 2026", "lens": "opportunities",
+     "why": "opportunities mode: money with a deadline, not articles about money"},
+    {"q": "learnership application 2026", "lens": "applications",
+     "why": "applications mode: things a person can actually apply to"},
+    {"q": "population by province south africa csv", "lens": "datasets",
+     "why": "datasets mode: a table, not a news story about the census"},
+    {"q": "public s3 bucket open data csv", "lens": "exposed",
+     "why": "exposed mode: data left open, found without a key"},
+    {"q": "tender documents", "site": "gov.za", "lens": "all",
+     "why": "a site-limited search: does the site stay the site"},
+]
+
+
+def run_one(base: str, spec: dict, limit: int, budget_ms: int) -> dict:
+    started = time.time()
+    body = {"q": spec["q"], "limit": limit, "fresh": True, "budget_ms": budget_ms,
+            "lens": spec.get("lens", "all")}
+    if spec.get("site"):
+        body["site"] = spec["site"]
+    report = call(base, "/api/v1/hunt", body)
+    report["_wall_s"] = round(time.time() - started, 2)
+    report["_spec"] = spec
+    return report
+
+
+def top_line(report: dict) -> str:
+    hits = report.get("hits") or []
+    if not hits:
+        return "**nothing**"
+    first = hits[0]
+    title = (first.get("title") or first.get("url") or "").strip()
+    return f"{title[:80]} — {first.get('domain') or ''} ({human_age(first)})"
+
+
+def suite_markdown(reports: list[dict]) -> str:
+    lines = ["### the engine, asked eight different things", "",
+             "One query per mode, the way a person would type them. Each row is a real",
+             "live search against the branch: open network, real engines, no cache.", "",
+             "| mode | asked | results | sources | time | top result |",
+             "|---|---|---|---|---|---|"]
+    for report in reports:
+        spec, stats = report["_spec"], report.get("stats") or {}
+        asked = spec["q"] + (f" (site:{spec['site']})" if spec.get("site") else "")
+        lines.append(f"| {spec.get('lens', 'all')} | {asked} | {len(report.get('hits') or [])} | "
+                     f"{stats.get('providers_ok', 0)} | {report.get('_wall_s')} s | "
+                     f"{top_line(report)} |")
+    lines.append("")
+    for report in reports:
+        lines.append(f"#### {report['_spec'].get('lens', 'all')} · `{report['_spec']['q']}`")
+        lines.append(f"_{report['_spec'].get('why', '')}_")
+        lines.append("")
+        lines.append(render(report, report["_spec"]["q"]))
+        lines.append("")
+    return "\n".join(lines)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base", default="http://127.0.0.1:8000")
-    parser.add_argument("--q", default="diary of a wimpy kid pdf")
+    parser.add_argument("--q", default="")
+    parser.add_argument("--lens", default="all")
+    parser.add_argument("--site", default="")
+    parser.add_argument("--suite", action="store_true",
+                        help="ask one question per mode instead of a single query")
     parser.add_argument("--limit", type=int, default=40)
     parser.add_argument("--budget-ms", type=int, default=4000)
     parser.add_argument("--json", default="")
@@ -102,9 +173,30 @@ def main() -> int:
         print(f"no answer from {args.base} — is it running?", file=sys.stderr)
         return 2
 
+    if args.suite or not args.q:
+        reports = []
+        for spec in SUITE:
+            print(f"… {spec.get('lens', 'all'):13} {spec['q']}", file=sys.stderr)
+            try:
+                reports.append(run_one(args.base, spec, args.limit, args.budget_ms))
+            except Exception as error:                    # one bad query is one row
+                print(f"  failed: {error}", file=sys.stderr)
+                reports.append({"hits": [], "stats": {}, "_spec": spec, "_wall_s": 0,
+                                "providers": [], "_error": str(error)[:200]})
+        markdown = suite_markdown(reports)
+        print(markdown)
+        if args.json:
+            with open(args.json, "w", encoding="utf-8") as handle:
+                json.dump({"suite": reports}, handle, indent=1, default=str)
+        if args.markdown:
+            with open(args.markdown, "w", encoding="utf-8") as handle:
+                handle.write(markdown + "\n")
+        return 0
+
     started = time.time()
     report = call(args.base, "/api/v1/hunt", {
         "q": args.q, "limit": args.limit, "fresh": True, "budget_ms": args.budget_ms,
+        "lens": args.lens, **({"site": args.site} if args.site else {}),
     })
     wall = time.time() - started
 
