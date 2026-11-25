@@ -114,8 +114,10 @@ SUITE = [
 
 def run_one(base: str, spec: dict, limit: int, budget_ms: int) -> dict:
     started = time.time()
+    # the order the page asks for, not the API's default: the suite has to test
+    # what a person is actually shown
     body = {"q": spec["q"], "limit": limit, "fresh": True, "budget_ms": budget_ms,
-            "lens": spec.get("lens", "all")}
+            "lens": spec.get("lens", "all"), "sort": spec.get("sort", "accuracy")}
     if spec.get("site"):
         body["site"] = spec["site"]
     report = call(base, "/api/v1/hunt", body)
