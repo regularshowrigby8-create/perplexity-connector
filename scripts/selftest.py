@@ -793,6 +793,80 @@ async def main() -> int:
     ok &= check("a real answer reports how many practice-site rows it left out",
                 timed_report.stats.local_excluded >= 0)
 
+    print("\n▸ 15b. a book title is answered with the book, not with a browser tab")
+    from app.providers import filehosts as _fh
+    from app.providers.archives import InternetArchive as _IA
+
+    # this is the real archive.org response for "diary of a wimpy kid",
+    # trimmed to four items — the shape is what broke the engine in the wild
+    _payload = {"response": {"numFound": 416, "docs": [
+        {"date": "2007-04-01T00:00:00Z", "downloads": 1989711,
+         "format": ["Text PDF", "EPUB", "Djvu XML"],
+         "identifier": "diaryofawimpykidbookseriesbyjeffkinney_202004",
+         "publicdate": "2020-04-03T14:01:43Z",
+         "title": "Diary Of A Wimpy Kid Book Series"},
+        {"date": "2021-10-31T00:00:00Z", "downloads": 131232, "format": ["EPUB"],
+         "identifier": "big-shot", "publicdate": "2021-10-31T03:08:50Z",
+         "title": "Diary Of A Wimpy Kid Big Shot ( Book 16)"},
+        {"downloads": 115156, "format": ["Text PDF", "EPUB"], "identifier": "OldSchool_201801",
+         "publicdate": "2018-01-04T07:51:40Z", "title": "Old School Diary Of A Wimpy Kid"},
+        {"downloads": 5, "format": ["EPUB"], "identifier": "cookery-2024",
+         "publicdate": "2024-01-01T00:00:00Z", "title": "A Cookery Book"},
+    ]}}
+    _cands = _fh.archive_candidates(_payload, {"pdf"}, "diary of a wimpy kid")
+    ok &= check("the item that is the book, and has a PDF in it, is opened first",
+                _cands and _cands[0]["identifier"] == "diaryofawimpykidbookseriesbyjeffkinney_202004",
+                str([c["identifier"] for c in _cands]))
+    ok &= check("an item with no PDF of its own is not opened for a PDF request",
+                all(c["identifier"] != "big-shot" for c in _cands))
+
+    _meta = {"server": "ia801234.us.archive.org",
+             "dir": "/12/items/diaryofawimpykidbookseriesbyjeffkinney_202004",
+             "metadata": {"title": ["Diary Of A Wimpy Kid Book Series"],
+                          "publicdate": "2020-04-03T14:01:43Z"},
+             "files": [{"name": "__ia_thumb.jpg"}, {"name": "item_meta.xml"},
+                       {"name": "Diary of a Wimpy Kid.epub", "size": "999"},
+                       {"name": "Diary of a Wimpy Kid.pdf", "size": "1234567"}]}
+    _files = _fh.archive_files(_meta, {"pdf"}, "fallback")
+    ok &= check("the file inside the item is the PDF, with a direct download link",
+                len(_files) == 1 and _files[0]["ext"] == "pdf"
+                and _files[0]["url"].startswith("https://ia801234.us.archive.org/12/items/")
+                and _files[0]["url"].endswith("Wimpy%20Kid.pdf"),
+                _files[0]["url"] if _files else "none")
+    ok &= check("a title that arrives as a list is read, not crashed on",
+                _files and _files[0]["title"].startswith("Diary Of A Wimpy Kid"))
+
+    class _Resp:
+        status_code = 200
+
+        def __init__(self, payload):
+            self._payload = payload
+
+        def json(self):
+            return self._payload
+
+        def raise_for_status(self):
+            return None
+
+    class _Client:
+        async def get(self, url, params=None, **kwargs):
+            return _Resp({"response": {"docs": [
+                {"identifier": "x1", "title": ["A Title In A List"],
+                 "description": ["A description in a list"], "date": ["2024-01-01"],
+                 "mediatype": ["texts"]}]}})
+
+    class _Ctx:
+        client = _Client()
+        limit = 5
+
+        class plan:
+            terms = "diary of a wimpy kid"
+
+    ia_hits = await _IA().hunt(_Ctx())
+    ok &= check("the archive engine survives list-shaped fields instead of erroring out",
+                len(ia_hits) == 1 and ia_hits[0].title == "A Title In A List",
+                str([h.title for h in ia_hits]))
+
     print("\n▸ 16. the engine reads the question before it fetches anything")
     from app import understand
 

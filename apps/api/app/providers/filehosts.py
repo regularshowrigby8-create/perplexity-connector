@@ -200,6 +200,91 @@ class Fdroid(Provider):
         return out
 
 
+def _one(value: Any) -> str:
+    """archive.org returns a string *or a list of strings* for the same field."""
+    if isinstance(value, list):
+        return str(value[0]) if value else ""
+    return "" if value is None else str(value)
+
+
+def archive_candidates(payload: Any, wanted: set[str], text: str) -> list[dict]:
+    """The items worth opening, best first.
+
+    Two things matter for a book (or any document) search and neither is
+    "uploaded most recently": the item should *be* the thing that was asked for,
+    and it should actually contain a file of the type that was asked for. The
+    advancedsearch response already says both (title, format), so most of the
+    work happens before a single item is opened.
+    """
+    rows = _rows(payload)
+    words = [w for w in re.findall(r"[a-z0-9]+", (text or "").lower()) if len(w) > 2]
+
+    def title_of(row: Any) -> str:
+        return _one(row.get("title")) if isinstance(row, dict) else ""
+
+    def has_wanted(row: Any) -> bool:
+        if not wanted:
+            return True
+        formats = row.get("format") if isinstance(row, dict) else None
+        if not formats:
+            return True                      # the response did not say; open it and see
+        if isinstance(formats, str):
+            formats = [formats]
+        hay = " ".join(str(f).lower() for f in formats)
+        return any(ext in hay or (ext == "pdf" and "pdf" in hay) for ext in wanted)
+
+    def score(row: Any) -> tuple:
+        title = title_of(row).lower()
+        matched = sum(1 for word in words if word in title)
+        downloads = 0
+        if isinstance(row, dict):
+            try:
+                downloads = int(row.get("downloads") or 0)
+            except (TypeError, ValueError):
+                downloads = 0
+        return (matched, downloads)
+
+    usable = [row for row in rows if isinstance(row, dict) and row.get("identifier") and has_wanted(row)]
+    usable.sort(key=score, reverse=True)
+    return usable[:5]
+
+
+def archive_files(payload: Any, wanted: set[str], default_title: str = "") -> list[dict]:
+    """The files inside one archive.org item, documents first.
+
+    Returns plain dicts so this can be tested without a network or a client.
+    """
+    metadata = (payload or {}).get("metadata") or {}
+    if not isinstance(metadata, dict):
+        metadata = {}
+    title = _one(metadata.get("title")) or default_title
+    published = (_one(metadata.get("publicdate")) or _one(metadata.get("date"))
+                 or _one((payload or {}).get("publicdate")))
+    server = (payload or {}).get("server") or "archive.org"
+    directory = (payload or {}).get("dir") or ""
+    order = ["pdf", "epub", "djvu.txt", "txt"]
+    files = []
+    for entry in (payload or {}).get("files") or []:
+        if not isinstance(entry, dict):
+            continue
+        name = _one(entry.get("name"))
+        if not name or name.endswith("_meta.xml") or name.endswith("_files.xml"):
+            continue
+        ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
+        if wanted and ext not in wanted:
+            continue
+        if not wanted and ext not in ("pdf", "epub"):
+            continue
+        files.append({
+            "name": name, "ext": ext, "size": _one(entry.get("size")),
+            "url": f"https://{server}{directory}/{quote(name)}",
+            "title": title, "published": published,
+            "rank": order.index(ext) if ext in order else len(order),
+        })
+    files.sort(key=lambda item: item["rank"])
+    return files[:6]
+
+
 class ArchiveFiles(Provider):
     id, name, family, layer = "archivefiles", "Internet Archive (files)", "filehost", "archive"
     description = "archive.org items resolved to the actual files inside them."
@@ -210,54 +295,49 @@ class ArchiveFiles(Provider):
     async def hunt(self, ctx: HuntContext) -> list[RawHit]:
         text = _text(ctx)
         wanted = set(_wanted(ctx))
-        query = f"({text}) AND mediatype:(software OR data OR texts OR audio OR movies)"
+        mediatypes = ("texts" if wanted & {"pdf", "epub", "doc", "docx", "djvu"}
+                      else "software OR data OR texts OR audio OR movies")
         params: list[tuple[str, Any]] = [
-            ("q", query), ("rows", "18"), ("page", "1"), ("output", "json"),
-            ("sort[]", "publicdate desc"),
-            ("fl[]", "identifier"),
+            ("q", f"({text}) AND mediatype:({mediatypes})"),
+            ("rows", "16"), ("page", "1"), ("output", "json"),
+            # a title is answered by the item people actually read, not by
+            # whatever was uploaded this morning
+            ("sort[]", "downloads desc"),
+            ("fl[]", "identifier"), ("fl[]", "title"), ("fl[]", "date"),
+            ("fl[]", "publicdate"), ("fl[]", "format"), ("fl[]", "downloads"),
         ]
         try:
             resp = await ctx.client.get("https://archive.org/advancedsearch.php", params=params)
             if resp.status_code >= 400:
                 return []
-            docs = _rows(resp.json())
+            candidates = archive_candidates(resp.json(), wanted, text)
         except Exception:
             return []
-        identifiers = [str(row.get("identifier") or "") for row in docs if row.get("identifier")][:8]
-        if not identifiers:
+        if not candidates:
             return []
 
-        async def files_for(identifier: str) -> list[RawHit]:
+        async def one(item: dict) -> list[RawHit]:
+            identifier = _one(item.get("identifier"))
             try:
-                meta = await ctx.client.get(f"https://archive.org/metadata/{identifier}")
+                meta = await asyncio.wait_for(
+                    ctx.client.get(f"https://archive.org/metadata/{identifier}"), timeout=3.0)
                 if meta.status_code >= 400:
                     return []
-                payload = meta.json() or {}
+                files = archive_files(meta.json(), wanted, _one(item.get("title")))
             except Exception:
                 return []
-            server = payload.get("server") or "archive.org"
-            directory = payload.get("dir") or f"/{identifier}"
-            made: list[RawHit] = []
-            for entry in payload.get("files") or []:
-                name = str(entry.get("name") or "")
-                ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
-                if not ext or (wanted and ext not in wanted):
-                    continue
-                url = f"https://{server}{directory}/{quote(name)}"
-                made.append(RawHit(
-                    url=url, title=str(payload.get("metadata", {}).get("title") or name) + f" · {name}",
-                    snippet=f"archive.org · {name} · {entry.get('size') or ''}".strip(" ·"),
-                    kind="file", published=str(payload.get("metadata", {}).get("publicdate") or ""),
-                    tags=("filehost", "archive.org", f"ext-{ext}"),
-                    meta={"host": "archive.org", "identifier": identifier, "filename": name,
-                          "size": entry.get("size")},
-                ))
-                if len(made) >= 6:
-                    break
-            return made
+            return [RawHit(
+                url=file["url"],
+                title=f"{file['title']} · {file['name']}",
+                snippet=f"archive.org · {file['name']}" + (f" · {file['size']} bytes" if file["size"] else ""),
+                kind="file", published=file["published"] or _one(item.get("publicdate")) or None,
+                archive=True,
+                tags=("filehost", "archive.org", f"ext-{file['ext']}"),
+                meta={"host": "archive.org", "identifier": identifier,
+                      "filename": file["name"], "size": file["size"]},
+            ) for file in files]
 
-        batches = await asyncio.gather(*(files_for(i) for i in identifiers),
-                                       return_exceptions=True)
+        batches = await asyncio.gather(*(one(item) for item in candidates), return_exceptions=True)
         out: list[RawHit] = []
         for batch in batches:
             if isinstance(batch, list):

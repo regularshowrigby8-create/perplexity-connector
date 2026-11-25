@@ -21,6 +21,9 @@ on:
       - ".github/workflows/live-search.yml"
       # touch a file in here to run the same question again on demand
       - ".github/trigger/**"
+      # and ask again whenever the engine itself changes
+      - "apps/api/app/**"
+      - "scripts/live_search.py"
 
 permissions:
   contents: write

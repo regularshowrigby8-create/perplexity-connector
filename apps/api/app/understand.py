@@ -295,7 +295,18 @@ def read(query: str) -> Understanding:
     understood.phrases = phrases[:5]
     understood.keywords = [word for word in re.findall(r"[a-zà-ÿ0-9][a-zà-ÿ0-9\-]{2,}", lowered)
                            if word not in FILE_WORDS][:12]
-    understood.subject = phrases[0] if phrases else " ".join(understood.keywords[:6])
+    # A short query is a title, not a bag of keywords: RAKE drops the little
+    # words, which turns "diary of a wimpy kid" into "wimpy kid" — and that is
+    # not what the person is looking for. Six words or fewer keeps its shape.
+    tokens = re.findall(r"[\w'’-]+", raw)
+    kept_tokens = [token for token in tokens if token.lower() not in FILE_WORDS]
+    if 1 <= len(kept_tokens) <= 6:
+        understood.subject = " ".join(kept_tokens)
+        if understood.subject and understood.subject.lower() not in {p.lower() for p in phrases}:
+            phrases.insert(0, understood.subject)
+            understood.phrases = phrases[:6]
+    else:
+        understood.subject = phrases[0] if phrases else " ".join(understood.keywords[:6])
 
     # ---- conflicts worth saying out loud
     now_year = datetime.now(timezone.utc).year

@@ -139,14 +139,30 @@ class InternetArchive(Provider):
         ]
         data = await get_json(ctx, "https://archive.org/advancedsearch.php", params=params)
         docs = ((data.get("response") or {}).get("docs")) or []
-        return [RawHit(
-            url=f"https://archive.org/details/{d.get('identifier')}",
-            title=clean(d.get("title")) or str(d.get("identifier")),
-            snippet=clean(d.get("description")),
-            kind="document", published=d.get("date"), archive=True,
-            tags=("internet-archive", d.get("mediatype") or ""),
-            meta={"mediatype": d.get("mediatype")},
-        ) for d in docs[:ctx.limit]]
+
+        def one(value) -> str:
+            # archive.org gives the same field as a string on one item and a
+            # list on the next; a list used to crash the whole engine
+            if isinstance(value, list):
+                return " ".join(str(item) for item in value if item)
+            return "" if value is None else str(value)
+
+        out: list[RawHit] = []
+        for doc in docs[:ctx.limit]:
+            if not isinstance(doc, dict):
+                continue
+            identifier = one(doc.get("identifier"))
+            if not identifier:
+                continue
+            out.append(RawHit(
+                url=f"https://archive.org/details/{identifier}",
+                title=clean(one(doc.get("title"))) or identifier,
+                snippet=clean(one(doc.get("description"))),
+                kind="document", published=one(doc.get("date")) or None, archive=True,
+                tags=("internet-archive", one(doc.get("mediatype"))),
+                meta={"mediatype": one(doc.get("mediatype"))},
+            ))
+        return out
 
 
 class ArquivoPT(Provider):
