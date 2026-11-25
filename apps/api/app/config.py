@@ -74,7 +74,7 @@ class Settings(BaseSettings):
     # One hop out: after the indexes answer, open the best few pages and take
     # the files and dates inside them. This is the crawler's own share of the
     # budget, and it is bounded so it can never own the answer's latency.
-    discover_ms: int = 1600
+    discover_ms: int = 1800
     discover_seeds: int = 6
 
     # the recency window every search answer lives inside

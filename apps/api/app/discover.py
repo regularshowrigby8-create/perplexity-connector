@@ -36,7 +36,8 @@ FILE_EXTS = {"pdf", "epub", "mobi", "djvu", "doc", "docx", "xls", "xlsx", "csv",
 # guess by a wide margin.
 DATE_META = ("article:published_time", "datepublished", "date", "pubdate", "publishdate",
              "dc.date", "dc.date.issued", "sailthru.date", "parsely-pub-date", "og:updated_time")
-PAGE_TIMEOUT = 1.2
+PAGE_TIMEOUT = 1.8
+MAX_BYTES = 400_000   # a page's head is the nav, the links and the metadata
 OFFER_HINTS = ("download", "/details/", "/doc/", "/document/", "/view/", "flipbook",
                "issuu", "yumpu", "fliphtml5", "scribd", "pubhtml5")
 
@@ -170,25 +171,43 @@ async def hop(hits: list[Any], client: Any, *, terms: list[str], types: list[str
     known = {getattr(h, "url", "") for h in hits}
     deadline = started + max(0.2, budget_s)
 
+    async def read_page(url: str, left: float) -> str | None:
+        """The page's first few hundred kilobytes, and nothing more.
+
+        Reading to the end of an archive.org item page is what made the hop
+        cost seconds. The links and the metadata are in the head, so the read
+        stops there — which is both faster and politer than pulling the whole
+        document to look at its first screen.
+        """
+        timeout = min(PAGE_TIMEOUT, max(0.3, left))
+        async with client.stream("GET", url, timeout=timeout,
+                                 headers={"Accept": "text/html,application/xhtml+xml"}) as resp:
+            if resp.status_code >= 400:
+                return None
+            ctype = (resp.headers.get("content-type") or "html").lower()
+            if "html" not in ctype and "xml" not in ctype:
+                return None
+            chunks: list[bytes] = []
+            size = 0
+            async for chunk in resp.aiter_bytes():
+                chunks.append(chunk)
+                size += len(chunk)
+                if size >= MAX_BYTES:
+                    break
+            return b"".join(chunks).decode(resp.encoding or "utf-8", "replace")
+
     async def one(seed: Any) -> list[RawHit]:
         left = deadline - time.perf_counter()
         if left <= 0:
             stats["skipped"] += 1
             return []
         try:
-            # A page gets a second, not the answer's whole latency: a hop that is
-            # slow is a hop that is skipped and counted.
-            resp = await client.get(getattr(seed, "url", ""),
-                                    timeout=min(PAGE_TIMEOUT, max(0.3, left)),
-                                    headers={"Accept": "text/html,application/xhtml+xml"})
-            if resp.status_code >= 400:
-                stats["skipped"] += 1
-                return []
-            if "html" not in (resp.headers.get("content-type") or "html").lower():
+            html = await read_page(getattr(seed, "url", ""), left)
+            if html is None:
                 stats["skipped"] += 1
                 return []
             stats["pages_read"] += 1
-            links = file_links(resp.text, str(seed.url), terms, types, cap=cap_per_page)
+            links = file_links(html, str(seed.url), terms, types, cap=cap_per_page)
         except Exception:
             stats["skipped"] += 1
             return []

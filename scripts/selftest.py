@@ -937,8 +937,10 @@ async def main() -> int:
                         provider="x", provider_name="X", kind="document", file_ext="pdf")])]
                 == ["https://archive.org/details/x"])
 
-    ok &= check("the hop never waits longer than a second for a page",
-                _discover.PAGE_TIMEOUT <= 1.2, str(_discover.PAGE_TIMEOUT))
+    ok &= check("the hop never waits long for a page",
+                _discover.PAGE_TIMEOUT <= 1.8, str(_discover.PAGE_TIMEOUT))
+    ok &= check("and reads only the head of it, not the whole document",
+                _discover.MAX_BYTES <= 600_000, str(_discover.MAX_BYTES))
 
     print("\n▸ 16. the engine reads the question before it fetches anything")
     from app import understand
