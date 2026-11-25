@@ -1080,6 +1080,454 @@
     }
 
   }
+
+  /* =========================================================== refined layer
+     One accent, serif headings, real spacing, quiet borders. The engine's
+     personality lives in what it returns, not in neon labels shouting about it.
+     Everything below overrides the older tokens and components; no hook that
+     the JavaScript uses (.deep-row, .tick, .pill, .lens, .field, ids) is
+     renamed, only repainted. */
+  :root {
+    --bg: #0c0e12;
+    --bg2: #10131a;
+    --panel: #12161d;
+    --panel2: #171c24;
+    --line: #232a35;
+    --line2: #2e3745;
+    --ink: #edf0f5;
+    --ink2: #c2c9d4;
+    --muted: #8b95a4;
+    --dim: #68717f;
+    --lime: #a8d9a0;
+    --cyan: #8fc9d8;
+    --amber: #e0bb84;
+    --red: #e5928f;
+    --violet: #b6a8dd;
+    --accent: #e0bb84;
+    --accent-ink: #1a1509;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --radius: 14px;
+    --radius-sm: 9px;
+  }
+
+  body {
+    background: var(--bg);
+    font-size: 15.5px;
+    line-height: 1.65;
+    letter-spacing: 0.005em;
+  }
+
+  .wrap {
+    max-width: 1040px;
+  }
+
+  .section {
+    padding: 58px 0;
+  }
+
+  h1.title {
+    font-family: var(--serif);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+    font-size: 52px;
+    margin: 18px 0 0;
+  }
+
+  h1.title .grad {
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .head h2,
+  .lede,
+  .note,
+  .deep-row .s {
+    letter-spacing: 0;
+  }
+
+  .head h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 26px;
+  }
+
+  .lede {
+    font-size: 17.5px;
+    line-height: 1.7;
+    color: var(--ink2);
+    max-width: 62ch;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .warn-strip {
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--accent);
+    background: var(--panel);
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
+    color: var(--ink2);
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+
+  .warn-strip strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .warn-mark {
+    color: var(--accent);
+  }
+
+  .cap {
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+
+  .cap b {
+    color: var(--ink2);
+    font-weight: 600;
+  }
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .02) inset;
+    padding: 18px;
+  }
+
+  .field {
+    border: 1px solid var(--line2);
+    background: var(--bg2);
+    border-radius: var(--radius-sm);
+    height: 56px;
+  }
+
+  .field:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(224, 187, 132, .1);
+  }
+
+  .field input {
+    font-size: 16.5px;
+    color: var(--ink);
+  }
+
+  .field .glyph {
+    color: var(--muted);
+  }
+
+  .btn {
+    border: 1px solid var(--line2);
+    background: var(--panel2);
+    color: var(--ink);
+    border-radius: var(--radius-sm);
+    padding: 12px 18px;
+    font-size: 14.5px;
+    font-weight: 500;
+    box-shadow: none;
+    transition: background .16s ease, border-color .16s ease, transform .16s ease;
+  }
+
+  .btn:hover {
+    border-color: var(--line2);
+    background: #1c222b;
+    transform: translateY(-1px);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+
+  .btn-primary:hover {
+    background: #eccb98;
+    border-color: #eccb98;
+  }
+
+  .btn-sm {
+    padding: 8px 13px;
+    font-size: 13px;
+  }
+
+  .lens {
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+
+  .lens[aria-pressed="true"],
+  .lens.is-on {
+    background: var(--panel2);
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .stats {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel);
+    overflow: hidden;
+  }
+
+  .stat {
+    border-right: 1px solid var(--line);
+    padding: 18px 16px;
+  }
+
+  .stat:last-child {
+    border-right: 0;
+  }
+
+  .stat .n {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 28px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .stat .n.lime,
+  .stat .n.cyan,
+  .stat .n.amber {
+    color: var(--ink);
+  }
+
+  .stat .l {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .card {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: var(--radius);
+    padding: 22px;
+    transition: border-color .16s ease, transform .16s ease;
+  }
+
+  .card:hover {
+    border-color: var(--line2);
+    transform: translateY(-2px);
+  }
+
+  .card h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+  }
+
+  .card p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .pill {
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: 11.5px;
+    letter-spacing: 0.01em;
+  }
+
+  .pill.lime,
+  .pill.cyan,
+  .pill.amber,
+  .pill.violet {
+    background: transparent;
+    border-color: var(--line2);
+    color: var(--ink2);
+  }
+
+  .chip {
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    border-radius: 999px;
+    font-size: 12.5px;
+  }
+
+  .chip.online {
+    border-color: rgba(168, 217, 160, .5);
+    color: var(--lime);
+  }
+
+  .chip.offline {
+    border-color: rgba(224, 187, 132, .4);
+    color: var(--amber);
+  }
+
+  .note {
+    border: 1px solid var(--line);
+    background: var(--bg2);
+    border-radius: var(--radius-sm);
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.65;
+    padding: 14px 16px;
+  }
+
+  .deep-row {
+    border-bottom: 1px solid var(--line);
+    padding: 18px 0;
+  }
+
+  .deep-row .t a {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .deep-row .t a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .deep-row .u {
+    font-size: 12.5px;
+    color: var(--dim);
+    margin-top: 3px;
+    word-break: break-all;
+  }
+
+  .deep-row .s {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-top: 8px;
+  }
+
+  .deep-counts .tick {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12.5px;
+    padding: 5px 12px;
+  }
+
+  .deep-counts .tick b {
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 14px;
+  }
+
+  .deep-controls label,
+  .deep-controls select,
+  .deep-controls input[type=number] {
+    border-color: var(--line2);
+    border-radius: var(--radius-sm);
+    background: var(--bg2);
+    color: var(--ink2);
+  }
+
+  .link-form {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1fr;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .link-form label {
+    display: grid;
+    gap: 7px;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .link-form input[type=text],
+  .link-form input[type=url],
+  .link-form input[type=number],
+  .link-form select {
+    border: 1px solid var(--line2);
+    background: var(--bg2);
+    color: var(--ink);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: var(--sans);
+    width: 100%;
+  }
+
+  .link-form input:focus,
+  .link-form select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(224, 187, 132, .1);
+  }
+
+  .link-form .row {
+    align-items: end;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .link-form .inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--muted);
+  }
+
+  .template-line {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    word-break: break-all;
+  }
+
+  .banner {
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--amber);
+    background: var(--panel);
+    border-radius: var(--radius-sm);
+  }
+
+  .foot {
+    color: var(--dim);
+    font-size: 12.5px;
+  }
+
+  @media (max-width: 720px) {
+    h1.title { font-size: 36px; }
+    .section { padding: 38px 0; }
+    .stat { border-right: 0; border-bottom: 1px solid var(--line); }
+  }
 </style>
 </head>
 <body>
@@ -1098,8 +1546,7 @@
       <a href="#deploy">Deploy</a>
     </nav>
     <div class="nav-right">
-      <span class="chip-warn" title="No popularity ranking, no freshness gate, no authority penalty — buried-first by design.">buried-first</span>
-      <span class="chip" id="status"><span class="dot"></span><span id="status-text">checking engine</span></span>
+            <span class="chip" id="status"><span class="dot"></span><span id="status-text">checking engine</span></span>
       <a class="btn btn-sm" id="open-app" href="#" target="_blank" rel="noreferrer noopener">API docs ↗</a>
     </div>
   </div>
@@ -1108,35 +1555,35 @@
 <main id="top">
   <section class="hero">
     <div class="wrap hero-in">
-      <span class="eyebrow"><span class="pulse"></span>119 remote engines · 86-engine crawl arsenal · zero keys</span>
-      <h1 class="title">Find what search<br/><span class="grad"> engines bury.</span></h1>
+      <span class="eyebrow"><span class="pulse"></span>119 sources · 86 site crawlers · no keys needed</span>
+      <h1 class="title">Find the files<br/><span class="grad">search engines bury.</span></h1>
       <p class="lede">
-        Nighthawk is a <b>fusion crawler</b> that walks the web itself, reads raw crawl archives and
-        queries every structured engine it can reach — then extracts, indexes and ranks the
-        <b>hosted files, open calls and portals</b> that a normal results page never shows you.
+        Search the open web for what ordinary search skips — <b>documents, forms, notices and
+        data</b> sitting in upload folders, portals and old directories. Results are matched exactly
+        as you type them, nothing is quietly removed, and you can always see why something matched.
       </p>
 
       <div class="warn-strip" data-verbatim="1" role="note">
         <span class="warn-mark">!</span>
         <div>
-          <strong>This engine does not rank by popularity, and it does not filter like one.</strong>
+          <strong>No popularity ranking. No quiet filtering.</strong>
           <p>
-            The point of Nighthawk is the material a normal results page demotes or drops: the PDF in
-            <span class="mono">/uploads/2019/03/</span>, the tender notice behind a portal search, the
-            “Index of /” listing nobody linked, the spreadsheet in a data dump, the page the site deleted.
-            No freshness gate, no “helpful content” scorer, no domain-authority penalty.
-            Queries are matched <b>word for word</b> — no stemming, no synonyms, no expansion — and
-            nothing is removed from the result set: duplicates are reported, junk is labelled and
-            sorted last. Sort order can change; that policy does not.
+            What you get is the material a normal results page demotes or drops: the PDF in
+            <span class="mono">/uploads/2019/03/</span>, the notice behind a portal search, the
+            “Index of /” listing nobody linked, the spreadsheet in a data dump.
+            Your words are matched <b>exactly</b> — no stemming, no synonyms, no guessing — and
+            nothing is taken out of the results: duplicates are labelled, low-quality pages are marked
+            and moved to the end. Type a file type (<b>pdf</b>, <b>apk</b>, <b>csv</b>) to keep only
+            that kind of file.
           </p>
         </div>
       </div>
 
       <div class="caps" role="list" aria-label="What this engine promises">
-        <span class="cap" role="listitem"><b>verbatim</b> word for word, no stemming</span>
-        <span class="cap" role="listitem"><b>newest first</b> to the second</span>
-        <span class="cap" role="listitem"><b>nothing removed</b> junk labelled, copies reported</span>
-        <span class="cap" role="listitem"><b>deep links</b> crawl pages only a pasted URL can reach</span>
+        <span class="cap" role="listitem"><b>exact words</b> matched as typed</span>
+        <span class="cap" role="listitem"><b>newest first</b> down to the second</span>
+        <span class="cap" role="listitem"><b>nothing hidden</b> duplicates and junk are labelled</span>
+        <span class="cap" role="listitem"><b>pasted links</b> reach pages nothing links to</span>
       </div>
 
       <div class="panel" id="hunt">
@@ -1144,15 +1591,15 @@
           <div class="field">
             <span class="glyph">⌕</span>
             <input id="q" type="search" placeholder="climate grants for coastal towns in Kenya" aria-label="Search query" />
-            <span class="tiny" style="white-space:nowrap">⏎ hunt</span>
+            <span class="tiny" style="white-space:nowrap">⏎ search</span>
           </div>
-          <button class="btn btn-primary" type="submit">Hunt</button>
-          <button class="btn" type="button" id="crawl-btn" title="Take the query into the crawler">Crawl instead</button>
+          <button class="btn btn-primary" type="submit">Search</button>
+          <button class="btn" type="button" id="crawl-btn" title="If you typed a URL, walk that site">Crawl a site</button>
         </form>
         <div class="lens-row" id="lenses" role="group" aria-label="Search lens"></div>
         <div class="lens-row" id="types" role="group" aria-label="File type"></div>
         <div class="row" style="margin-top:10px">
-          <button class="link-btn" type="button" id="settings-toggle">engine settings</button>
+          <button class="link-btn" type="button" id="settings-toggle">connection settings</button>
         </div>
         <div class="settings" id="settings">
           <div>
@@ -1193,47 +1640,47 @@
 
   <section class="wrap section">
     <div class="stats">
-      <div class="stat"><div class="n lime" id="s-remote">119</div><div class="l">remote engines</div></div>
-      <div class="stat"><div class="n cyan" id="s-arsenal">86</div><div class="l">arsenal engines</div></div>
-      <div class="stat"><div class="n" id="s-ready">—</div><div class="l">live in this box</div></div>
-      <div class="stat"><div class="n amber" id="s-portals">54</div><div class="l">portal universe</div></div>
-      <div class="stat"><div class="n" id="s-files">0</div><div class="l">files in vault</div></div>
-      <div class="stat"><div class="n" id="s-docs">0</div><div class="l">docs indexed</div></div>
+      <div class="stat"><div class="n lime" id="s-remote">119</div><div class="l">sources</div></div>
+      <div class="stat"><div class="n cyan" id="s-arsenal">86</div><div class="l">site crawlers</div></div>
+      <div class="stat"><div class="n" id="s-ready">—</div><div class="l">ready now</div></div>
+      <div class="stat"><div class="n amber" id="s-portals">54</div><div class="l">portals</div></div>
+      <div class="stat"><div class="n" id="s-files">0</div><div class="l">files saved</div></div>
+      <div class="stat"><div class="n" id="s-docs">0</div><div class="l">documents</div></div>
     </div>
   </section>
 
   <section class="wrap section">
-    <div class="head"><h2>Seven ways in</h2><span class="rule"></span><span class="tiny">hunt and crawl run on this page · the rest are the engine’s own endpoints</span></div>
+    <div class="head"><h2>What you can do here</h2><span class="rule"></span><span class="tiny">search and crawling run on this page</span></div>
     <div class="grid">
       <a class="card" href="#live" data-route="hunt">
         <div class="top"><span class="pill lime">federated</span></div>
-        <h3>Hunt</h3>
-        <p>One query fans out to every reachable engine, folds near-duplicates into the richest record, then fuses by reciprocal rank — funder, amount, location and closing date attached.</p>
+        <h3>Search</h3>
+        <p>One search across every working source: documents, forms, tenders, datasets and portals, newest first, with the deadline and the funder attached where they exist.</p>
       </a>
       <a class="card" href="#live" data-route="crawl">
         <div class="top"><span class="pill cyan">primary</span></div>
-        <h3>Fusion crawler</h3>
-        <p>Point it at seeds or a query. It harvests, walks the frontier, opens PDFs and spreadsheets, and indexes the text.</p>
+        <h3>Crawl a site</h3>
+        <p>Give it a URL and it walks the site — pages, PDFs, spreadsheets, downloads — then reads and saves what it finds.</p>
       </a>
       <a class="card" href="#arsenal-link" data-route="arsenal">
         <div class="top"><span class="pill violet">86 engines</span></div>
-        <h3>Arsenal</h3>
-        <p>Crawlee, Scrapy, Katana, hakrawler, gau, ffuf, trafilatura, pypdf — probed live, dispatched by role.</p>
+        <h3>Crawlers</h3>
+        <p>The tools it can call, and whether each one is working right now. Nothing is faked: a source that fails says so.</p>
       </a>
       <a class="card" href="#vault-link" data-route="vault">
         <div class="top"><span class="pill amber">local</span></div>
-        <h3>Vault</h3>
-        <p>SQLite FTS5 + Whoosh + Tantivy over metadata and extracted full text. Works with the network unplugged.</p>
+        <h3>Your index</h3>
+        <p>Everything it has saved, searchable offline — including the text inside the documents, not just their titles.</p>
       </a>
       <a class="card" href="#deep">
         <div class="top"><span class="pill lime">deep links</span></div>
-        <h3>Deep crawl</h3>
-        <p>Paste exact URLs a search engine never crawled — portal notices, unlinked annexes, sitemap-only pages — and get a report of why nothing else could reach them.</p>
+        <h3>Pasted links</h3>
+        <p>Paste exact URLs no search engine has crawled — portal notices, unlinked annexes — and see why nothing else could reach them.</p>
       </a>
-      <a class="card" href="#hunts-link" data-route="hunts">
-        <div class="top"><span class="pill">diffing</span></div>
-        <h3>Watchers</h3>
-        <p>Save a hunt, run it again later — it only reports URLs it has genuinely never seen before.</p>
+      <a class="card" href="#similar" data-route="similar">
+        <div class="top"><span class="pill">link patterns</span></div>
+        <h3>Similar links</h3>
+        <p>Paste one link — a form, a record, a file — and find every other link built the same way, filtered by a word or phrase.</p>
       </a>
       <a class="card" href="#api-link" data-route="api/docs">
         <div class="top"><span class="pill cyan">rest</span></div>
@@ -1243,8 +1690,47 @@
     </div>
   </section>
 
+  <section class="wrap section" id="similar">
+    <div class="head"><h2>Similar links</h2><span class="rule"></span><span class="tiny">find every other link shaped like this one</span></div>
+    <p class="note" style="margin-bottom:16px">
+      Paste a link you already have. Its shape is kept — an id becomes a wildcard, so
+      <span class="mono">/forms/d/e/{id}/viewform</span> stays and the id does not — and every link with the
+      same shape turns up. Add a word or phrase to keep only the links that mention it. The ones it rejects
+      are still listed underneath, so a strict phrase never looks like an empty web.
+    </p>
+    <form class="link-form" id="link-form" autocomplete="off">
+      <label>Link
+        <input id="link-seed" type="url" placeholder="https://docs.google.com/forms/d/e/…/viewform" required />
+      </label>
+      <label>Word or phrase <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(optional — matched against the link and its text)</span>
+        <input id="link-phrase" type="text" placeholder="round 4" />
+      </label>
+      <div class="row">
+        <label style="flex:0 0 120px">How deep
+          <select id="link-depth">
+            <option value="1">1 level</option>
+            <option value="2" selected>2 levels</option>
+            <option value="3">3 levels</option>
+          </select>
+        </label>
+        <label style="flex:0 0 120px">Max pages
+          <input id="link-pages" type="number" min="1" max="200" value="30" />
+        </label>
+        <label class="inline"><input id="link-same" type="checkbox" checked /> same site only</label>
+        <label class="inline"><input id="link-engines" type="checkbox" checked /> ask the engine too</label>
+        <button class="btn btn-primary" type="submit">Find similar links</button>
+      </div>
+    </form>
+    <div class="deep-counts" id="link-counts"></div>
+    <div class="row" style="margin:10px 0 4px">
+      <span class="template-line" id="link-template"></span>
+      <button class="btn btn-sm" type="button" id="link-copy" hidden>copy all</button>
+    </div>
+    <div class="deep-results" id="link-out"></div>
+  </section>
+
   <section class="wrap section deep" id="deep">
-    <div class="head"><h2>Deep links — the results only a pasted URL can reach</h2><span class="rule"></span><span class="tiny">no search engine involved</span></div>
+    <div class="head"><h2>Pasted links — pages nothing links to</h2><span class="rule"></span><span class="tiny">no search engine involved</span></div>
     <p class="dim" style="max-width:86ch;margin:0 0 14px">
       A portal’s search form, an unlinked annex, a sitemap entry nothing points at, an attachment behind
       a JavaScript link, a page the site deleted — none of that can be ranked by an engine that never
@@ -1282,7 +1768,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   </section>
 
   <section class="wrap section" id="practice">
-    <div class="head"><h2>Prove it in 20 seconds — no internet needed</h2><span class="rule"></span><span class="tiny">offline practice target</span></div>
+    <div class="head"><h2>Try it on a sample site</h2><span class="rule"></span><span class="tiny">works without an internet connection</span></div>
     <div class="steps">
       <div class="step">
           <div>
@@ -1311,7 +1797,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   </section>
 
   <section class="wrap section" id="deploy">
-    <div class="head"><h2>Launch</h2><span class="rule"></span><span class="tiny">zero config, no keys</span></div>
+    <div class="head"><h2>Run it yourself</h2><span class="rule"></span><span class="tiny">no configuration, no API keys</span></div>
     <div class="cmds">
       
         <div class="cmd">
@@ -1349,9 +1835,9 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
 <footer>
   <div class="wrap foot">
-    <span class="mono">NIGHTHAWK v1.2 · type-aware</span>
+    <span class="mono">NIGHTHAWK v1.3</span>
     <span class="dim">·</span>
-    <span>119 remote engines · 86 arsenal engines · 54 portals · verbatim &amp; unrestricted</span>
+    <span>119 sources · 86 site crawlers · 54 portals · exact matching</span>
     <span class="dim">·</span>
     <a href="#api-link" data-route="api/docs">API</a>
     <a href="#arsenal-link" data-route="arsenal">Engine status</a>
@@ -1492,6 +1978,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     "arsenal": "/api/v1/arsenal",
     "vault": "/api/v1/vault",
     "hunts": "/api/v1/hunts",
+    "similar": "#similar",
     "api/docs": "/api/docs"
   };
 
@@ -1580,6 +2067,18 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
   wireRoutes();
   renderTypes();
+
+  document.getElementById("link-form").addEventListener("submit", function (event) {
+    event.preventDefault();
+    runLinks();
+  });
+  document.getElementById("link-copy").addEventListener("click", function () {
+    var text = Array.prototype.map.call(
+      document.querySelectorAll("#link-out .deep-row .u"), function (node) { return node.textContent; }
+    ).join("\n");
+    if (navigator.clipboard) navigator.clipboard.writeText(text);
+    toast(text.split("\n").length + " links copied");
+  });
 
   // ------------------------------------------------------------------- probe
   function setStatus(state, text) {
@@ -2131,6 +2630,152 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       box.appendChild(row);
     });
     deepEl("deep-export").disabled = false;
+  }
+
+  // ------------------------------------------------------------ similar links
+  // A seed link is reduced to its shape (ids become wildcards) and every link
+  // with that shape is collected: from the pages around the seed, and from the
+  // engine, which is asked for the literal prefix. A phrase filters the list;
+  // whatever it rejects is still shown under "didn't match", never hidden.
+  function linkEl(id) { return document.getElementById(id); }
+
+  function renderLinks(report) {
+    var links = report.links || [];
+    var near = report.near || [];
+    var stats = report.stats || {};
+
+    linkEl("link-template").textContent = report.template || "";
+    linkEl("link-copy").hidden = links.length === 0;
+
+    var bar = linkEl("link-counts");
+    bar.innerHTML = "";
+    function tick(label, value, title) {
+      var node = document.createElement("span");
+      node.className = "tick";
+      node.title = title || label;
+      node.innerHTML = "<b>" + value + "</b> " + label;
+      bar.appendChild(node);
+    }
+    tick("links", links.length, "same shape" + (report.phrase ? " and matching your phrase" : ""));
+    tick("pages read", stats.pages_fetched || 0, "pages fetched around the seed");
+    tick("links seen", stats.anchors_seen || 0, "every link on those pages");
+    if (report.phrase) {
+      tick("didn't match", stats.phrase_rejected || 0, "same shape, phrase not found — still listed below");
+    }
+    if (stats.errors) tick("errors", stats.errors, "fetches or sources that failed");
+
+    var box = linkEl("link-out");
+    box.innerHTML = "";
+
+    function row(item, dimmed, why) {
+      var article = document.createElement("article");
+      article.className = "deep-row";
+      if (dimmed) article.style.opacity = "0.62";
+
+      var top = document.createElement("div");
+      top.className = "t";
+      var link = document.createElement("a");
+      link.href = item.url;
+      link.target = "_blank";
+      link.rel = "noreferrer noopener";
+      link.textContent = item.text || item.url;
+      top.appendChild(link);
+      if (item.url === report.seed) top.appendChild(pill("your link", "pill lime", "this is the link you pasted"));
+      if (item.phrase_ok && report.phrase) {
+        top.appendChild(pill("phrase in " + (item.phrase_where || []).join(" + "), "pill", "where your phrase was found"));
+      }
+      if (dimmed) top.appendChild(pill("phrase not found", "pill muted", why));
+      article.appendChild(top);
+
+      var where = document.createElement("div");
+      where.className = "u";
+      where.textContent = item.url;
+      article.appendChild(where);
+
+      var found = document.createElement("div");
+      found.className = "deep-badges";
+      (item.found_on || []).slice(0, 3).forEach(function (source) {
+        found.appendChild(pill("found on " + source.replace(/^engine:.*/, "the engine"), "pill muted", source));
+      });
+      article.appendChild(found);
+      return article;
+    }
+
+    if (!links.length) {
+      var empty = document.createElement("div");
+      empty.className = "note";
+      empty.textContent = report.phrase
+        ? "Nothing with that shape also matched your phrase. Every same-shape link is below."
+        : "No other link with that shape turned up. Try more pages or a higher depth.";
+      box.appendChild(empty);
+    }
+    links.forEach(function (item) { box.appendChild(row(item, false, "")); });
+
+    if (near.length) {
+      var heading = document.createElement("div");
+      heading.className = "note";
+      heading.style.margin = "18px 0 0";
+      heading.textContent = near.length + " more link" + (near.length === 1 ? "" : "s") +
+        " with the same shape didn't mention “" + report.phrase + "”. Shown, not hidden:";
+      box.appendChild(heading);
+      near.slice(0, 60).forEach(function (item) {
+        box.appendChild(row(item, true, "your phrase was not in the link or its text"));
+      });
+    }
+
+    if ((report.errors || []).length) {
+      var errs = document.createElement("details");
+      errs.className = "note";
+      errs.style.marginTop = "14px";
+      var summary = document.createElement("summary");
+      summary.textContent = report.errors.length + " fetch or source problem" +
+        (report.errors.length === 1 ? "" : "s") + " (nothing hidden)";
+      errs.appendChild(summary);
+      var list = document.createElement("ul");
+      report.errors.slice(0, 20).forEach(function (line) {
+        var li = document.createElement("li");
+        li.textContent = line;
+        list.appendChild(li);
+      });
+      errs.appendChild(list);
+      box.appendChild(errs);
+    }
+
+    linkEl("similar").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function runLinks() {
+    var seed = linkEl("link-seed").value.trim();
+    if (!seed) { linkEl("link-seed").focus(); return; }
+    if (!/^https?:\/\//i.test(seed)) { toast("the link needs to start with http:// or https://"); return; }
+    var body = {
+      seed: seed,
+      phrase: linkEl("link-phrase").value.trim(),
+      match_in: "both",
+      depth: parseInt(linkEl("link-depth").value, 10) || 2,
+      max_pages: Math.max(1, parseInt(linkEl("link-pages").value, 10) || 30),
+      max_links: 300,
+      same_host: linkEl("link-same").checked,
+      use_engines: linkEl("link-engines").checked,
+      respect_robots: true
+    };
+    linkEl("link-counts").innerHTML = "";
+    var loading = document.createElement("div");
+    loading.className = "note";
+    loading.textContent = "Reading the shape, then looking for it…";
+    linkEl("link-out").innerHTML = "";
+    linkEl("link-out").appendChild(loading);
+
+    post("/api/v1/links", body).then(function (report) {
+      renderLinks(report);
+      toast((report.links || []).length + " similar link" + ((report.links || []).length === 1 ? "" : "s"));
+    }).catch(function (err) {
+      linkEl("link-out").innerHTML = "";
+      var bad = document.createElement("div");
+      bad.className = "note";
+      bad.textContent = "Couldn't read that link: " + err.message;
+      linkEl("link-out").appendChild(bad);
+    });
   }
 
   function runDeep() {

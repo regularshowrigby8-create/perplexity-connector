@@ -398,6 +398,54 @@ async def main() -> int:
     ok &= check("a record dated in the future no longer outranks the past",
                 order.index("old") < order.index("future"), str(order))
 
+    print("\n\u25b8 9. similar links: one link in, every link of that shape out")
+    from app.links import LinkRequest, find_links, template_of
+
+    form = ("https://docs.google.com/forms/d/e/"
+            "1FAIpQLSeUgRo9ZXDqQIE3U4J2uGECV3SApcHs5M95tBlbaflCeSp52w/viewform")
+    shape = template_of(form)
+    ok &= check("a form link reduces to a shape, id blanked",
+                shape["template"].endswith("/forms/d/e/{id}/viewform"), shape["template"])
+    ok &= check("the shape is a pattern, not a fixed string",
+                "{id}" not in shape["regex"] and "[A-Za-z0-9_" in shape["regex"])
+
+    seed = f"http://127.0.0.1:{PORT}/demo/forms/a1b2c3d4e5f60718/view.html"
+    found = await find_links(LinkRequest(seed=seed, phrase="", depth=2, max_pages=12,
+                                         use_engines=False, delay=0.0))
+    urls = [row["url"] for row in found["links"]]
+    siblings = [u for u in urls if "/forms/" in u and u != seed]
+    ok &= check("it finds the other links with that shape", len(siblings) >= 3, str(len(siblings)))
+    ok &= check("every match really shares the shape",
+                all("/forms/" in u and u.endswith("/view.html") for u in urls), str(urls[:2]))
+    ok &= check("it says where each one was found",
+                all(row["found_on"] for row in found["links"]))
+
+    filtered = await find_links(LinkRequest(seed=seed, phrase="solar", depth=2, max_pages=12,
+                                            use_engines=False, delay=0.0))
+    ok &= check("a phrase keeps only the links that mention it",
+                len(filtered["links"]) == 1 and "deadbeefcafe0123" in filtered["links"][0]["url"],
+                str([r["url"] for r in filtered["links"]]))
+    ok &= check("and says where the phrase matched (link or text)",
+                filtered["links"][0]["phrase_where"] == ["text"],
+                str(filtered["links"][0]["phrase_where"]))
+    ok &= check("links the phrase rejects are reported, not hidden",
+                len(filtered["near"]) >= 3, str(len(filtered["near"])))
+
+    impossible = await find_links(LinkRequest(seed=seed, phrase="nowhere-at-all-xyz",
+                                              depth=1, max_pages=6, use_engines=False, delay=0.0))
+    ok &= check("an impossible phrase returns nothing matched but still lists the shape",
+                impossible["links"] == [] and len(impossible["near"]) >= 1,
+                str(impossible["stats"]))
+
+    launcher_html = (ROOT / "index.html").read_text(encoding="utf-8")
+    ok &= check("the launcher has the link crawler panel",
+                'id="link-seed"' in launcher_html and 'id="link-form"' in launcher_html
+                and 'id="link-out"' in launcher_html)
+    ok &= check("the panel posts to the link endpoint",
+                "/api/v1/links" in launcher_html)
+    ok &= check("the refined look replaced the neon tokens",
+                "--accent:" in launcher_html and "Iowan Old Style" in launcher_html)
+
     httpd.shutdown()
     print("\n" + ("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED"))
     return 0 if ok else 1

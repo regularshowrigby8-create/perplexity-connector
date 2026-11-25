@@ -123,6 +123,56 @@ reasons arrive. The offline practice target includes a page that is linked from 
 (`demo/annex/off-cycle-notice.html`) so the feature can be proven without the internet — the self-test
 asserts that a normal crawl cannot find it and a pasted deep crawl can.
 
+## Similar links — one link in, the rest of that shape out
+
+Forms, notice portals and government document systems rarely publish an index. Each item lives at its
+own link with one changing segment — an id, a slug, a code:
+
+```
+https://docs.google.com/forms/d/e/1FAIpQLSeUgRo9ZXDqQIE3U4J2uGECV3SApcHs5M95tBlbaflCeSp52w/viewform
+                                    └────────────── the only part that changes ──────────────┘
+```
+
+Paste any one of them into **Similar links**, and Nighthawk works out the *shape* of the link
+(everything fixed stays fixed, the varying part becomes `{id}`), then crawls out from your seed to find
+every other link built the same way. The panel shows the shape it matched, so you can see exactly what
+it looked for:
+
+```
+https://docs.google.com/forms/d/e/{id}/viewform
+```
+
+The second box takes a **phrase or word that must appear in the link** — in the URL itself or in the
+link text on the page it was found (`match_in: "both"` by default). Matches are listed first. The ones
+the phrase ruled out are not thrown away: they stay underneath under *didn't match*, with the reason,
+because a link that has the right shape is still the right link — you just asked for a narrower view.
+
+`POST /api/v1/links` does the same thing without the page:
+
+```json
+{
+  "seed": "https://docs.google.com/forms/d/e/1FAIpQLSe…/viewform",
+  "phrase": "climate",
+  "match_in": "both",
+  "depth": 2,
+  "max_pages": 30,
+  "max_links": 300,
+  "same_host": true,
+  "use_engines": true,
+  "respect_robots": true
+}
+```
+
+Each returned link carries where it was seen (`found_on`), whether your phrase matched the URL, the
+text, both, or neither (`phrase_where`), and the crawl's counts: pages read, links seen, links with the
+same shape, kept, rejected. `notes` explains in words what the shape was; `errors` lists pages that
+refused to load rather than pretending they were empty.
+
+The offline practice target has the case built in: `demo/forms/` links to four sibling forms
+(`/demo/forms/{id}/view.html`) with different round names, so the self-test can prove that a pasted
+seed finds its siblings, that `solar` keeps exactly one of them and reports the other three as
+rejected, and that an impossible phrase matches nothing while still listing the shape.
+
 ## Typing a file type means that file type
 
 `apk` used to be read as the word "apk": you got papers about water that happened to contain those
@@ -324,6 +374,7 @@ POST /api/v1/hunt            federated search (verbatim, newest-first, nothing r
 POST /api/v1/hunt/stream     same, as Server-Sent Events
 POST /api/v1/deep            crawl pasted exact links + why each hit is deep-only
 POST /api/v1/deep/stream     same, as SSE
+POST /api/v1/links           one link in, every link of the same shape out
 POST /api/v1/crawl           run the crawler to completion
 POST /api/v1/crawl/stream    live crawl events (page, file, pagehit, blocked, done)
 GET  /api/v1/engines         remote engines + status
@@ -404,12 +455,16 @@ state is `data/` (SQLite vault, watchlist, extraction cache).
 The launcher is not a menu of links into the Next.js app — it **runs the hunt and the crawl in
 place**. `Hunt` POSTs `/api/v1/hunt` and renders the rows (verbatim badge, word distance, copies
 reported, junk/noise labelled, newest first); `Crawl` does the same through `/api/v1/crawl` when the
-box holds a URL; `Deep crawl` already had its own panel. Arsenal, Vault, Watchers and API open the
-engine's own JSON/docs in a new tab.
+box holds a URL; `Deep crawl` and `Similar links` have panels of their own. Vault, Watchers and Arsenal
+open the engine's own JSON in a new tab.
 
 That matters on a one-container deployment, where `/hunt` and `/vault` — pages of the Next.js app —
 do not exist at all. Before this, clicking **Hunt** on `nighthawk-*.onrender.com` returned
 `{"detail":"Not Found"}`; now the same click lists results without leaving the page.
+
+The look is deliberately quiet: a serif heading face, one warm accent, rounded panels, and plain words
+on the buttons (`Search`, `Crawl a site`, `Similar links`) instead of feature names. Nothing on the page
+explains itself in jargon before it helps you.
 
 If the page is the half you already deployed to Netlify or Vercel, give that deployment an engine
 with the proxy / meta / `?api=` options in *Deploying the launcher on a static host* above. The
@@ -438,5 +493,6 @@ apps/api/app/
   fixtures.py      the offline practice target
 apps/web/          Next.js 15 interface (hunt, crawl, arsenal, vault, watchers)
 docs/              architecture, engine reference, deployment, and REPOS.md (what was imported)
-scripts/selftest.py  end-to-end proof: crawl the fixture, then search inside it
+scripts/selftest.py  end-to-end proof: crawl the fixture, then search inside it, then
+                     derive a link shape and find its siblings
 ```

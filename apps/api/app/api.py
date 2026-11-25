@@ -13,6 +13,7 @@ from . import arsenal, local_index, registry
 from .config import public_port, settings
 from .crawl import CrawlRequest, FusionCrawler
 from .deep import DeepRequest, deep_crawl
+from .links import LinkRequest, find_links
 from .change import content_hash, diff as diff_text
 from .extract import canonical_url
 from .models import HuntRequest
@@ -237,6 +238,18 @@ async def post_crawl_stream(payload: CrawlRequest, request: Request) -> Streamin
         await crawler.run()
 
     return sse_stream(producer)
+
+
+@router.post("/links")
+async def post_links(payload: LinkRequest, request: Request) -> dict[str, Any]:
+    """Paste one link; find every other link with the same shape.
+
+    `phrase` filters those links (in the URL, the link text, or both) and links
+    that fail it are still reported as `near`, so an over-strict phrase is
+    visible instead of just returning nothing.
+    """
+    rate_limit(request)
+    return await find_links(payload)
 
 
 @router.get("/demo-target")

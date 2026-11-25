@@ -144,6 +144,37 @@ Sitemap: http://127.0.0.1:{port}/demo/sitemap.xml
 """,
     # deliberately unlinked: no page, no sitemap entry, no robots reference — the
     # only way to reach it is to paste the exact URL (the deep-link test target)
+    # ---- a link shape with siblings, for the link crawler ----------------
+    "forms/index.html": """<!doctype html><html><head><title>Grant application forms — all rounds</title></head><body>
+<h1>Application forms</h1>
+<p>Every round of the climate resilience grant has its own response form.</p>
+<ul>
+<li><a href="/demo/forms/a1b2c3d4e5f60718/view.html">Round 1 — climate resilience grant application form</a></li>
+<li><a href="/demo/forms/9f8e7d6c5b4a3021/view.html">Round 2 — climate resilience grant application form</a></li>
+<li><a href="/demo/forms/1234abcd5678ef90/view.html">Round 3 — water points maintenance form</a></li>
+<li><a href="/demo/forms/deadbeefcafe0123/view.html">Round 4 — solar mini-grid survey form</a></li>
+<li><a href="https://docs.google.com/forms/d/e/1FAIpQLSeUgRo9ZXDqQIE3U4J2uGECV3SApcHs5M95tBlbaflCeSp52w/viewform">Google form — partners only</a></li>
+</ul></body></html>""",
+    "forms/a1b2c3d4e5f60718/view.html": """<!doctype html><html><head><title>Round 1 — climate resilience grant application form</title></head><body>
+<h1>Round 1 — climate resilience grant application form</h1>
+<p>Round one of the climate resilience grant. Use this form to apply before the closing date.</p>
+<p><a href="../index.html">All application forms</a></p>
+</body></html>""",
+    "forms/9f8e7d6c5b4a3021/view.html": """<!doctype html><html><head><title>Round 2 — climate resilience grant application form</title></head><body>
+<h1>Round 2 — climate resilience grant application form</h1>
+<p>Round two of the climate resilience grant. Use this form to apply before the closing date.</p>
+<p><a href="../index.html">All application forms</a></p>
+</body></html>""",
+    "forms/1234abcd5678ef90/view.html": """<!doctype html><html><head><title>Round 3 — water points maintenance form</title></head><body>
+<h1>Round 3 — water points maintenance form</h1>
+<p>Water points maintenance, round three. Use this form to apply before the closing date.</p>
+<p><a href="../index.html">All application forms</a></p>
+</body></html>""",
+    "forms/deadbeefcafe0123/view.html": """<!doctype html><html><head><title>Round 4 — solar mini-grid survey form</title></head><body>
+<h1>Round 4 — solar mini-grid survey form</h1>
+<p>Solar mini-grid survey, round four. Use this form to apply before the closing date.</p>
+<p><a href="../index.html">All application forms</a></p>
+</body></html>""",
     "annex/off-cycle-notice.html": """<!doctype html><html><head><title>Off-cycle notice — climate resilience grant addendum</title>
 <meta name="description" content="Addendum to the climate resilience grant: an additional USD 120,000 for coastal districts.">
 </head><body>
