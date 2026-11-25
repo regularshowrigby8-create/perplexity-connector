@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -28,6 +29,19 @@ def _find_root() -> Path:
 
 ROOT = _find_root()
 DATA_DIR = ROOT / "data"
+
+
+def public_port() -> int:
+    """The port this process is reachable on.
+
+    Render and Railway hand out PORT and health-check it; everywhere else it is
+    8000. Used for the fixture site's own URLs so the practice target is not
+    hard-wired to a port the host never opened.
+    """
+    try:
+        return int(os.environ.get("PORT") or 8000)
+    except ValueError:
+        return 8000
 
 
 class Settings(BaseSettings):

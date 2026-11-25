@@ -1421,6 +1421,18 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     return list;
   }
 
+  // The practice target is a fixture served by the engine, so links to it have
+  // to name the engine. "127.0.0.1:8000" is only true when the whole thing runs
+  // on one laptop; on a hosted engine it must follow the resolved origin.
+  function demoBase() {
+    var pinned = (resolvedBase || storedBase() || "").replace(/\/+$/, "");
+    if (pinned) return pinned;
+    var host = location.hostname || "";
+    var local = location.protocol === "file:" || host === "localhost" ||
+      host === "127.0.0.1" || host === "0.0.0.0" || host === "";
+    return local ? "http://127.0.0.1:8000" : location.origin;
+  }
+
   function base() {
     var saved = storedBase().trim().replace(/\/+$/, "");
     if (saved) return saved;
@@ -1568,14 +1580,14 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   document.getElementById("crawl-btn").addEventListener("click", function () { go("crawl"); });
 
   document.getElementById("practice-deep").addEventListener("click", function () {
-    deepEl("deep-seeds").value = "http://127.0.0.1:8000/demo/annex/off-cycle-notice.html";
+    deepEl("deep-seeds").value = demoBase() + "/demo/annex/off-cycle-notice.html";
     deepEl("deep-q").value = "climate resilience grant";
     document.getElementById("deep").scrollIntoView({ behavior: "smooth", block: "start" });
     toast("unlinked page loaded — run the deep crawl");
   });
 
   document.getElementById("practice-btn").addEventListener("click", function () {
-    location.href = url("/crawl?seeds=" + encodeURIComponent("http://127.0.0.1:8000/demo/index.html")
+    location.href = url("/crawl?seeds=" + encodeURIComponent(demoBase() + "/demo/index.html")
       + "&q=climate%20grant");
   });
 

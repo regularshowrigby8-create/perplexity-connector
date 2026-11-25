@@ -13,7 +13,7 @@ import asyncio
 from . import fixtures, local_index
 from .crawl import CrawlRequest, FusionCrawler
 from .api import router
-from .config import ROOT, settings
+from .config import ROOT, public_port, settings
 
 
 def launcher_path() -> Path | None:
@@ -33,14 +33,14 @@ def launcher_path() -> Path | None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     local_index.init()
-    demo_root = fixtures.build(8000)
+    demo_root = fixtures.build(public_port())
     app.mount("/demo", StaticFiles(directory=str(demo_root), html=True), name="demo")
 
     async def prime() -> None:
         try:
             if local_index.vault_stats().get("documents", 0) == 0:
                 await FusionCrawler(CrawlRequest(
-                    seeds=["http://127.0.0.1:8000/demo/index.html"],
+                    seeds=[f"http://127.0.0.1:{public_port()}/demo/index.html"],
                     query="climate grant", depth=2, max_pages=14, max_files=16,
                     serp_engines=[], delay=0.0, label="vault-prime",
                 )).run()

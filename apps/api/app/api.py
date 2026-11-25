@@ -10,7 +10,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from . import arsenal, local_index, registry
-from .config import settings
+from .config import public_port, settings
 from .crawl import CrawlRequest, FusionCrawler
 from .deep import DeepRequest, deep_crawl
 from .change import content_hash, diff as diff_text
@@ -244,7 +244,7 @@ async def demo_target() -> dict[str, Any]:
     return {
         "name": "Nighthawk practice target",
         "root": "/demo/index.html",
-        "seeds": ["http://127.0.0.1:8000/demo/index.html"],
+        "seeds": [f"http://127.0.0.1:{public_port()}/demo/index.html"],
         "note": "A local fixture site with an index-of listing, three PDFs, a CSV, JSON, "
                 "a ZIP and a robots-disallowed page. Used to prove the crawl pipeline "
                 "without needing internet access.",

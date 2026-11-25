@@ -279,6 +279,23 @@ async def main() -> int:
             else probe.stdout.strip())
     ok &= check("the package imports from /app/app, not just from a checkout",
                 probe.returncode == 0 and Path(probe.stdout.strip()) == shallow, said)
+
+    # hosts open their own port: the fixture site must follow it, not assume 8000
+    from app.api import demo_target
+
+    saved_port = os.environ.get("PORT")
+    os.environ["PORT"] = "12345"
+    try:
+        target = await demo_target()
+    finally:
+        if saved_port is None:
+            os.environ.pop("PORT", None)
+        else:
+            os.environ["PORT"] = saved_port
+    ok &= check("the practice target follows the port the host opened",
+                target["seeds"][0].endswith(":12345/demo/index.html"), target["seeds"][0])
+    ok &= check("the launcher does not pin the practice target to 8000",
+                "demoBase()" in launcher and "127.0.0.1:8000/demo" not in launcher)
     hosts = {
         "render.yaml": "Dockerfile.api",
         "fly.toml": "Dockerfile.api",
