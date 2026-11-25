@@ -2904,8 +2904,8 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       note.push("the two-year window is off for this answer \u2014 you asked for older results");
     } else if (stats.cut_older) {
       note.push(stats.cut_older + " older than " + (stats.window_days || 730) + " days left out");
-      if (stats.cut_older_files) {
-        note.push(stats.cut_older_files + " of them the " +
+      if (stats.cut_older_matches) {
+        note.push(stats.cut_older_matches + " of them offered the " +
           (typed.length ? typed[0] : "file") + " you asked for \u2014 \u201cinclude older results\u201d brings them back");
       }
     }

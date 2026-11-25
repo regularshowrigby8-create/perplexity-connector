@@ -64,7 +64,8 @@ def render(report: dict, query: str) -> str:
         f"- one hop out: opened {stats.get('hop_pages', 0)} page(s), took "
         f"{stats.get('hop_found', 0)} file(s) out of them, "
         f"{stats.get('hop_skipped', 0)} page(s) unreadable",
-        f"- files of the asked type cut by the window: {stats.get('cut_older_files', 0)}",
+        f"- older results that offered the asked type, cut by the window: "
+        f"{stats.get('cut_older_matches', 0)}",
         f"- read as: {understanding.get('summary', '—')}",
         "",
     ]

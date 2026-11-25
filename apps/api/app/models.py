@@ -142,9 +142,11 @@ class HuntStats(BaseModel):
     hop_pages: int = 0
     hop_found: int = 0
     hop_skipped: int = 0
-    # files of the type that was asked for, cut only because they are older
-    # than the window — reported, because that is the cut most likely to hurt
-    cut_older_files: int = 0
+    # results that matched what was asked for — the file itself, or a page that
+    # offers one — cut only because they are older than the window. Reported
+    # because that is the cut most likely to hurt: a 2007 archive.org item is
+    # still the book that was asked for.
+    cut_older_matches: int = 0
     # freshness ledger — second granularity for the first minute
     fresh_seconds: int = 0      # < 60s
     fresh_minutes: int = 0      # < 60m

@@ -773,12 +773,14 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     # asked for: a 2007 PDF is still the PDF the person wanted. It is still cut by
     # default (the window is the window), but it is counted and named, so the page
     # can offer to include it for this one search instead of pretending it is gone.
-    cut_older_files = 0
+    cut_older_matches = 0
     if file_types:
         asked_exts = {t.lower() for t in file_types}
-        cut_older_files = sum(1 for h in fused
-                              if (h.file_ext or "").lower() in asked_exts
-                              and window.classify(h) == recency.OLD)
+        cut_older_matches = sum(
+            1 for h in fused
+            if window.classify(h) == recency.OLD
+            and ((h.file_ext or "").lower() in asked_exts
+                 or query_intent.offers_type(h, file_types)))
     fused, window_stats = recency.apply(fused, window)
     before = len(fused)
     collapsed = 0
@@ -865,7 +867,7 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         hop_pages=int(hop_stats.get("pages_read") or 0),
         hop_found=int(hop_stats.get("found") or 0),
         hop_skipped=int(hop_stats.get("skipped") or 0),
-        cut_older_files=int(cut_older_files),
+        cut_older_matches=int(cut_older_matches),
         fresh_seconds=sum(1 for h in fused if h.age_seconds is not None and h.age_seconds < 60),
         fresh_minutes=sum(1 for h in fused if h.age_seconds is not None and 60 <= h.age_seconds < 3600),
         fresh_hours=sum(1 for h in fused if h.age_seconds is not None and 3600 <= h.age_seconds < 86400),

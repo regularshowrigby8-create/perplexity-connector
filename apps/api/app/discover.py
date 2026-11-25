@@ -36,6 +36,7 @@ FILE_EXTS = {"pdf", "epub", "mobi", "djvu", "doc", "docx", "xls", "xlsx", "csv",
 # guess by a wide margin.
 DATE_META = ("article:published_time", "datepublished", "date", "pubdate", "publishdate",
              "dc.date", "dc.date.issued", "sailthru.date", "parsely-pub-date", "og:updated_time")
+PAGE_TIMEOUT = 1.2
 OFFER_HINTS = ("download", "/details/", "/doc/", "/document/", "/view/", "flipbook",
                "issuu", "yumpu", "fliphtml5", "scribd", "pubhtml5")
 
@@ -175,8 +176,10 @@ async def hop(hits: list[Any], client: Any, *, terms: list[str], types: list[str
             stats["skipped"] += 1
             return []
         try:
+            # A page gets a second, not the answer's whole latency: a hop that is
+            # slow is a hop that is skipped and counted.
             resp = await client.get(getattr(seed, "url", ""),
-                                    timeout=min(2.5, max(0.4, left)),
+                                    timeout=min(PAGE_TIMEOUT, max(0.3, left)),
                                     headers={"Accept": "text/html,application/xhtml+xml"})
             if resp.status_code >= 400:
                 stats["skipped"] += 1
