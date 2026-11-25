@@ -19,6 +19,11 @@ on:
   push:
     paths:
       - ".github/workflows/live-search.yml"
+      # touch a file in here to run the same question again on demand
+      - ".github/trigger/**"
+
+permissions:
+  contents: write
 
 concurrency:
   group: live-search
@@ -85,6 +90,32 @@ jobs:
                   continue
               print(f"| {p['id']} | {p['status']} | {p['count']} | {(p.get('message') or '')[:60]} |")
           PY
+
+      # The artifact is nice, but a runner's log is not always reachable from
+      # where the work is being watched. The answer also goes into the repo, so
+      # it can be read with a plain `git pull`.
+      - name: keep the answer in the repo
+        if: always()
+        run: |
+          set -e
+          stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+          mkdir -p reports/live-search
+          if [ -f "$RUNNER_TEMP/answer.md" ]; then
+            cp "$RUNNER_TEMP/answer.md" "reports/live-search/${stamp}.md"
+            cp "$RUNNER_TEMP/answer.json" "reports/live-search/${stamp}.json" || true
+          else
+            printf 'the search did not produce an answer — see the run log\n' \
+              > "reports/live-search/${stamp}.md"
+          fi
+          git config user.name "nighthawk runner"
+          git config user.email "action@github.com"
+          git add reports/live-search
+          if git diff --cached --quiet; then
+            echo "nothing to record"
+          else
+            git commit -m "live search: ${{ github.event.inputs.q || 'diary of a wimpy kid pdf' }}"
+            git push
+          fi
 
       - name: keep the answer
         if: always()
