@@ -217,19 +217,63 @@ def matches_type(ext: object, domain: str, url: str, types: list[str]) -> bool:
     return False
 
 
+# Words a page uses when it is *offering* the file rather than being one.
+OFFER_WORDS = {
+    "pdf": ("pdf", "download", "ebook", "e-book", "book", "reader", "flipbook", "scribd",
+            "docs", "document", "archive.org", "yumpu", "issuu", "fliphtml5"),
+    "epub": ("epub", "ebook", "e-book", "download", "reader", "archive.org"),
+    "docx": ("docx", "word document", "download", "template"),
+    "xlsx": ("xlsx", "spreadsheet", "excel", "download"),
+    "csv": ("csv", "dataset", "download", "data"),
+    "apk": ("apk", "download", "android"),
+}
+
+
+def offers_type(hit, types: list[str]) -> bool:
+    """Does this page hand over a file of the type that was asked for?
+
+    The mainstream engines answer "diary of a wimpy kid pdf" with pages —
+    archive.org item pages, Scribd, flipbook viewers — not with bare `.pdf`
+    URLs. Dropping those pages left the answer with nothing even when the words
+    were found, so a page that visibly offers the type is kept and labelled
+    instead of being thrown away.
+    """
+    text = " ".join(str(part or "") for part in (
+        getattr(hit, "title", ""), getattr(hit, "snippet", ""),
+        getattr(hit, "url", ""))).lower()
+    kind = (getattr(hit, "kind", "") or "").lower()
+    if kind in ("portal", "dork", "package", "release"):
+        return False
+    for wanted in types:
+        for word in OFFER_WORDS.get(wanted.lower(), (wanted.lower(),)):
+            if word in text:
+                return True
+    return False
+
+
 def filter_by_type(hits: list, types: list[str]) -> tuple[list, int]:
-    """Keep only the type that was asked for, and say how many were set aside.
+    """Keep the type that was asked for, and say how many were set aside.
 
     This is the one filter in the engine, and it only exists because the query
-    asked for it (`apk`, `pdf report`, `csv mediafire`). No type word in the
-    query, no filter: everything comes back as before.
+    asked for it (`apk`, `pdf report`, `csv mediafire`). Two kinds of result
+    survive it: the files themselves, and pages that are offering one (an
+    archive.org item page, a Scribd document, a flipbook) — those are tagged
+    `offers-type` so the page can say which is which.
     """
     if not types:
         return hits, 0
-    kept = [hit for hit in hits
-            if matches_type(getattr(hit, "file_ext", None),
-                            getattr(hit, "domain", "") or "",
-                            getattr(hit, "url", "") or "", types)]
+    kept: list = []
+    for hit in hits:
+        if matches_type(getattr(hit, "file_ext", None),
+                        getattr(hit, "domain", "") or "",
+                        getattr(hit, "url", "") or "", types):
+            kept.append(hit)
+        elif offers_type(hit, types):
+            tags = list(getattr(hit, "tags", []) or [])
+            if "offers-type" not in tags:
+                tags.append("offers-type")
+            hit.tags = tags
+            kept.append(hit)
     return kept, len(hits) - len(kept)
 
 

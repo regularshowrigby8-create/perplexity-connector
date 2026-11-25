@@ -2749,6 +2749,10 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (hit.match_where) {
       top.appendChild(pill("in " + hit.match_where, "pill muted", "where the match was found"));
     }
+    if ((hit.tags || []).indexOf("offers-type") !== -1) {
+      top.appendChild(pill("page offering the file", "pill muted",
+        "not a file itself — a page that hands it over (an archive item, a document viewer, a download page)"));
+    }
     if (hit.off_topic) {
       top.appendChild(pill("none of your words", "pill muted",
         "kept, but it contains less than a third of the words you typed — sorted below everything that does"));
@@ -2869,6 +2873,10 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       // the one filter, and it exists because it was typed
       note.push("only " + typed.slice(0, 4).join(" / "));
       note.push((intent.removed_by_type || 0) + " of another type, set aside");
+      var offering = hits.filter(function (h) {
+        return (h.tags || []).indexOf("offers-type") !== -1;
+      }).length;
+      if (offering) note.push(offering + " pages offering one, after the files");
     }
     if (hosts.length) note.push("aimed at " + hosts.slice(0, 3).join(", "));
     if (report.sort === "accuracy") note.push("best match first");

@@ -384,9 +384,11 @@ async def main() -> int:
                  domain="vault", published=now_iso, first_seen=now_iso, age_source="published"),
     ])
     only_pdf = await hunt(HuntRequest(q="annual report pdf", limit=0, fresh=True), use_cache=False)
-    ok &= check("searching 'pdf' returns pdfs and only pdfs",
-                bool(only_pdf.hits) and {h.file_ext for h in only_pdf.hits} == {"pdf"},
-                str({h.file_ext for h in only_pdf.hits}))
+    ok &= check("searching 'pdf' returns pdfs, plus pages that offer one",
+                bool(only_pdf.hits) and all(h.file_ext == "pdf" or "offers-type" in (h.tags or [])
+                                            for h in only_pdf.hits)
+                and any(h.file_ext == "pdf" for h in only_pdf.hits),
+                str({(h.file_ext, "offers-type" in (h.tags or [])) for h in only_pdf.hits}))
     ok &= check("and it says how many of another type it set aside",
                 only_pdf.intent.get("removed_by_type", 0) > 0,
                 str(only_pdf.intent.get("removed_by_type")))
@@ -871,6 +873,39 @@ async def main() -> int:
     ok &= check("the archive engine survives list-shaped fields instead of erroring out",
                 len(ia_hits) == 1 and ia_hits[0].title == "A Title In A List",
                 str([h.title for h in ia_hits]))
+
+    print("\n▸ 15c. the open web is asked, and a page offering the file counts")
+    from app import intent as _intent
+    from app.providers import keyless as _keyless
+
+    ok &= check("the general engines that need no key are registered",
+                {"bing-rss", "ddg-lite", "mojeek-html"} <= {p.id for p in registry.PROVIDERS})
+    ok &= check("they are asked first, so the budget cannot cut them",
+                {"bing-rss", "ddg-lite", "mojeek-html"} <= {p.id for p in registry.PROVIDERS[:6]},
+                str([p.id for p in registry.PROVIDERS[:6]]))
+
+    _rss = ("<?xml version='1.0'?><rss><channel>"
+            "<item><title>Diary of a Wimpy Kid 1 - Archive.org</title>"
+            "<link>https://archive.org/download/x/Diary%20of%20a%20wimpy%20kid%20book01.pdf</link>"
+            "<description>[PDF] DIARY of a Wimpy Kid</description>"
+            "<pubDate>Mon, 01 Apr 2007 00:00:00 GMT</pubDate></item>"
+            "</channel></rss>")
+    parsed = _keyless.parse_bing_rss(_rss)
+    ok &= check("Bing's public RSS is read into a result", len(parsed) == 1
+                and parsed[0]["url"].endswith("book01.pdf"), str(parsed)[:80])
+
+    _page = Hit(url="https://archive.org/details/diaryofawimpykidbookseriesbyjeffkinney_202004",
+                title="Diary Of A Wimpy Kid Book Series", snippet="PDF · EPUB · download",
+                provider="internetarchive", provider_name="IA", kind="document")
+    _scribd = Hit(url="https://www.scribd.com/doc/238171104/Diary-of-a-Wimpy-Kid-Book-1",
+                  title="Free Online Diary of a Wimpy Kid 1 | PDF", snippet="Free download as PDF",
+                  provider="bing-rss", provider_name="Bing", kind="page")
+    _noise = Hit(url="https://example.com/pasta", title="Best pasta recipes", snippet="food",
+                 provider="x", provider_name="X", kind="page")
+    _kept, _dropped = _intent.filter_by_type([_page, _scribd, _noise], ["pdf"])
+    ok &= check("a page that offers the PDF survives the type filter, tagged",
+                len(_kept) == 2 and all("offers-type" in (h.tags or []) for h in _kept)
+                and _dropped == 1, f"{len(_kept)} kept, {_dropped} set aside")
 
     print("\n▸ 16. the engine reads the question before it fetches anything")
     from app import understand

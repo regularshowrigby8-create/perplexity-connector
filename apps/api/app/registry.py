@@ -1,7 +1,8 @@
 """One registry of every independent engine the monster can call."""
 from __future__ import annotations
 
-from .providers import (archives, code, datasets, filehosts, launchers, metasearch, opendata,
+from .providers import (
+    keyless as keyless_providers,archives, code, datasets, filehosts, launchers, metasearch, opendata,
                         openscience, opportunities, opportunities_live, realtime, scholar, vault,
                         web)
 from .providers.base import Provider
@@ -70,10 +71,15 @@ OPPORTUNITIES_LIVE = [
 # archive.org's software collection or SourceForge. Dispatched when a query
 # names a file type or a host, and alongside the files lens.
 FILE_HOSTS = [engine() for engine in filehosts.FILE_HOSTS]
+# The general web engines that need no key. Without these the engine has no
+# open-web index at all and answers a book search with scholarly PDFs.
+KEYLESS = [engine for engine in keyless_providers.KEYLESS]
 LOCAL = [vault.Vault(), vault.VaultFullText()]
 LAUNCHERS = [launchers.Portals(), launchers.DorkLauncher()]
 
-PROVIDERS: list[Provider] = [*WEB, *METASEARCH, *ARCHIVES, *OPPORTUNITIES, *SCHOLAR,
+# Keyless general engines first: when the budget runs out, the engines that can
+# find a document on the open web must already have their answer in.
+PROVIDERS: list[Provider] = [*KEYLESS, *WEB, *METASEARCH, *ARCHIVES, *OPPORTUNITIES, *SCHOLAR,
                              *DATASETS, *CODE, *REALTIME, *OPEN_SCIENCE, *OPEN_DATA,
                              *OPPORTUNITIES_LIVE, *FILE_HOSTS, *LOCAL, *LAUNCHERS]
 
