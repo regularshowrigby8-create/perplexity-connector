@@ -11,6 +11,7 @@ import functools
 import http.server
 import os
 import socketserver
+import subprocess
 import sys
 import tempfile
 import threading
@@ -259,6 +260,25 @@ async def main() -> int:
                 "COPY index.html" in dockerfile and "NH_DATA_DIR=/data" in dockerfile)
     ok &= check("the image listens on the port the host hands it",
                 "${PORT:-8000}" in dockerfile and "EXPOSE 8000" in dockerfile)
+
+    # the container has no repo around it: /app/app/config.py, two levels deep.
+    # Counting parents died there with IndexError before uvicorn ever bound.
+    shallow = Path(tempfile.mkdtemp(prefix="nighthawk-shallow-"))
+    (shallow / "app").mkdir()
+    (shallow / "app" / "__init__.py").write_text("")
+    (shallow / "app" / "config.py").write_text(
+        (ROOT / "apps" / "api" / "app" / "config.py").read_text(encoding="utf-8"))
+    (shallow / "index.html").write_text("<!doctype html>", encoding="utf-8")
+    probe = subprocess.run(
+        [sys.executable, "-c",
+         "import sys; sys.path.insert(0, sys.argv[1]);"
+         "from app.config import ROOT; print(ROOT)", str(shallow)],
+        capture_output=True, text=True,
+        env={**os.environ, "NH_DATA_DIR": str(shallow / "data")})
+    said = (probe.stdout.strip() or probe.stderr.strip().splitlines()[-1] if probe.stderr.strip()
+            else probe.stdout.strip())
+    ok &= check("the package imports from /app/app, not just from a checkout",
+                probe.returncode == 0 and Path(probe.stdout.strip()) == shallow, said)
     hosts = {
         "render.yaml": "Dockerfile.api",
         "fly.toml": "Dockerfile.api",

@@ -4,7 +4,29 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ROOT = Path(__file__).resolve().parents[3]
+
+def _find_root() -> Path:
+    """Where the project root is, found rather than counted.
+
+    In a checkout this file is <root>/apps/api/app/config.py, so the root is
+    three levels up. In the container the package is copied to /app/app, so
+    there are only two levels above it and `parents[3]` is an IndexError — which
+    is exactly how the first Render deploy died, at import, before uvicorn bound
+    a port.
+
+    Walk up instead and stop at the first directory that looks like the root:
+    the repo marker, or the launcher sitting beside the package.
+    """
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        if (parent / "apps" / "api" / "app" / "config.py").is_file():
+            return parent                      # repo checkout
+        if (parent / "index.html").is_file():
+            return parent                      # container: /app/index.html + /app/app
+    return here.parent.parent                  # last resort, never used
+
+
+ROOT = _find_root()
 DATA_DIR = ROOT / "data"
 
 
