@@ -16,7 +16,8 @@ class Vault(Provider):
     async def hunt(self, ctx: HuntContext) -> list[RawHit]:
         rows = local_index.search_vault(ctx.plan.terms, limit=ctx.limit)
         return [RawHit(url=r["url"], title=r["title"], snippet=r["snippet"],
-                       kind=r.get("kind") or "page", tags=("vault",))
+                       kind=r.get("kind") or "page", tags=("vault",),
+                       meta=r.get("meta") or {})
                 for r in rows]
 
 
@@ -31,5 +32,6 @@ class VaultFullText(Provider):
     async def hunt(self, ctx: HuntContext) -> list[RawHit]:
         rows = local_index.search_docs(ctx.plan.terms, limit=ctx.limit)
         return [RawHit(url=r["url"], title=r["title"], snippet=r["snippet"],
-                       kind="document", tags=("fulltext", r.get("engine") or ""))
+                       kind="opportunity" if (r.get("meta") or {}).get("structured") else "document",
+                       tags=("fulltext", r.get("engine") or ""), meta=r.get("meta") or {})
                 for r in rows]

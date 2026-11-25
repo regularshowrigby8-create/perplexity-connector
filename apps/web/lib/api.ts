@@ -24,6 +24,16 @@ export type Hit = {
   tags: string[];
   archive: boolean;
   portal: boolean;
+  funder: string | null;
+  amount: string | null;
+  currency: string | null;
+  location: string | null;
+  structured: string | null;
+  schema_type: string | null;
+  size: number | null;
+  sniffed: string | null;
+  keyphrases: string[];
+  near_dupes: number;
   sources: { provider: string; name: string; rank: number; url: string }[];
   meta: Record<string, unknown>;
 };
@@ -52,9 +62,12 @@ export type HuntResponse = {
     files: number;
     opportunities: number;
     closing_soon: number;
+    duplicates_collapsed: number;
+    dropped_noise: number;
     took_ms: number;
     cached: boolean;
   };
+  expanded: string[];
   plays: string[];
 };
 

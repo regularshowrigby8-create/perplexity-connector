@@ -9,9 +9,9 @@ from the inside.
 from __future__ import annotations
 
 import asyncio
+import heapq
 import re
 import time
-from collections import deque
 from dataclasses import dataclass, field
 from typing import Any, Awaitable, Callable
 from urllib.parse import urljoin, urlsplit
@@ -22,10 +22,13 @@ from pydantic import BaseModel, Field
 from . import local_index
 from .arsenal import available_ids
 from .config import settings
-from .extract import (canonical_url, depth_score, fingerprint, find_deadline,
-                      opportunity_tags, pretty_name, safe_domain, truncate)
+from .extract import (FILE_MAP, canonical_url, depth_score, fingerprint, find_deadline,
+                      human_size, opportunity_tags, pretty_name, safe_domain, truncate)
+from .magic import pdf_title, sniff
+from .priority import score as url_priority
+from .schemaorg import extract as schema_extract, guess_fields
 from .models import Hit
-from .textkit import extract_text, file_text, meta_extract, parse_links
+from .textkit import extract_text, file_text, meta_extract, parse_links_rich
 
 Emit = Callable[[dict], Awaitable[None]]
 READY = available_ids()
@@ -124,6 +127,7 @@ class FusionCrawler:
         self.visited: set[str] = set()
         self.files: dict[str, Hit] = {}
         self.page_hits: dict[str, Hit] = {}
+        self._pdf_titles: dict[str, str] = {}
         self.robots: dict[str, Any] = {}
         self.gates: dict[str, float] = {}
         self.pages_lock = asyncio.Lock()
@@ -139,21 +143,23 @@ class FusionCrawler:
         host = safe_domain(url)
         return not self.allowed_hosts or host in self.allowed_hosts
 
+    def _crawl_delay(self, host: str) -> float:
+        parser = self.robots.get(host)
+        if isinstance(parser, tuple) and parser[0] == "protego":
+            try:
+                delay = parser[1].crawl_delay(settings.user_agent)
+                return float(delay) if delay else 0.0
+            except Exception:
+                return 0.0
+        return 0.0
+
     async def _gate(self, url: str) -> None:
         host = urlsplit(url).netloc
         wait_until = self.gates.get(host, 0)
         now = time.monotonic()
         if wait_until > now:
             await asyncio.sleep(min(wait_until - now, 3.0))
-        delay = self.req.delay
-        parser = self.robots.get(host)
-        if parser is not None:
-            try:
-                crawl_delay = parser.crawl_delay(settings.user_agent)
-                if crawl_delay:
-                    delay = max(delay, min(float(crawl_delay), 3.0))
-            except Exception:
-                pass
+        delay = max(self.req.delay, min(self._crawl_delay(host), 3.0))
         self.gates[host] = time.monotonic() + delay
 
     async def _robots_for(self, url: str) -> Any:
@@ -162,17 +168,25 @@ class FusionCrawler:
             return self.robots[host]
         parser = None
         try:
-            from urllib.robotparser import RobotFileParser
-
             origin = f"{urlsplit(url).scheme}://{host}"
             resp = await self.client.get(f"{origin}/robots.txt", timeout=6.0)
             if resp.status_code == 200 and resp.text:
-                parser = RobotFileParser()
-                parser.parse(resp.text.splitlines())
+                # protego (scrapy's own parser): wildcards, `$` anchors and the
+                # longest-match rule, which urllib's parser gets wrong.
+                try:
+                    from protego import Protego
+
+                    robot = Protego.parse(resp.text)
+                    parser = ("protego", robot)
+                except Exception:
+                    from urllib.robotparser import RobotFileParser
+
+                    fallback = RobotFileParser()
+                    fallback.parse(resp.text.splitlines())
+                    parser = ("stdlib", fallback)
                 await self._send("robots", host=host, rules=len(resp.text.splitlines()),
-                                 sitemaps=[line.split(":", 1)[1].strip()
-                                           for line in resp.text.splitlines()
-                                           if line.lower().startswith("sitemap:")])
+                                 sitemaps=list(robot.sitemaps) if isinstance(parser, tuple)
+                                 and parser[0] == "protego" else [])
         except Exception:
             parser = None
         self.robots[host] = parser
@@ -185,9 +199,14 @@ class FusionCrawler:
         if parser is None:
             return True
         try:
-            return parser.can_fetch(settings.user_agent, url)
+            if isinstance(parser, tuple):
+                kind, robot = parser
+                if kind == "protego":
+                    return bool(robot.can_fetch(url, settings.user_agent))
+                return bool(robot.can_fetch(settings.user_agent, url))
         except Exception:
             return True
+        return True
 
     # ---------------------------------------------------------------------- fetch
     async def _fetch(self, url: str) -> tuple[int, str, bytes, str]:
@@ -416,56 +435,80 @@ class FusionCrawler:
         if len(self.files) >= self.req.max_files:
             return None
         ext, kind, mime, domain = fingerprint(url)
-        if ext is None and kind == "page":
-            return None
+        if kind == "page" or ext in ("html", "htm", "php", "asp", "aspx", "jsp", "shtml"):
+            return None  # pages belong to page_hits, not the file list
         if self.req.file_types and (ext or "") not in self.req.file_types:
             return None
+
         head = await self._head(url)
         size = head.get("size")
-        if str(head.get("mime") or "").startswith(("text/html",)) and ext:
-            return None
-        text, text_engine = "", ""
+        if str(head.get("mime") or "").startswith("text/html") and ext:
+            return None  # an .pdf that answers text/html is a login wall, not a document
+
+        text, text_engine, sniffed, body_len = "", "", None, 0
         if self.req.extract_files:
             try:
                 if head.get("size") and int(head["size"]) > self.req.max_bytes:
                     raise ValueError("too large")
-                status, _ctype, body, fetch_engine = await self._fetch(url)
+                status, _ctype, body, _engine = await self._fetch(url)
                 if status >= 400:
                     return None
                 if body:
+                    body_len = len(body)
                     self.stats.bytes += len(body)
-                    text, text_engine = await asyncio.to_thread(file_text, body, url, head.get("mime"))
+                    sniffed_ext, sniffed_mime = await asyncio.to_thread(sniff, body)
+                    if sniffed_ext and sniffed_ext != "html":
+                        if sniffed_ext != ext:
+                            sniffed = f"{ext or 'none'}→{sniffed_ext}"
+                        ext = sniffed_ext
+                        kind, mime = FILE_MAP.get(ext, (kind, sniffed_mime or mime))
+                        domain = safe_domain(url)
+                    text, text_engine = await asyncio.to_thread(
+                        file_text, body, url, head.get("mime") or mime)
                     if text:
                         local_index.index_document(canon, url, pretty_name(url), text, text_engine)
                         self.stats.docs_indexed += 1
                         self.stats.bump(text_engine)
+                    if ext == "pdf":
+                        guessed = await asyncio.to_thread(pdf_title, body)
+                        if guessed and domain not in pretty_name(url):
+                            self._pdf_titles[canon] = guessed
             except Exception:
                 pass
-        deadline = find_deadline(text[:4000]) if text else None
-        snippet_bits = [f"{(ext or 'file').upper()} · {pretty_name(url)}"]
-        if size:
-            from .extract import human_size
 
+        size = size or (body_len or None)
+        deadline = find_deadline(text[:4000]) if text else None
+        title = self._pdf_titles.get(canon) or pretty_name(url)
+        snippet_bits = [f"{(ext or 'file').upper()} · {title}"]
+        if size:
             snippet_bits.append(human_size(size) or "")
+        if sniffed:
+            snippet_bits.append(f"magic says {sniffed}")
         if text:
             snippet_bits.append(truncate(text, 320))
         hit = Hit(
-            url=url, title=pretty_name(url), snippet=" · ".join(b for b in snippet_bits if b),
+            url=url, title=title, snippet=" · ".join(b for b in snippet_bits if b),
             provider="crawler", provider_name="Fusion Crawler", kind=kind or "document",
             file_ext=ext, mime=head.get("mime") or mime, domain=domain,
             deadline=deadline, tags=("crawled", ext or "file") + (("text-indexed",) if text else ()),
             archive=False, meta={"referrer": referrer, "size": size, "text_engine": text_engine,
-                                 "chars": len(text)},
+                                 "chars": len(text), "sniffed": sniffed},
         )
+        hit.size = int(size) if size and str(size).isdigit() else None
+        hit.sniffed = sniffed
+        hit.mime = head.get("mime") or mime
+        hit.schema_type = None  # files carry no schema.org type of their own
         hit.depth = depth_score(url, ext, False, text[:2000])
         hit.score = 40 + hit.depth * 0.5
         self.files[canon] = hit
         self.stats.files += 1
+        if sniffed:
+            self.stats.bump("magic-sniff")
         await self._send("file", hit=hit.model_dump())
         return hit
 
     # ---------------------------------------------------------------------- visit
-    async def _visit(self, url: str, depth: int) -> list[tuple[str, int]]:
+    async def _visit(self, url: str, depth: int, anchor: str = "") -> list[tuple]:
         canon = canonical_url(url)
         if canon in self.visited:
             return []
@@ -495,16 +538,21 @@ class FusionCrawler:
 
         self.stats.pages += 1
         html = body.decode("utf-8", "replace")
-        links, link_engine = await asyncio.to_thread(parse_links, html, url)
+        links = await asyncio.to_thread(parse_links_rich, html, url)
         text, text_engine = await asyncio.to_thread(extract_text, html, url)
         meta = await asyncio.to_thread(meta_extract, html)
+        records = await asyncio.to_thread(schema_extract, html, url)
+        best = next((r for r in records if r["category"] == "opportunity"), None)
         title = meta.get("title") or ""
         if not title:
             m = re.search(r"<title[^>]*>(.*?)</title>", html, re.I | re.S)
             title = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", m.group(1))).strip()[:200] if m else url
+
         self.stats.links += len(links)
-        self.stats.bump(link_engine)
+        self.stats.bump("selectolax")
         self.stats.bump(text_engine)
+        if records:
+            self.stats.bump("schema.org")
 
         listing = bool(re.search(
             r"(<title[^>]*>\s*index of|<h1[^>]*>\s*index of|parent directory\s*</|directory listing)",
@@ -516,37 +564,71 @@ class FusionCrawler:
             local_index.index_document(canon, url, title, text, text_engine)
             self.stats.docs_indexed += 1
 
+        guessed = await asyncio.to_thread(guess_fields, text[:6000]) if text else {}
+        if guessed:
+            best = {**guessed, **(best or {})}   # JSON-LD wins over prose
         deadline = find_deadline(text[:6000]) if text else None
+        explicit_deadline = None
+        if best and best.get("deadline"):
+            explicit_deadline = find_deadline("", explicit=best["deadline"])
+        if explicit_deadline:
+            deadline = explicit_deadline
         opps = opportunity_tags(f"{title} {text[:3000]}")
-        if (deadline or len(opps) >= 2) and canon not in self.page_hits:
+        structured = bool(best)
+        if (deadline or len(opps) >= 2 or structured) and canon not in self.page_hits:
             self.stats.opportunities += 1
             page_hit = Hit(
                 url=url, title=title or url,
                 snippet=truncate(text, 340),
                 provider="crawler", provider_name="Fusion Crawler",
-                kind="opportunity" if deadline else "page",
+                kind="opportunity" if (deadline or structured) else "page",
                 file_ext=None, mime="text/html", domain=safe_domain(url),
-                deadline=deadline, tags=tuple(dict.fromkeys(["crawled", "page", *opps])),
-                meta={"text_engine": text_engine, "chars": len(text)},
+                deadline=deadline,
+                funder=(best or {}).get("organization") or None,
+                amount=(best or {}).get("amount") or None,
+                currency=(best or {}).get("currency") or None,
+                location=(best or {}).get("location") or None,
+                structured=(str(best["type"]).title() if best and best.get("type") else None),
+                tags=tuple(dict.fromkeys(
+                    ["crawled", "page", *(opps)]
+                    + ([best["type"]] if best and best.get("type") else [])
+                    + ([best["keywords"].split(",")[0].strip()] if best and best.get("keywords") else []))),
+                meta={"text_engine": text_engine, "chars": len(text),
+                      "structured": records[:3],
+                      "organization": (best or {}).get("organization"),
+                      "amount": (best or {}).get("amount"),
+                      "currency": (best or {}).get("currency")},
             )
+            page_hit.schema_type = page_hit.structured
             page_hit.depth = depth_score(url, None, False, text[:2000])
-            page_hit.score = 35 + page_hit.depth * 0.5
+            page_hit.score = 35 + page_hit.depth * 0.5 + (12 if structured else 0)
             self.page_hits[canon] = page_hit
             await self._send("pagehit", hit=page_hit.model_dump())
 
-        await self._send("page", url=url, title=title, status=status, depth=depth,
-                         links=len(links), text_chars=len(text), link_engine=link_engine,
-                         text_engine=text_engine, engine=fetch_engine, listing=listing)
+        if records:
+            await self._send("structured", url=url, count=len(records),
+                             types=sorted({r["type"] for r in records})[:6])
 
-        next_wave: list[tuple[str, int]] = []
+        await self._send("page", url=url, title=title, status=status, depth=depth,
+                         links=len(links), text_chars=len(text), link_engine="selectolax",
+                         text_engine=text_engine, engine=fetch_engine, listing=listing,
+                         structured=len(records))
+
+        frontier: list[tuple] = []
+        terms = [t for t in self.req.query.lower().split() if len(t) > 3][:5]
         for link in links:
-            if FILE_EXT_RE.search(link):
-                await self._register_file(link, url, depth + 1)
+            target = link["url"]
+            if FILE_EXT_RE.search(target):
+                await self._register_file(target, url, depth + 1)
                 continue
-            if depth + 1 <= self.req.depth and link not in self.visited and self._same_host_ok(link):
-                if len(self.visited) + len(next_wave) < self.req.max_pages * 6:
-                    next_wave.append((link, depth + 1))
-        return next_wave
+            if depth + 1 > self.req.depth or target in self.visited:
+                continue
+            if not self._same_host_ok(target):
+                continue
+            priority = url_priority(target, link.get("anchor", ""), terms, depth + 1,
+                                    from_sitemap=False, same_host=True)
+            frontier.append((priority, target, depth + 1, link.get("anchor", "")))
+        return frontier
 
     # ------------------------------------------------------------------------ run
     async def run(self) -> dict[str, Any]:
@@ -559,21 +641,36 @@ class FusionCrawler:
             await self.client.aclose()
             return {"stats": self.stats.as_dict(), "files": [], "seeds": []}
 
-        frontier: deque[tuple[str, int]] = deque((url, 0) for url, _ in seeds)
+        terms = [t for t in (self.req.query or "").lower().split() if len(t) > 3][:5]
+        heap: list[tuple] = []
+        seq = 0
+        for url, source in seeds:
+            priority = url_priority(url, "", terms, 0, from_sitemap=(source == "sitemap"))
+            heapq.heappush(heap, (-priority, seq, url, 0, ""))
+            seq += 1
+
         pages_seen = 0
-        while frontier and pages_seen < self.req.max_pages:
-            width = min(len(frontier), max(2, self.req.concurrency * 2))
-            batch = [frontier.popleft() for _ in range(width)]
+        while heap and pages_seen < self.req.max_pages:
+            width = min(len(heap), max(2, self.req.concurrency * 2))
+            batch = [heapq.heappop(heap) for _ in range(width)]
             pages_seen += len(batch)
-            results = await asyncio.gather(*[self._visit(u, d) for u, d in batch],
-                                           return_exceptions=True)
+            results = await asyncio.gather(
+                *[self._visit(item[2], item[3], item[4]) for item in batch],
+                return_exceptions=True)
             for result in results:
-                if isinstance(result, list):
-                    for item in result:
-                        if len(frontier) < self.req.max_pages * 6:
-                            frontier.append(item)
+                if isinstance(result, BaseException):
+                    self.stats.errors += 1
+                    await self._send("error", url="", message=f"{type(result).__name__}: {result}"[:160])
+                    continue
+                if not isinstance(result, list):
+                    continue
+                for entry in result:
+                    if len(heap) < self.req.max_pages * 8:
+                        heapq.heappush(heap, (-entry[0], seq, entry[1], entry[2], entry[3]))
+                        seq += 1
             await self._send("progress", pages=self.stats.pages, files=self.stats.files,
-                             queued=len(frontier), docs=self.stats.docs_indexed)
+                             queued=len(heap), docs=self.stats.docs_indexed,
+                             opportunities=self.stats.opportunities)
 
         await self._send("status", message="closing connections")
         await self.client.aclose()

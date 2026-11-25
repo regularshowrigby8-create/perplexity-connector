@@ -89,7 +89,16 @@ documents, datasets, listings and an application pack.</p>
 <p><a href="/demo/files/budget.csv">Download budget (CSV)</a></p>
 <p><a href="/demo/files/annual-report-2025.pdf">Annual report 2025 (PDF)</a></p>
 </body></html>""",
-    "opportunities.html": """<!doctype html><html><head><title>Open opportunities</title></head><body>
+    "opportunities.html": """<!doctype html><html><head><title>Open opportunities</title>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Grant",
+ "name":"Climate Resilience Grant 2026",
+ "funder":{"@type":"Organization","name":"Ford Foundation"},
+ "amount":{"@type":"MonetaryAmount","currency":"USD","value":90000},
+ "applicationDeadline":"2026-02-28",
+ "location":{"@type":"Place","name":"Nairobi, Kenya"},
+ "description":"Grants of USD 15,000 to 90,000 for community organisations working on climate adaptation."}
+</script></head><body>
 <h1>Open calls</h1>
 <article><h2>Climate Resilience Grant 2026</h2>
 <p>Grants of USD 15,000 to 90,000 for community organisations. Applications close

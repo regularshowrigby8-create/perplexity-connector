@@ -85,6 +85,36 @@ def parse_links(html: str, base: str) -> tuple[list[str], str]:
     return out, engine
 
 
+def parse_links_rich(html: str, base: str) -> list[dict]:
+    """Links with anchor text and rel — needed for focused-crawl priority scoring."""
+    from urllib.parse import urljoin
+
+    out: list[dict] = []
+    seen: set[str] = set()
+    try:
+        from selectolax.lexbor import LexborHTMLParser as HTMLParser
+
+        tree = HTMLParser(html)
+        for node in tree.css("a[href]"):
+            href = (node.attributes.get("href") or "").strip()
+            if not href or href.startswith(("mailto:", "tel:", "javascript:", "#")):
+                continue
+            url = urljoin(base, href).split("#", 1)[0]
+            if url in seen or not url.startswith(("http://", "https://")):
+                continue
+            seen.add(url)
+            out.append({
+                "url": url,
+                "anchor": (node.text() or "").strip()[:200],
+                "rel": node.attributes.get("rel") or "",
+                "in_listing": False,
+            })
+    except Exception:
+        links, _engine = parse_links(html, base)
+        return [{"url": u, "anchor": "", "rel": "", "in_listing": False} for u in links]
+    return out
+
+
 def extract_text(html: str, url: str) -> tuple[str, str]:
     """Try the extraction chain in order; return (text, engine_used)."""
     html = html[:1_800_000]

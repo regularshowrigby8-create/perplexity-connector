@@ -125,25 +125,10 @@ def safe_domain(url: str) -> str:
 
 
 def canonical_url(url: str) -> str:
-    """Dedupe key: strip trackers, normalise scheme/host, sort params, drop fragments."""
-    try:
-        parts = urllib.parse.urlsplit(url.strip())
-    except ValueError:
-        return url.strip()
-    if not parts.scheme:
-        parts = urllib.parse.urlsplit("https://" + url.strip())
-    host = (parts.hostname or "").lower().removeprefix("www.")
-    port = parts.port
-    scheme = "https" if parts.scheme in ("http", "https") else parts.scheme
-    netloc = host if not port or port in (80, 443) else f"{host}:{port}"
-    query = [(k, v) for k, v in urllib.parse.parse_qsl(parts.query, keep_blank_values=True)
-             if not TRACKING.match(k)]
-    query.sort()
-    path = re.sub(r"/{2,}", "/", parts.path or "/")
-    if path != "/":
-        path = path.rstrip("/")
-    qs = urllib.parse.urlencode(query)
-    return urllib.parse.urlunsplit((scheme, netloc, path, qs, ""))
+    """Dedupe key — delegated to urlnorm (courlan/SearXNG rules, cached)."""
+    from .urlnorm import canonicalize
+
+    return canonicalize(url)
 
 
 def pretty_name(url: str) -> str:

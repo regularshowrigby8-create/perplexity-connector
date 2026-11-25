@@ -123,6 +123,15 @@ function HuntView() {
     }
   }, [q, saved]);
 
+  function factLine(hit: Hit): string {
+    return [
+      hit.funder ? `funder: ${hit.funder}` : "",
+      hit.amount ? `amount: ${[hit.currency, hit.amount].filter(Boolean).join(" ")}` : "",
+      hit.location ? `location: ${hit.location}` : "",
+      hit.structured ? `type: ${hit.structured}` : "",
+    ].filter(Boolean).join(" · ");
+  }
+
   function exportHits(kind: "json" | "md") {
     const data = final?.hits ?? hits;
     if (!data.length) return;
@@ -137,7 +146,8 @@ function HuntView() {
         "",
         ...data.map((h, i) =>
           `${i + 1}. [${h.title}](${h.url})\n   ${h.file_ext ? `\`.${h.file_ext}\` · ` : ""}depth ${h.depth}` +
-          `${h.deadline ? ` · ${h.deadline.date} (${h.deadline.days_left}d)` : ""} · ${h.provider_name}\n   ${h.snippet}`),
+          `${h.deadline ? ` · ${h.deadline.date} (${h.deadline.days_left}d)` : ""} · ${h.provider_name}` +
+          `${factLine(h) ? `\n   ${factLine(h)}` : ""}\n   ${h.snippet}`),
       ];
       blob = new Blob([lines.join("\n")], { type: "text/markdown" });
     }
@@ -290,6 +300,32 @@ function HuntView() {
             </div>
           </div>
 
+          {final && (final.expanded?.length > 0 || final.stats.duplicates_collapsed > 0) && (
+            <div className="expand-row">
+              {final.expanded?.length > 0 && (
+                <>
+                  <span className="tiny">expanded:</span>
+                  {final.expanded.slice(0, 8).map((term) => (
+                    <Link key={term} className="pill cyan"
+                      href={`/hunt?q=${encodeURIComponent(`${q} ${term}`)}&lens=${lens}`}>
+                      + {term}
+                    </Link>
+                  ))}
+                </>
+              )}
+              {final.stats.duplicates_collapsed > 0 && (
+                <span className="pill violet" title="near-identical pages and copies folded by MinHash + LSH">
+                  {final.stats.duplicates_collapsed} near-duplicates folded
+                </span>
+              )}
+              {final.stats.dropped_noise > 0 && (
+                <span className="pill" title="login walls, carts and cookie pages removed">
+                  {final.stats.dropped_noise} noise dropped
+                </span>
+              )}
+            </div>
+          )}
+
           {running && (
             <div className="stream-strip">
               {Array.from({ length: 14 }).map((_, i) => (
@@ -304,6 +340,8 @@ function HuntView() {
               Files get a type boost, deadlines inside 30 days get up to +45%, and the depth score
               (archive-only, deep paths, upload dirs, non-mainstream hosts) adds up to +40%.
               Duplicates collapse to one canonical URL and list every engine that agreed.
+              Near-identical copies (MinHash + LSH, then a token-set pass) fold into the richest
+              record, and a record with a funder, an amount and a closing date outranks everything.
             </div>
           )}
 
@@ -349,7 +387,9 @@ function HuntView() {
               {shown.filter((h) => h.file_ext).length} files ·{" "}
               {shown.filter((h) => h.deadline && h.deadline.days_left >= 0).length} live deadlines ·{" "}
               {shown.filter((h) => h.archive).length} archive-only ·{" "}
-              {shown.filter((h) => h.sources.length > 1).length} multi-engine consensus
+              {shown.filter((h) => h.sources.length > 1).length} multi-engine consensus ·{" "}
+              {shown.filter((h) => h.amount).length} with amounts ·{" "}
+              {shown.filter((h) => h.funder).length} with named funders
             </p>
           )}
         </section>

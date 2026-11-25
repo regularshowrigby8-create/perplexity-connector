@@ -88,12 +88,17 @@ Crawl streams emit `status`, `seeds`, `serp`, `sitemap`, `robots`, `page`, `list
 
 ## 5. Crawl contract
 
-Breadth-first by depth wave. Each URL: canonicalise → same-host check → robots check → host gate
-(per-host delay and crawl-delay) → fetch (engine-selected, byte-capped) → content-type dispatch.
+Priority-first. The frontier is a heap keyed by `priority.url_priority()` — documents and
+opportunity vocabulary float up, login walls, carts and pagination sink — and each wave pops
+`2 × concurrency` requests. Each URL: canonicalise → same-host check → robots check (protego:
+wildcards, `$` anchors, crawl-delay) → host gate → fetch (engine-selected, byte-capped) →
+content-type dispatch.
 
-- HTML → `parse_links` (selectolax → parsel → bs4 → regex) and `extract_text`
+- HTML → `parse_links_rich` (selectolax lexbor → bs4), `schemaorg.extract` (JSON-LD → microdata →
+  RDFa) with a prose fallback (`guess_fields`) and `extract_text`
   (trafilatura → readability → justext → newspaper3k → boilerpy3 → html2text → bs4).
-- Files → HEAD for size/mime → bounded GET → `file_text` (pypdf → pdfminer, openpyxl, python-docx,
+- Files → HEAD for size/mime → bounded GET → `magic.sniff` (magic bytes re-label the extension and
+  MIME) → `file_text` (pypdf → pdfminer, openpyxl, python-docx,
   zipfile, text decode) → `index_document` → emit a `Hit`.
 - Pages with a deadline or ≥2 opportunity tags are emitted as page hits.
 
@@ -108,9 +113,29 @@ Three local indexes, one query surface:
 - **Whoosh** — a RAM index of the current candidate set for BM25F re-scoring.
 - **Tantivy** — mirrored documents for fast offline retrieval.
 
-`search_docs` returns snippet fragments with match markers, which the UI renders as highlights.
+`search_docs` returns snippet fragments with match markers, which the UI renders as highlights, and
+hydrates structured fields from the vault record (`_payload_meta`) so the full-text engine can
+return a complete opportunity, not just a snippet.
 
-## 7. Security posture
+## 7. Specificity pipeline
+
+Recall is the easy half. Before ranking, every result passes through:
+
+1. `urlnorm.canonicalize` — RFC-3986 path cleanup, ~90 tracking/session parameters, default
+   documents, IDNA and `www` folding; `registrable()` for site identity.
+2. `schemaorg` — typed records from JSON-LD/microdata/RDFa, then `guess_fields` for prose
+   (`funded by …`, `USD 250,000`, `Duty station: …`).
+3. `magic` — file truth from bytes, not extensions; PDF titles extracted when the name is useless.
+4. `near_dup.cluster` — MinHash+LSH (`num_perm=128`), token-set ≥92 pass, simhash ≤3 fallback;
+   the **richest** member survives and inherits the others' fields.
+5. `orchestrator.build_hit` — specificity boosts (named funder + amount, schema type, complete
+   record), term coverage, diversity demotion.
+6. `local_index.payload_richness` — the vault only accepts a *richer* record over an existing one,
+   so a re-hunt can never downgrade a structured result to a plain snippet.
+
+`docs/REPOS.md` maps each of these to the project whose algorithm or parameter set it came from.
+
+## 8. Security posture
 
 - Keys, when supplied, live in the request body only; they are never persisted or logged.
 - No arbitrary URL proxying — the browser talks to one origin and the server only fetches targets

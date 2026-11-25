@@ -1,8 +1,9 @@
 # Nighthawk
 
-**One engine that finds what search engines bury.** A fusion crawler, 66 remote engines,
+**One engine that finds what search engines bury.** A fusion crawler, 69 remote engines,
 an 86-engine crawl arsenal and a local full-text vault — fused into a single ranked stream of
-**hosted files, open calls, application packs, exposed listings and datasets**.
+**hosted files, open calls, application packs, exposed listings and datasets** — each result carrying
+the **funder, amount, currency, location, closing date and real file type** where the web exposes them.
 
 No API keys. No setup wizard. Nothing to configure before your first hunt.
 
@@ -72,6 +73,24 @@ five HTML pages, an "Index of /files" listing, three PDFs, a CSV, JSON, a ZIP an
 robots-disallowed page. One click on **Load practice target → Start** exercises the whole
 pipeline: fetch → parse → extract → index → rank.
 
+## Specificity, not just recall
+
+Breadth is cheap. What makes a result usable is the fields inside it. Nighthawk imports the
+machinery that produces them:
+
+| Layer | Module | What it does |
+|---|---|---|
+| URL truth | `urlnorm.py` | RFC-3986 path cleaning, ~90 tracking/session params stripped, default-document removal, IDNA + `www` folding, registrable-domain resolution (courlan / tldextract rules) |
+| Near-duplicate collapse | `near_dup.py` | MinHash + LSH (`num_perm=128`), token-set second pass, 64-bit simhash fallback; the **richest** record survives and inherits the others' fields |
+| Real file type | `magic.py` | magic-byte sniffing (PDF/OOXML/OLE2/RAR/7z/gzip/SQLite/images/audio/mp4), ZIP re-labelling, PDF title fallback |
+| Structured fields | `schemaorg.py` | JSON-LD / microdata / RDFa → typed records, plus a prose fallback (`funded by …`, `USD 250,000`, `Duty station: …`) |
+| Keyphrases | `keyterms.py` | YAKE (`n=3`, `dedupLim=0.85`) + lens thesaurus expansion |
+| Crawl priority | `priority.py` | heap frontier: documents and opportunity words first, login walls and carts last |
+| Change detection | `change.py` | per-URL content hash, word-level diffs for watchers |
+
+See **[docs/REPOS.md](docs/REPOS.md)** for the full import map — 120 projects, which of them run
+on the request path, and the parameter that came from each.
+
 ## The arsenal (86 engines)
 
 Not a list of logos — each entry is probed and dispatched by role:
@@ -88,12 +107,13 @@ Not a list of logos — each entry is probed and dispatched by role:
 Missing tiers are reported honestly in `/arsenal` and skipped at runtime. Drop a binary on `PATH`
 or `pip install` a Python engine and it lights up — no code change, no restart of the registry logic.
 
-## The remote engines (66)
+## The remote engines (69)
 
 `SearXNG · Brave · Tavily · Exa · Serper · SerpApi (+Bing, Yahoo, Ecosia, Startpage, Yandex,
 Scholar, News) · SearchApi · Google CSE · Perplexity · You.com · Mojeek · Qwant · MetaGer ·
 Whoogle · LibreX · 4get · YaCy · Wiby · Marginalia · Gigablast (retired) · Common Crawl ·
-Wayback · Internet Archive · Arquivo.pt · Grants.gov · ReliefWeb (jobs + reports) · EU SEDIA ·
+Wayback · Internet Archive · Arquivo.pt · Grants.gov · NIH RePORTER · NSF Awards · USAspending ·
+ReliefWeb (jobs + reports) · EU SEDIA ·
 OpenAlex · Crossref · arXiv · DOAJ · PubMed · Semantic Scholar · CORE · Wikipedia · Wikidata ·
 Open Library · Zenodo · Figshare · Data.gov (+UK, EU, AU, CA) · World Bank documents + data ·
 Hugging Face · GitHub · GitLab · Hacker News · Stack Exchange · npm · crates.io ·
@@ -145,13 +165,13 @@ apps/api/app/
   crawl.py         fusion crawler: seeds → frontier → files → vault
   arsenal.py       the 86-engine manifest + probes
   textkit.py       parser/extractor dispatch
-  registry.py      the 66 remote engines
+  registry.py      the 69 remote engines
   orchestrator.py  fan-out, fusion, ranking, streaming
   local_index.py   SQLite FTS5 / Whoosh / Tantivy / BM25 vault
   portals.py       54 portals + archive targeting
   plays.py         natural language → dorks
   fixtures.py      the offline practice target
 apps/web/          Next.js 15 interface (hunt, crawl, arsenal, vault, watchers)
-docs/              architecture, engine reference, deployment
+docs/              architecture, engine reference, deployment, and REPOS.md (what was imported)
 scripts/selftest.py  end-to-end proof: crawl the fixture, then search inside it
 ```

@@ -38,6 +38,16 @@ class Hit(BaseModel):
     tags: list[str] = Field(default_factory=list)
     archive: bool = False
     portal: bool = False
+    funder: str | None = None
+    amount: str | None = None
+    currency: str | None = None
+    location: str | None = None
+    structured: str | None = None
+    schema_type: str | None = None
+    size: int | None = None
+    sniffed: str | None = None
+    keyphrases: list[str] = Field(default_factory=list)
+    near_dupes: int = 0
     sources: list[ProviderRef] = Field(default_factory=list)
     meta: dict[str, Any] = Field(default_factory=dict)
 
@@ -76,6 +86,8 @@ class HuntStats(BaseModel):
     files: int = 0
     opportunities: int = 0
     closing_soon: int = 0
+    duplicates_collapsed: int = 0
+    dropped_noise: int = 0
     took_ms: int = 0
     cached: bool = False
 
@@ -89,6 +101,7 @@ class HuntResponse(BaseModel):
     facets: dict[str, list[dict[str, Any]]]
     stats: HuntStats
     plays: list[str] = Field(default_factory=list)
+    expanded: list[str] = Field(default_factory=list)
 
 
 class ScoutRequest(BaseModel):

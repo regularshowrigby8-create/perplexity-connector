@@ -411,3 +411,45 @@ h1.title .grad {
 .spin { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(0,0,0,0.25);
   border-top-color: #0a1200; border-radius: 50%; animation: sp 0.7s linear infinite; }
 @keyframes sp { to { transform: rotate(360deg) } }
+
+/* ------------------------------------------------------------------ structured facts
+   A hit that names a funder, an amount and a closing date should read like a
+   record, not a blue link. These are the extracted fields, not a summary. */
+.facts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+.fact {
+  display: inline-flex; align-items: baseline; gap: 6px;
+  padding: 4px 9px; border-radius: 7px; font-size: 12.4px;
+  border: 1px solid rgba(255,255,255,0.09); background: rgba(255,255,255,0.035);
+}
+.fact-l {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--dim);
+}
+.fact-v { color: var(--ink); font-weight: 600; }
+.fact.lime { border-color: rgba(194,255,61,0.28); background: rgba(194,255,61,0.06); }
+.fact.lime .fact-v { color: var(--lime); }
+.fact.amber { border-color: rgba(255,182,72,0.28); background: rgba(255,182,72,0.06); }
+.fact.amber .fact-v { color: var(--amber); }
+.fact.cyan { border-color: rgba(79,224,255,0.26); background: rgba(79,224,255,0.06); }
+.fact.cyan .fact-v { color: var(--cyan); }
+.fact.violet { border-color: rgba(167,139,250,0.26); background: rgba(167,139,250,0.06); }
+.fact.violet .fact-v { color: var(--violet); }
+
+.phrases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+.phrase {
+  font-family: var(--mono); font-size: 10.5px; color: var(--dim);
+  padding: 2px 7px; border-radius: 5px;
+  border: 1px dashed rgba(255,255,255,0.11); background: transparent;
+}
+
+.expand-row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin: 12px 0 2px; padding: 9px 11px; border-radius: 9px;
+  border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02);
+}
+
+.change-row {
+  margin-top: 8px; padding: 9px 11px; border-radius: 8px;
+  border: 1px solid rgba(255,182,72,0.22); background: rgba(255,182,72,0.05);
+}
+.change-delta { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 6px; }

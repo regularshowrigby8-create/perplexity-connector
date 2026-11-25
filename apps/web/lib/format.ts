@@ -32,6 +32,27 @@ export function hostOf(url: string): string {
   }
 }
 
+export function fmtMoney(amount: string | null, currency: string | null): string {
+  if (!amount) return "";
+  const value = Number(String(amount).replace(/[^0-9.]/g, ""));
+  const pretty = Number.isFinite(value) && value > 0
+    ? value.toLocaleString("en-US", { maximumFractionDigits: 0 })
+    : amount;
+  return currency ? `${currency} ${pretty}` : pretty;
+}
+
+export function fmtSize(bytes: number | null): string {
+  if (!bytes) return "";
+  const units = ["B", "KB", "MB", "GB"];
+  let value = bytes;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit += 1;
+  }
+  return `${value < 10 && unit > 0 ? value.toFixed(1) : Math.round(value)}${units[unit]}`;
+}
+
 export function fileIcon(ext: string | null): string {
   if (!ext) return "◇";
   if (["pdf"].includes(ext)) return "▤";

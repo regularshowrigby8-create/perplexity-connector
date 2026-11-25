@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from . import arsenal, local_index, registry
 from .config import settings
 from .crawl import CrawlRequest, FusionCrawler
+from .change import content_hash, diff as diff_text
 from .extract import canonical_url
 from .models import HuntRequest
 from .orchestrator import hunt
@@ -267,7 +268,26 @@ async def run_hunt(hunt_id: int) -> dict[str, Any]:
                 new_items.append(hit.model_dump())
         conn.execute("UPDATE hunts SET last_run_at = ?, last_count = ? WHERE id = ?",
                      (local_index.now(), len(response.hits), hunt_id))
+
+    changed: list[dict[str, Any]] = []
+    for hit in response.hits:
+        canon = canonical_url(hit.url)
+        text = local_index.doc_text(canon)
+        if not text:
+            continue
+        digest = content_hash(text)
+        prior = local_index.prior_hunt_doc(hunt_id, canon)
+        if prior and prior.get("hash") and prior["hash"] != digest:
+            delta = diff_text(prior.get("excerpt") or "", text[:6000])
+            changed.append({"url": hit.url, "title": hit.title,
+                            "added": delta["added"], "removed": delta["removed"],
+                            "sample": delta["sample"], "word_added": delta["word_added"],
+                            "word_removed": delta["word_removed"],
+                            "deadline": hit.deadline.date if hit.deadline else None})
+        local_index.store_hunt_doc(hunt_id, canon, digest, text[:6000])
+
     return {"hunt": hunt_row, "new": new_items, "new_count": len(new_items),
+            "changed": changed, "changed_count": len(changed),
             "total": len(response.hits), "stats": response.stats.model_dump()}
 
 

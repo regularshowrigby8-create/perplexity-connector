@@ -4,6 +4,14 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { api, type Hit } from "@/lib/api";
 
+type Change = {
+  url: string; title: string; added: number; removed: number;
+  sample: string; word_added: string[]; word_removed: string[];
+  deadline: string | null;
+};
+
+type RunResult = { new: Hit[]; new_count: number; changed: Change[]; changed_count: number };
+
 type Hunt = {
   id: number; name: string; query: string; lens: string; site: string | null;
   created_at: string; last_run_at: string | null; last_count: number; seen?: number;
@@ -16,6 +24,7 @@ export default function HuntsPage() {
   const [lens, setLens] = useState("all");
   const [busy, setBusy] = useState<number | null>(null);
   const [newItems, setNewItems] = useState<Record<number, Hit[]>>({});
+  const [changes, setChanges] = useState<Record<number, Change[]>>({});
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
@@ -41,8 +50,9 @@ export default function HuntsPage() {
   async function run(id: number) {
     setBusy(id);
     try {
-      const data = await api<{ new: Hit[]; new_count: number }>(`/api/v1/hunts/${id}/run`, { method: "POST" });
+      const data = await api<RunResult>(`/api/v1/hunts/${id}/run`, { method: "POST" });
       setNewItems((prev) => ({ ...prev, [id]: data.new }));
+      setChanges((prev) => ({ ...prev, [id]: data.changed ?? [] }));
       load();
     } catch (err) {
       setError((err as Error).message);
@@ -66,7 +76,8 @@ export default function HuntsPage() {
       <p className="lede" style={{ maxWidth: 800 }}>
         Save a hunt and run it whenever you like. Nighthawk keeps a canonical-URL ledger per
         watcher, so a run only reports what is genuinely new since last time — new calls, new PDFs,
-        new listings.
+        new listings. Known URLs are hashed on every run, so a page that keeps its address but
+        changes its text (a moved deadline, a bigger budget) shows up as a diff, not silence.
       </p>
 
       <div className="search-panel" style={{ marginTop: 18 }}>
@@ -120,6 +131,30 @@ export default function HuntsPage() {
                 {hunt.last_run_at && <span className="pill cyan">last run {hunt.last_run_at.slice(0, 16).replace("T", " ")}</span>}
                 {hunt.last_count > 0 && <span className="pill lime">{hunt.last_count} hits</span>}
               </div>
+              {(changes[hunt.id]?.length ?? 0) > 0 && (
+                <div style={{ marginTop: 10 }}>
+                  <div className="tiny" style={{ color: "var(--amber)" }}>
+                    {changes[hunt.id].length} document(s) changed since last run
+                  </div>
+                  {changes[hunt.id].slice(0, 5).map((change) => (
+                    <div key={change.url} className="change-row">
+                      <a href={change.url} target="_blank" rel="noreferrer" className="file-name">
+                        {change.title}
+                      </a>
+                      <div className="change-delta">
+                        {(change.word_added ?? []).map((word) => (
+                          <span key={`a-${word}`} className="pill lime">+ {word}</span>
+                        ))}
+                        {(change.word_removed ?? []).map((word) => (
+                          <span key={`r-${word}`} className="pill red">− {word}</span>
+                        ))}
+                        <span className="tiny">{change.added} added · {change.removed} removed</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {(newItems[hunt.id]?.length ?? 0) > 0 && (
                 <div style={{ marginTop: 10 }}>
                   <div className="tiny" style={{ color: "var(--lime)" }}>

@@ -9,13 +9,17 @@ from typing import Any, Awaitable, Callable
 
 import httpx
 
-from . import local_index, registry
+from . import local_index, near_dup, registry
 from .config import settings
 from .extract import (canonical_url, depth_score, fingerprint, find_deadline, opportunity_tags,
                       truncate)
 from .models import Deadline, Hit, HuntRequest, HuntResponse, HuntStats, ProviderRef
+from .keyterms import expand_terms, keyphrases
+from .schemaorg import guess_fields
 from .plays import build_plan
+from .priority import NOISE, is_document
 from .portals import portal_domains
+from .urlnorm import registrable
 from .providers.base import HuntContext, Provider, RawHit
 
 Emit = Callable[[dict], Awaitable[None]]
@@ -40,7 +44,8 @@ def _urgency(days: int) -> str:
     return "later"
 
 
-def build_hit(raw: RawHit, provider: Provider, rank: int, lens: str) -> Hit | None:
+def build_hit(raw: RawHit, provider: Provider, rank: int, lens: str,
+              terms: list[str] | None = None) -> Hit | None:
     url = (raw.url or "").strip()
     if not url.startswith(("http://", "https://")):
         return None
@@ -53,6 +58,13 @@ def build_hit(raw: RawHit, provider: Provider, rank: int, lens: str) -> Hit | No
     elif raw.snippet:
         deadline = find_deadline(raw.snippet)
     text = f"{raw.title} {raw.snippet}"
+    if raw.url and provider.layer != "portal" and NOISE.search(raw.url):
+        return None  # login walls, carts and cookie pages are not answers
+    coverage = 0.0
+    if terms:
+        haystack = f"{raw.title} {raw.snippet} {raw.url}".lower()
+        matched = sum(1 for term in terms if term and term in haystack)
+        coverage = matched / max(1, len(terms))
     hit = Hit(
         url=url, title=raw.title or url, snippet=truncate(raw.snippet, 360),
         provider=provider.id, provider_name=provider.name, kind=kind, file_ext=ext,
@@ -93,15 +105,82 @@ def build_hit(raw: RawHit, provider: Provider, rank: int, lens: str) -> Hit | No
         except ValueError:
             pass
     boost *= 1.0 + (hit.depth / 100.0) * 0.4
+    boost *= 1.0 + 0.45 * coverage
+    if is_document(url):
+        boost *= 1.12
     if raw.kind == "portal":
         boost *= 0.45
     if raw.kind == "dork":
         boost *= 0.35
+    hit.meta["coverage"] = round(coverage, 3)
+    try:
+        inherited = (raw.meta or {}).get("keyphrases")
+        hit.keyphrases = list(inherited)[:6] if isinstance(inherited, list) and inherited \
+            else keyphrases(text, limit=6)
+    except Exception:
+        hit.keyphrases = []
+    if raw.meta.get("structured"):
+        hit.schema_type = str(raw.meta["structured"])[:60]
+    for key in ("funder", "amount", "currency", "location", "structured"):
+        value = (raw.meta or {}).get(key)
+        if value:
+            setattr(hit, key, str(value)[:120])
+    meta = raw.meta or {}
+    if meta.get("schema_type") and not hit.schema_type:
+        hit.schema_type = str(meta["schema_type"])[:60]
+    if meta.get("sniffed"):
+        hit.sniffed = str(meta["sniffed"])[:40]
+    try:
+        if meta.get("size"):
+            hit.size = int(float(meta["size"]))
+    except (TypeError, ValueError):
+        pass
+    if not hit.amount or not hit.funder:
+        guessed = guess_fields(f"{raw.title} {raw.snippet}") or {}
+        hit.funder = hit.funder or (guessed.get("organization") or None)
+        hit.amount = hit.amount or (guessed.get("amount") or None)
+        hit.currency = hit.currency or (guessed.get("currency") or None)
+        hit.location = hit.location or (guessed.get("location") or None)
+    # specificity is only known once the fields are populated
+    if hit.funder and hit.amount and hit.deadline:
+        boost *= 1.3      # a complete record answers the question by itself
+    elif hit.funder and hit.amount:
+        boost *= 1.3
+    elif hit.amount or hit.funder:
+        boost *= 1.12
+    if hit.structured:
+        boost *= 1.18
+    if hit.kind in ("opportunity", "grant"):
+        boost *= 1.22
+    elif hit.kind == "page":
+        boost *= 0.95
     hit.score = round(rrf * boost, 3)
     return hit
 
 
+RICH_FIELDS = ("funder", "amount", "currency", "location", "structured", "schema_type",
+               "sniffed", "size")
+
+
+def hit_specificity(hit: Hit) -> int:
+    """How much *specific* detail a hit carries (drives merge truth and ranking)."""
+    score = sum(2 for field in RICH_FIELDS if getattr(hit, field, None))
+    if hit.deadline:
+        score += 3
+    if hit.kind in ("opportunity", "grant"):
+        score += 4
+    elif hit.kind == "document":
+        score += 1
+    return score
+
+
 def merge_hits(hits: list[Hit]) -> list[Hit]:
+    """Fold duplicate URLs, keeping the *most specific* record as the base.
+
+    Score decides freshness, specificity decides truth: the crawl's structured
+    record (funder + amount + schema type) must survive a merge with a weaker
+    full-text snippet of the same page.
+    """
     merged: dict[str, Hit] = {}
     for hit in hits:
         key = canonical_url(hit.url)
@@ -109,21 +188,55 @@ def merge_hits(hits: list[Hit]) -> list[Hit]:
         if existing is None:
             merged[key] = hit
             continue
-        existing.sources.extend(hit.sources)
-        existing.tags = list(dict.fromkeys([*existing.tags, *hit.tags]))
-        if hit.score > existing.score:
-            keep_score, keep_provider = existing.score, existing.provider
-            existing.__dict__.update({**hit.__dict__})
-            existing.score = max(keep_score, hit.score)
-            existing.provider = keep_provider
-        if len(hit.snippet) > len(existing.snippet):
-            existing.snippet = hit.snippet
-        existing.depth = max(existing.depth, hit.depth)
-        existing.archive = existing.archive or hit.archive
-        if hit.deadline and (not existing.deadline or
-                             abs(hit.deadline.days_left) < abs(existing.deadline.days_left)):
-            existing.deadline = hit.deadline
+        if hit_specificity(hit) > hit_specificity(existing):
+            primary, secondary = hit, existing
+            merged[key] = hit
+        else:
+            primary, secondary = existing, hit
+        known = {source.provider for source in primary.sources}
+        primary.sources = [*primary.sources,
+                           *[s for s in secondary.sources if s.provider not in known]]
+        primary.tags = list(dict.fromkeys([*primary.tags, *secondary.tags]))
+        for field in RICH_FIELDS:
+            if getattr(primary, field, None) in (None, "", 0) and getattr(secondary, field, None):
+                setattr(primary, field, getattr(secondary, field))
+        if not primary.keyphrases and secondary.keyphrases:
+            primary.keyphrases = list(secondary.keyphrases)
+        primary.score = max(primary.score, secondary.score)
+        primary.depth = max(primary.depth, secondary.depth)
+        primary.archive = primary.archive or secondary.archive
+        if not primary.deadline:
+            primary.deadline = secondary.deadline
+        if len(secondary.snippet) > len(primary.snippet):
+            primary.snippet = secondary.snippet
     return list(merged.values())
+
+
+def diversify(hits: list[Hit], per_site: int = 2, window: int = 24,
+              penalty: float = 0.72) -> list[Hit]:
+    """MMR-flavoured diversity: demote (not reorder) sites that hog the top.
+
+    Scores are penalised geometrically for each extra hit from the same
+    registrable domain inside the top window, so the final ranking stays
+    strictly monotone while no single site owns the first page.
+    """
+    if len(hits) <= per_site:
+        return hits
+    local = {"vault", "vault_docs", "crawler"}
+    counts: dict[str, int] = {}
+    for index, hit in enumerate(hits):
+        if index >= window:
+            break
+        if hit.provider in local or hit.provider_name == "Fusion Crawler":
+            continue  # your own corpus is not "one site hogging the page"
+        site = registrable(hit.url) or hit.domain
+        seen = counts.get(site, 0)
+        counts[site] = seen + 1
+        if seen >= per_site:
+            hit.score = round(hit.score * (penalty ** (seen - per_site + 1)), 3)
+            hit.tags = sorted({*(hit.tags or []), "diversity-demoted"})
+    hits.sort(key=lambda h: (-h.score, -h.depth))
+    return hits
 
 
 def rank(hits: list[Hit], sort: str) -> list[Hit]:
@@ -136,6 +249,7 @@ def rank(hits: list[Hit], sort: str) -> list[Hit]:
         hits.sort(key=lambda h: (h.published or "", -h.score), reverse=True)
     else:
         hits.sort(key=lambda h: (-h.score, -h.depth))
+        hits = diversify(hits)
     return hits
 
 
@@ -211,6 +325,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
 
     started = time.perf_counter()
     plan = build_plan(req.q, req.lens, req.site, req.file_types)
+    expanded = expand_terms(plan.terms, plan.lens)
+    terms = [t for t in plan.terms.lower().replace(":", " ").split() if len(t) > 2][:8]
     domains = portal_domains(plan.terms, plan.lens, plan.site, cap=settings.max_domains_per_hunt)
     providers, waiting = select_providers(req, explicit=bool(req.providers))
     if not providers:
@@ -223,7 +339,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                              "plays": [{"id": p.id, "label": p.label, "dork": p.dork} for p in plan.plays]},
                     "domains": domains,
                     "providers": [p.id for p in providers],
-                    "waiting": [p.id for p in waiting]})
+                    "waiting": [p.id for p in waiting],
+                    "expanded": expanded})
 
     async with httpx.AsyncClient(
         timeout=httpx.Timeout(settings.provider_timeout, connect=settings.connect_timeout),
@@ -239,13 +356,16 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
             {"id": p.id, "name": p.name, "status": "needs_key", "count": 0, "ms": 0,
              "message": "credentials not set"} for p in waiting
         ]
+        dropped = 0
         for finished in asyncio.as_completed(tasks):
             provider, raws, ms, error = await finished
             batch: list[Hit] = []
             for index, raw in enumerate(raws):
-                hit = build_hit(raw, provider, index + 1, plan.lens)
+                hit = build_hit(raw, provider, index + 1, plan.lens, terms)
                 if hit:
                     batch.append(hit)
+                else:
+                    dropped += 1
             collected.extend(batch)
             statuses.append({"id": provider.id, "name": provider.name,
                              "status": "error" if error else ("empty" if not raws else "ok"),
@@ -260,6 +380,11 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                 await emit({"type": "provider", **statuses[-1]})
 
     fused = merge_hits(collected)
+    before = len(fused)
+    fused, collapsed = near_dup.cluster(fused)
+    for hit in fused:
+        hit.near_dupes = int((hit.meta or {}).get("near_dupes") or 0)
+    _ = before
     fused = rank(fused, req.sort)
     if len(fused) > req.limit:
         fused = fused[: req.limit]
@@ -277,12 +402,14 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         files=sum(1 for h in fused if h.file_ext),
         opportunities=sum(1 for h in fused if h.kind in ("opportunity", "application")),
         closing_soon=sum(1 for h in fused if h.deadline and 0 <= h.deadline.days_left <= 30),
+        duplicates_collapsed=int(collapsed),
+        dropped_noise=int(dropped),
         took_ms=int((time.perf_counter() - started) * 1000),
         cached=False,
     )
     response = HuntResponse(query=plan.terms, lens=plan.lens, site=plan.site, hits=fused,
                             providers=statuses, facets=facets(fused), stats=stats,
-                            plays=[p.dork for p in plan.plays])
+                            plays=[p.dork for p in plan.plays], expanded=expanded)
     _cache[key] = (time.time(), response)
     if len(_cache) > settings.cache_max:
         for stale in sorted(_cache, key=lambda k: _cache[k][0])[:50]:

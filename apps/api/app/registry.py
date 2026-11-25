@@ -20,7 +20,8 @@ ARCHIVES = [
 ]
 OPPORTUNITIES = [
     opportunities.GrantsGov(), opportunities.ReliefWebJobs(), opportunities.ReliefWebReports(),
-    opportunities.EuFunding(),
+    opportunities.EuFunding(), opportunities.NihReporter(), opportunities.NsfAwards(),
+    opportunities.UsaSpending(),
 ]
 SCHOLAR = [
     scholar.OpenAlex(), scholar.Crossref(), scholar.Arxiv(), scholar.DOAJ(), scholar.PubMed(),

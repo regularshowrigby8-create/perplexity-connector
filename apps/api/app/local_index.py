@@ -35,17 +35,14 @@ def db() -> Iterator[sqlite3.Connection]:
     conn.row_factory = sqlite3.Row
     try:
         conn.execute("PRAGMA journal_mode=WAL")
+        _ensure_schema(conn)
         yield conn
         conn.commit()
     finally:
         conn.close()
 
 
-def init() -> None:
-    settings.data_dir.mkdir(parents=True, exist_ok=True)
-    with db() as conn:
-        conn.executescript(
-            """
+_SCHEMA = """
             CREATE TABLE IF NOT EXISTS vault (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 url TEXT NOT NULL,
@@ -117,18 +114,19 @@ def init() -> None:
                 created_at TEXT NOT NULL
             );
             CREATE UNIQUE INDEX IF NOT EXISTS saved_canonical ON saved(canonical);
+            CREATE TABLE IF NOT EXISTS hunt_docs (
+                hunt_id INTEGER NOT NULL,
+                canonical TEXT NOT NULL,
+                hash TEXT,
+                excerpt TEXT,
+                updated_at TEXT,
+                PRIMARY KEY (hunt_id, canonical)
+            );
             CREATE TABLE IF NOT EXISTS runs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 query TEXT, lens TEXT, providers INTEGER, hits INTEGER,
                 took_ms INTEGER, created_at TEXT
             );
-            """
-        )
-
-
-with db() as conn:
-        conn.executescript(
-            """
             CREATE TABLE IF NOT EXISTS docs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 canonical TEXT NOT NULL UNIQUE,
@@ -156,7 +154,145 @@ with db() as conn:
                 INSERT INTO docs_fts(rowid, title, text) VALUES (new.id, new.title, new.text);
             END;
             """
-        )
+
+
+def _ensure_schema(conn: sqlite3.Connection, force: bool = False) -> None:
+    """Create tables when they are missing — the vault must survive a wipe.
+
+    Users delete the data directory, containers start with an empty volume, and
+    a long-lived process can outlive its own database file. Checking the schema
+    on every connection costs one index lookup and removes a whole class of
+    ``no such table`` failures.
+    """
+    if not force:
+        row = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='vault'").fetchone()
+        if row is not None:
+            return
+    conn.executescript(_SCHEMA)
+    _ensure_columns(conn)
+
+
+def init() -> None:
+    settings.data_dir.mkdir(parents=True, exist_ok=True)
+    with db() as conn:
+        _ensure_schema(conn, force=True)
+
+
+def _ensure_columns(conn: sqlite3.Connection | None = None) -> None:
+    """Small in-place migrations; the vault must survive upgrades."""
+    wanted = {"docs": {"hash": "TEXT"}, "vault": {"rich": "INTEGER NOT NULL DEFAULT 0"}}
+
+    def migrate(target: sqlite3.Connection) -> None:
+        for table, columns in wanted.items():
+            existing = {row[1] for row in target.execute(f"PRAGMA table_info({table})")}
+            for column, kind in columns.items():
+                if column not in existing:
+                    target.execute(f"ALTER TABLE {table} ADD COLUMN {column} {kind}")
+
+    if conn is not None:
+        migrate(conn)
+        return
+    with db() as fresh:
+        migrate(fresh)
+
+
+def now() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def _terms(text: str) -> list[str]:
+    return [t for t in re.split(r"[^a-z0-9]+", (text or "").lower()) if len(t) > 1 and t not in STOP]
+
+
+RICH_FIELDS = ("funder", "amount", "currency", "location", "structured", "schema_type",
+               "size", "sniffed", "mime", "keyphrases", "near_dupes")
+
+
+def _payload_of(hit) -> dict:
+    return {"tags": getattr(hit, "tags", []), "published": getattr(hit, "published", None),
+            "archive": getattr(hit, "archive", False),
+            "meta": getattr(hit, "meta", {}) or {},
+            **{key: getattr(hit, key, None) for key in RICH_FIELDS}}
+
+
+def payload_richness(payload: dict) -> int:
+    """Rank records by how much *specific* detail they carry.
+
+    A hunt re-surfaces the same URL through weaker engines (full-text snippet,
+    portal link). Those must never overwrite the crawl's structured record.
+    """
+    score = 0
+    for key in ("funder", "amount", "currency", "location", "structured", "schema_type"):
+        if payload.get(key):
+            score += 2
+    if payload.get("size"):
+        score += 1
+    if payload.get("keyphrases"):
+        score += 1
+    if payload.get("tags"):
+        score += 1
+    return score
+
+
+def upsert_hits(hits: Iterable) -> int:
+    """Persist every surfaced hit into the local vault (dedupe by canonical URL)."""
+    from .extract import canonical_url
+
+    added = 0
+    stamp = now()
+    with _lock, db() as conn:
+        for h in hits:
+            try:
+                canon = canonical_url(h.url)
+                payload = json.dumps(_payload_of(h), default=str)
+                richness = payload_richness(_payload_of(h))
+                cur = conn.execute(
+                    """INSERT INTO vault (url, canonical, title, snippet, provider, kind, file_ext,
+                                          domain, deadline, depth, first_seen, last_seen, times_seen,
+                                          payload, rich)
+                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1,?,?)
+                       ON CONFLICT(canonical) DO UPDATE SET
+                         last_seen=excluded.last_seen,
+                         times_seen=vault.times_seen+1,
+                         title=CASE WHEN excluded.rich > vault.rich THEN excluded.title
+                                    ELSE vault.title END,
+                         snippet=CASE WHEN excluded.rich > vault.rich
+                                        OR length(excluded.snippet) > length(vault.snippet)
+                                      THEN excluded.snippet ELSE vault.snippet END,
+                         deadline=CASE WHEN excluded.rich > vault.rich THEN excluded.deadline
+                                       ELSE COALESCE(vault.deadline, excluded.deadline) END,
+                         kind=CASE WHEN excluded.rich > vault.rich THEN excluded.kind
+                                   ELSE vault.kind END,
+                         file_ext=COALESCE(vault.file_ext, excluded.file_ext),
+                         payload=CASE WHEN excluded.rich >= vault.rich THEN excluded.payload
+                                      ELSE vault.payload END,
+                         rich=MAX(vault.rich, excluded.rich),
+                         depth=MAX(vault.depth, excluded.depth)""",
+                    (h.url, canon, h.title, h.snippet, h.provider, h.kind, h.file_ext,
+                     h.domain, h.deadline.date if getattr(h, "deadline", None) else None,
+                     int(getattr(h, "depth", 0)), stamp, stamp, payload, richness),
+                )
+                added += cur.rowcount
+            except sqlite3.Error:
+                continue
+    return added
+
+
+def _payload_meta(payload: str | None) -> dict:
+    """Structured fields stored with a vault row, flattened for re-hydration."""
+    try:
+        data = json.loads(payload or "{}")
+    except (ValueError, AttributeError):
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    out = dict(data.get("meta") or {})
+    for key in ("funder", "amount", "currency", "location", "structured", "size",
+                "schema_type", "sniffed", "mime", "keyphrases", "near_dupes"):
+        if data.get(key):
+            out[key] = data[key]
+    return out
 
 
 def index_document(canonical: str, url: str, title: str, text: str, engine: str) -> bool:
@@ -180,90 +316,99 @@ def index_document(canonical: str, url: str, title: str, text: str, engine: str)
             return False
 
 
+def _match_plan(terms: list[str]) -> str:
+    """One broad OR query; term coverage is applied as a ranking pass instead.
+
+    A raw OR lets "grant" or "kenya" dominate bm25 and bury the page that matches
+    every word; a raw AND throws away good partial matches. So: retrieve broad,
+    then rank by how many query terms each row actually covers.
+    """
+    return " OR ".join(f'"{t}"' for t in terms[:12])
+
+
+def _coverage(text: str, terms: list[str]) -> float:
+    haystack = (text or "").lower()
+    if not terms:
+        return 0.0
+    return sum(1 for term in terms if term in haystack) / len(terms)
+
+
+def _order_by_coverage(rows: list, terms: list[str], text_of, limit: int) -> list:
+    """Full-coverage rows first, then partial, each group in bm25 order."""
+    if not rows:
+        return rows
+    scored = [(row, _coverage(text_of(row), terms)) for row in rows]
+    best = max(cov for _, cov in scored)
+    if best >= 1.0:
+        keep = [(row, cov) for row, cov in scored if cov >= 1.0]
+    elif best >= 0.5:
+        keep = [(row, cov) for row, cov in scored if cov >= 0.5]
+    else:
+        keep = scored
+    if len(keep) < min(3, limit):
+        keep = scored
+    keep.sort(key=lambda pair: -pair[1])          # stable: bm25 order preserved
+    return [row for row, _ in keep[:limit]]
+
+
 def search_docs(query: str, limit: int = 40) -> list[dict]:
+    """Full-text search inside extracted documents, enriched from the vault.
+
+    The LEFT JOIN matters: a PDF found by the crawler has a rich vault record
+    (funder, amount, schema type). Hydrating those fields here means the
+    full-text engine returns complete records, not bare snippets.
+    """
     terms = _terms(query)
     if not terms:
         return []
-    match = " OR ".join(f'"{t}"' for t in terms[:12])
     out: list[dict] = []
     try:
         with db() as conn:
             rows = conn.execute(
                 """SELECT d.url, d.title, d.engine, d.chars, bm25(docs_fts) AS rank,
-                          snippet(docs_fts, 1, '[', ']', ' … ', 24) AS frag
-                   FROM docs_fts JOIN docs d ON d.id = docs_fts.rowid
-                   WHERE docs_fts MATCH ? ORDER BY rank LIMIT ?""", (match, limit))
+                          snippet(docs_fts, 1, '[', ']', ' … ', 24) AS frag,
+                          v.payload AS payload
+                   FROM docs_fts
+                   JOIN docs d ON d.id = docs_fts.rowid
+                   LEFT JOIN vault v ON v.canonical = d.canonical
+                   WHERE docs_fts MATCH ? ORDER BY rank LIMIT ?""",
+                (_match_plan(terms), max(limit * 3, 40))).fetchall()
+            rows = _order_by_coverage(
+                rows, terms,
+                lambda row: f"{row['title']} {row['frag']} {row['url']}", limit)
             for row in rows:
                 out.append({
                     "url": row["url"], "title": row["title"] or row["url"],
                     "snippet": row["frag"], "engine": row["engine"], "chars": row["chars"],
                     "score": round(-row["rank"] * 10, 3),
+                    "meta": _payload_meta(row["payload"]),
                 })
     except sqlite3.Error:
         return []
     return out
 
 
-def now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
-
-
-def _terms(text: str) -> list[str]:
-    return [t for t in re.split(r"[^a-z0-9]+", (text or "").lower()) if len(t) > 1 and t not in STOP]
-
-
-def upsert_hits(hits: Iterable) -> int:
-    """Persist every surfaced hit into the local vault (dedupe by canonical URL)."""
-    from .extract import canonical_url
-
-    added = 0
-    stamp = now()
-    with _lock, db() as conn:
-        for h in hits:
-            try:
-                canon = canonical_url(h.url)
-                payload = json.dumps(
-                    {"tags": getattr(h, "tags", []), "published": getattr(h, "published", None),
-                     "archive": getattr(h, "archive", False)}, default=str
-                )
-                cur = conn.execute(
-                    """INSERT INTO vault (url, canonical, title, snippet, provider, kind, file_ext,
-                                          domain, deadline, depth, first_seen, last_seen, times_seen, payload)
-                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1,?)
-                       ON CONFLICT(canonical) DO UPDATE SET
-                         last_seen=excluded.last_seen,
-                         times_seen=vault.times_seen+1,
-                         snippet=CASE WHEN length(excluded.snippet) > length(vault.snippet)
-                                      THEN excluded.snippet ELSE vault.snippet END,
-                         deadline=COALESCE(vault.deadline, excluded.deadline),
-                         depth=MAX(vault.depth, excluded.depth)""",
-                    (h.url, canon, h.title, h.snippet, h.provider, h.kind, h.file_ext,
-                     h.domain, h.deadline.date if getattr(h, "deadline", None) else None,
-                     int(getattr(h, "depth", 0)), stamp, stamp, payload),
-                )
-                added += cur.rowcount
-            except sqlite3.Error:
-                continue
-    return added
-
-
 def search_vault(query: str, limit: int = 40, file_ext: str | None = None) -> list[dict]:
     terms = _terms(query)
     if not terms:
         return []
-    match = " OR ".join(f'"{t}"' for t in terms[:12])
     sql = ("SELECT v.*, bm25(vault_fts) AS rank FROM vault_fts "
            "JOIN vault v ON v.id = vault_fts.rowid WHERE vault_fts MATCH ?")
-    params: list = [match]
     if file_ext:
         sql += " AND v.file_ext = ?"
-        params.append(file_ext)
     sql += " ORDER BY rank LIMIT ?"
-    params.append(limit)
     out: list[dict] = []
     try:
         with db() as conn:
-            for row in conn.execute(sql, params):
+            params: list = [_match_plan(terms)]
+            if file_ext:
+                params.append(file_ext)
+            params.append(max(limit * 3, 60))
+            rows = conn.execute(sql, params).fetchall()
+            rows = _order_by_coverage(
+                rows, terms,
+                lambda row: f"{row['title']} {row['snippet']} {row['url']}", limit)
+            for row in rows:
                 out.append({
                     "url": row["url"], "title": row["title"], "snippet": row["snippet"] or "",
                     "provider": row["provider"] or "vault", "provider_name": "Nighthawk Vault",
@@ -271,6 +416,7 @@ def search_vault(query: str, limit: int = 40, file_ext: str | None = None) -> li
                     "domain": row["domain"] or "", "depth": row["depth"] or 0,
                     "deadline": row["deadline"], "score": round(-row["rank"] * 10, 2),
                     "first_seen": row["first_seen"], "times_seen": row["times_seen"],
+                    "meta": _payload_meta(row["payload"]),
                 })
     except sqlite3.Error:
         return []
@@ -421,6 +567,34 @@ def tantivy_search(query: str, limit: int = 40) -> list[dict]:
         return out
     except Exception:
         return []
+
+
+def doc_text(canonical: str, limit: int = 200_000) -> str | None:
+    try:
+        with db() as conn:
+            row = conn.execute("SELECT text FROM docs WHERE canonical = ?", (canonical,)).fetchone()
+        return (row["text"] or "")[:limit] if row else None
+    except sqlite3.Error:
+        return None
+
+
+def store_hunt_doc(hunt_id: int, canonical: str, hash_value: str, excerpt: str) -> None:
+    with db() as conn:
+        conn.execute(
+            """INSERT INTO hunt_docs (hunt_id, canonical, hash, excerpt, updated_at)
+               VALUES (?,?,?,?,?)
+               ON CONFLICT(hunt_id, canonical) DO UPDATE SET
+                 hash = excluded.hash, excerpt = excluded.excerpt,
+                 updated_at = excluded.updated_at""",
+            (hunt_id, canonical, hash_value, excerpt[:6000], now()))
+
+
+def prior_hunt_doc(hunt_id: int, canonical: str) -> dict | None:
+    with db() as conn:
+        row = conn.execute(
+            "SELECT hash, excerpt FROM hunt_docs WHERE hunt_id = ? AND canonical = ?",
+            (hunt_id, canonical)).fetchone()
+    return dict(row) if row else None
 
 
 def vault_stats() -> dict:
