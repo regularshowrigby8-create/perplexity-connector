@@ -27,7 +27,7 @@ services:
     plan: free
     region: frankfurt
     healthCheckPath: /healthz
-    autoDeploy: true
+    autoDeployTrigger: commit   # redeploy on each push to the branch below
     envVars:
       - key: NH_DATA_DIR
         value: /tmp/nighthawk
