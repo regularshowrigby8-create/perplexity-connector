@@ -1,0 +1,4 @@
+# Root requirements so a host that detects Python without reading Dockerfile.api
+# installs the same engine. The real list is apps/api/requirements.txt; keep this
+# file pointing at it instead of copying it.
+-r apps/api/requirements.txt

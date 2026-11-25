@@ -309,7 +309,8 @@ Everything is proxied through the Next.js app, so the browser only ever talks to
 
 `index.html` is a static page; the crawler is a Python service. Netlify can serve the page but not
 run `/api/*`, which is exactly why a freshly-dropped deployment says **"No engine answered"** — the
-page is fine, it just has nothing to talk to. Three ways to fix it, in order of preference:
+page is fine, it just has nothing to talk to. Put an engine behind it (see *Running it somewhere
+that is not your machine*), in one of three ways:
 
 1. **Proxy (best).** The repo ships `netlify.toml` and `vercel.json` with an `/api/*` proxy. Edit the
    one `to`/`destination` URL to point at a running engine, redeploy, and the launcher finds it as
@@ -323,14 +324,40 @@ The probe tries, in order: `?api=` → the meta tag → the saved setting → th
 `8000-<sandbox>` preview convention → `localhost` (only when the page itself is local). The banner
 lists every URL it tried, so "offline" is never a mystery.
 
-## Deploy
+## Running it somewhere that is not your machine
+
+The crawler is a long-running Python service, so it needs a host that runs processes, not a host
+that serves files. The image is built so that **one container is the whole product**: `GET /` returns
+the launcher, `/api/v1/*` is the engine, on one origin — no proxy rewrite, no engine URL to paste,
+no "offline" banner.
+
+| Where | What runs there | What you do |
+|---|---|---|
+| **Render** | page + crawler, one Docker service, disk for the vault | New → Blueprint → this repo → Apply (`render.yaml`) |
+| **Fly.io** | same image, one machine, `jnb` region by default | `fly launch --copy-config --no-deploy`, `fly volumes create nighthawk_data -s 1`, `fly deploy` (`fly.toml`) |
+| **Railway** | same image, `$PORT` respected | New Project → Deploy from repo (`railway.json`) |
+| **Any VPS** | both, on `http://host:8000/` | `docker compose up -d --build` |
+| **Netlify / Vercel** | **the page only** — no Python, no crawler | deploy, then give it an engine (below) |
+| **This sandbox preview** | both, until the session ends | open the `:8000` or `:3000` preview |
+
+The single-container path, in full:
 
 ```bash
-docker compose up -d --build     # api :8000, web :3000, volumes for data/
+docker build -f Dockerfile.api -t nighthawk .
+docker run -d -p 8000:8000 -v nighthawk-data:/data nighthawk
+# http://127.0.0.1:8000/      → the launcher
+# http://127.0.0.1:8000/api/v1/health → the engine the page is talking to
 ```
 
-Or `./run.sh` on a VPS with Python 3.11+ and Node 20+. The only persistent state is `data/`
-(SQLite vault, watchlist, extraction cache).
+Mount `/data` (or set `NH_DATA_DIR`) or the vault resets whenever the container is replaced.
+
+`docker compose up -d --build` still runs the two-service layout (api `:8000`, web `:3000`) for the
+Next.js app; `./run.sh` does the same on a VPS with Python 3.11+ and Node 20+. The only persistent
+state is `data/` (SQLite vault, watchlist, extraction cache).
+
+If the page is the half you already deployed to Netlify or Vercel, give that deployment an engine
+with the proxy / meta / `?api=` options in *Deploying the launcher on a static host* above. The
+engine itself has to live on one of the rows in the table that can run Python.
 
 ## Responsible use
 

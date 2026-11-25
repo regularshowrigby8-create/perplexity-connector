@@ -1,0 +1,33 @@
+# Render blueprint — one service, one origin, nothing local.
+#
+# Render runs Docker, so this deploys the same image you run on a VPS: the page
+# is served at / and the crawler answers at /api/v1/* from the same origin. There
+# is no static/API split to wire up and no engine URL to paste into the page.
+#
+#   Render dashboard -> New -> Blueprint -> pick this repo -> Apply
+#
+# Cost note, said plainly: a disk needs a paid instance type. Without `disk:`
+# below, everything still works but the vault (SQLite/Whoosh/Tantivy) resets on
+# each deploy or restart. Delete the disk block to stay on the free tier.
+
+services:
+  - type: web
+    name: nighthawk
+    runtime: docker
+    dockerfilePath: ./Dockerfile.api
+    dockerContext: .
+    plan: starter
+    region: frankfurt
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NH_DATA_DIR
+        value: /data
+      - key: NH_RATE_LIMIT_PER_MIN
+        value: "120"
+      - key: NH_USER_AGENT
+        value: "Nighthawk/1.0 (+https://github.com/regularshowrigby8-create/perplexity-connector)"
+    disk:
+      name: nighthawk-data
+      mountPath: /data
+      sizeGB: 1

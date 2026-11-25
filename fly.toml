@@ -1,0 +1,43 @@
+# Fly.io — one machine, one origin, page and crawler together.
+#
+#   fly launch --copy-config --no-deploy    # keeps this file, makes the app
+#   fly volumes create nighthawk_data -s 1 -r jnb
+#   fly deploy
+#
+# The region is Johannesburg because that is where the results page is read
+# from; change it freely. GET / is the launcher, /api/v1/* is the crawler, both
+# on https://<app>.fly.dev — no proxy, no engine URL to configure.
+
+app = "nighthawk"
+primary_region = "jnb"
+
+[build]
+  dockerfile = "Dockerfile.api"
+
+[env]
+  NH_DATA_DIR = "/data"
+  NH_RATE_LIMIT_PER_MIN = "120"
+  NH_USER_AGENT = "Nighthawk/1.0 (+https://github.com/regularshowrigby8-create/perplexity-connector)"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/healthz"
+
+[[mounts]]
+  source = "nighthawk_data"
+  destination = "/data"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1

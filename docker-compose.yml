@@ -4,12 +4,15 @@ services:
       context: .
       dockerfile: Dockerfile.api
     environment:
+      NH_DATA_DIR: /data
       NH_USER_AGENT: "Nighthawk/1.0 (+https://example.org/bot)"
       NH_RATE_LIMIT_PER_MIN: "120"
     volumes:
-      - nh-data:/app/data
-    expose:
-      - "8000"
+      - nh-data:/data
+    ports:
+      # Published so the API container is usable on its own: http://host:8000/
+      # is the launcher and /api/v1/* is the crawler, same origin, no web build.
+      - "8000:8000"
     restart: unless-stopped
 
   web:

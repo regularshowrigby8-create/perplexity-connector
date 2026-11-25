@@ -240,6 +240,36 @@ async def main() -> int:
     ok &= check("launcher is not minified", launcher.count("\n") > 1200,
                 f"{launcher.count(chr(10))} lines")
 
+    print("\n\u25b8 7. one container, one origin (so it is not local)")
+    from fastapi.responses import FileResponse
+    from app import main as api_main
+
+    page = api_main.launcher_path()
+    ok &= check("the API finds the launcher beside it",
+                page is not None and page.name == "index.html", str(page))
+    served = await api_main.index()
+    ok &= check("GET / is the launcher, not a redirect",
+                isinstance(served, FileResponse) and served.media_type == "text/html")
+    launch = await api_main.launch()
+    ok &= check("GET /launch is the same file",
+                isinstance(launch, FileResponse) and Path(launch.path) == Path(served.path))
+
+    dockerfile = (ROOT / "Dockerfile.api").read_text(encoding="utf-8")
+    ok &= check("the image ships the page with the crawler",
+                "COPY index.html" in dockerfile and "NH_DATA_DIR=/data" in dockerfile)
+    hosts = {
+        "render.yaml": "Dockerfile.api",
+        "fly.toml": "Dockerfile.api",
+        "railway.json": "Dockerfile.api",
+        "Procfile": "uvicorn app.main:app",
+    }
+    missing = [name for name, needle in hosts.items()
+               if not (ROOT / name).is_file() or needle not in (ROOT / name).read_text(encoding="utf-8")]
+    ok &= check("every durable host has a ready config", not missing, str(missing))
+    compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+    ok &= check("compose publishes the engine on its own",
+                '"8000:8000"' in compose and "nh-data:/data" in compose)
+
     httpd.shutdown()
     print("\n" + ("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED"))
     return 0 if ok else 1
