@@ -11,6 +11,13 @@ const HOP_BY_HOP = new Set([
   "content-length", "content-encoding",
 ]);
 
+const CORS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "GET,POST,PUT,DELETE,OPTIONS",
+  "access-control-allow-headers": "content-type,authorization",
+  "access-control-max-age": "86400",
+};
+
 async function forward(req: NextRequest, path: string[]): Promise<Response> {
   const url = new URL(req.url);
   const target = `${API}/api/${path.join("/")}${url.search}`;
@@ -35,15 +42,17 @@ async function forward(req: NextRequest, path: string[]): Promise<Response> {
       redirect: "manual",
       cache: "no-store",
     });
-    const out = new Headers();
+    const out = new Headers(CORS);
     upstream.headers.forEach((value, key) => {
-      if (!HOP_BY_HOP.has(key.toLowerCase())) out.set(key, value);
+      if (!HOP_BY_HOP.has(key.toLowerCase()) && !key.toLowerCase().startsWith("access-control-")) {
+        out.set(key, value);
+      }
     });
     return new Response(upstream.body, { status: upstream.status, headers: out });
   } catch (error) {
     return Response.json(
       { detail: `Engine gateway unreachable: ${(error as Error).message}` },
-      { status: 502 },
+      { status: 502, headers: CORS },
     );
   }
 }
@@ -61,4 +70,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
 }
 export async function DELETE(req: NextRequest, ctx: Ctx) {
   return forward(req, (await ctx.params).path);
+}
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: CORS });
 }

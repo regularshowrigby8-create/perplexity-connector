@@ -10,6 +10,18 @@ No API keys. No setup wizard. Nothing to configure before your first hunt.
 ./run.sh          # → http://localhost:3000
 ```
 
+### Or just open the launcher
+
+`index.html` is a single self-contained page — no build step, no dependencies. Double-click it,
+or drop it on Vercel/Netlify/S3 as a static site, and point it at your engine under
+**engine settings**. It probes `/api/v1/health` for live counts, links into every view, and shows
+the launch commands with one-click copy.
+
+```
+python3 -m http.server 8080      # serve the page alone
+# or, with the API running: http://localhost:8000/launch
+```
+
 ---
 
 ## Why this exists

@@ -3,6 +3,7 @@ WORKDIR /app
 COPY apps/web/package.json ./
 RUN npm install --no-audit --no-fund
 COPY apps/web ./
+COPY index.html ./index.html
 ENV NEXT_OUTPUT=standalone
 RUN npm run build
 
@@ -12,5 +13,6 @@ ENV NODE_ENV=production API_URL=http://api:8000
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
+COPY index.html ./index.html
 EXPOSE 3000
 CMD ["node", "server.js"]

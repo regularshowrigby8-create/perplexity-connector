@@ -3,9 +3,9 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 import asyncio
@@ -14,6 +14,8 @@ from . import fixtures, local_index
 from .crawl import CrawlRequest, FusionCrawler
 from .api import router
 from .config import settings
+
+LAUNCHER = settings.data_dir.parent / "index.html"
 
 
 @asynccontextmanager
@@ -62,6 +64,14 @@ app.include_router(router)
 @app.get("/api")
 async def api_root() -> RedirectResponse:
     return RedirectResponse("/api/docs")
+
+
+@app.get("/launch", include_in_schema=False)
+async def launch() -> FileResponse:
+    """Serve the standalone launcher page straight from the API host."""
+    if not LAUNCHER.exists():
+        raise HTTPException(status_code=404, detail="launcher not found")
+    return FileResponse(LAUNCHER, media_type="text/html")
 
 
 @app.get("/healthz")
