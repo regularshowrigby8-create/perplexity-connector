@@ -1523,68 +1523,253 @@
     font-size: 12.5px;
   }
 
+  .hero:before { display: none; }
+
+  #status.chip { font-family: inherit; }
+
+  .menu-col a,
+  .menu-col button { line-height: 1.5; }
+
+  .panel-page .head h2 { font-size: 23px; }
+
+  .deep-row { border-radius: var(--radius-sm); }
+
   @media (max-width: 720px) {
     h1.title { font-size: 36px; }
     .section { padding: 38px 0; }
     .stat { border-right: 0; border-bottom: 1px solid var(--line); }
   }
+  /* ---- quiet layer: one column, one accent, most of the page behind a menu ---- */
+  .wrap { max-width: 880px; }
+
+  body { font-size: 16px; }
+
+  [hidden] { display: none !important; }
+
+  .nav {
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: none;
+  }
+
+  .nav-in { height: 58px; }
+
+  .brand { font-size: 15px; letter-spacing: 0.01em; }
+
+  .brand small { display: none; }
+
+  .brand-mark {
+    background: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  #status.chip {
+    background: none;
+    border-color: transparent;
+    padding: 0 4px 0 0;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--muted);
+  }
+
+  #menu-btn { font-size: 13px; letter-spacing: 0.02em; }
+
+  .menu {
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+  }
+
+  .menu-in {
+    display: flex;
+    gap: 52px;
+    padding: 20px 0 24px;
+    flex-wrap: wrap;
+  }
+
+  .menu-col { min-width: 132px; }
+
+  .menu-col h4 {
+    margin: 0 0 9px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .menu-col button,
+  .menu-col a {
+    display: block;
+    width: 100%;
+    padding: 5px 0;
+    background: none;
+    border: 0;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14.5px;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .menu-col button:hover,
+  .menu-col a:hover { color: var(--accent); }
+
+  .hero { padding: 72px 0 30px; }
+
+  .hero-in { max-width: 720px; margin: 0 auto; }
+
+  h1.title {
+    font-size: 38px;
+    line-height: 1.14;
+    margin: 0 0 14px;
+    max-width: 22ch;
+  }
+
+  .lede {
+    font-size: 16.5px;
+    line-height: 1.62;
+    color: var(--dim);
+    margin: 0 0 26px;
+    max-width: 52ch;
+  }
+
+  #hunt.panel { padding: 13px; border-radius: var(--radius); }
+
+  .sub-row {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    margin: 9px 2px 2px;
+  }
+
+  .link-btn { font-size: 13px; }
+
+  .link-btn.back { font-size: 13px; color: var(--dim); white-space: nowrap; }
+
+  .section { padding: 26px 0 56px; }
+
+  .panel-page { max-width: 720px; margin: 0 auto; }
+
+  .panel-page .head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+  }
+
+  .panel-page .head .rule { display: none; }
+
+  .panel-page .head .back { margin-left: auto; }
+
+  .panel-page .dim { max-width: 60ch; }
+
+  .hint {
+    display: inline;
+    margin-left: 6px;
+    font-size: 12px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .panel-page .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .panel-page .stat { background: var(--bg); padding: 14px 12px; }
+
+  .panel-page .stat .n { font-size: 20px; }
+
+  .panel-page .steps { gap: 12px; }
+
+  .panel-page .step { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 16px; background: var(--panel); }
+
+  .panel-page .step h4 { margin: 0 0 4px; font-size: 15px; }
+
+  .panel-page .step p { margin: 0; color: var(--dim); font-size: 14px; }
+
+  footer .foot {
+    gap: 10px;
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding: 22px 0 28px;
+    font-size: 13px;
+  }
+
+  footer .foot .link-btn { font-size: 13px; }
+
+  #cont-counts:empty,
+  #cont-log:empty { display: none; }
+
+  @media (max-width: 720px) {
+    h1.title { font-size: 31px; max-width: none; }
+    .hero { padding: 44px 0 20px; }
+    .menu-in { gap: 26px; padding: 16px 0 20px; }
+    .menu-col { min-width: 44%; }
+    #hunt .row > .btn { flex: 1 1 100%; }
+    .panel-page .head { flex-wrap: wrap; }
+  }
+
 </style>
 </head>
 <body>
 
 <header class="nav">
   <div class="wrap nav-in">
-    <a class="brand" href="#top">
+    <a class="brand" href="#search" data-open="search">
       <span class="brand-mark">N</span>
-      <span>Nighthawk<small>buried web engine</small></span>
+      <span>Nighthawk</span>
     </a>
-    <nav class="nav-links">
-      <a href="#hunt">Hunt</a>
-      <a href="#deep">Deep links</a>
-      <a href="#launch">Launch</a>
-      <a href="#practice">Practice target</a>
-      <a href="#deploy">Deploy</a>
-    </nav>
     <div class="nav-right">
-            <span class="chip" id="status"><span class="dot"></span><span id="status-text">checking engine</span></span>
-      <a class="btn btn-sm" id="open-app" href="#" target="_blank" rel="noreferrer noopener">API docs ↗</a>
+      <span class="chip" id="status"><span class="dot"></span><span id="status-text">checking engine</span></span>
+      <button class="btn btn-sm" type="button" id="menu-btn" aria-expanded="false" aria-controls="menu">Menu</button>
+    </div>
+  </div>
+  <div class="menu" id="menu" hidden>
+    <div class="wrap menu-in">
+      <div class="menu-col">
+        <h4>Find</h4>
+        <button type="button" data-open="search">Search</button>
+        <button type="button" data-open="crawl">Crawl a site</button>
+        <button type="button" data-open="similar">Similar links</button>
+        <button type="button" data-open="continuous">Live crawl</button>
+        <button type="button" data-open="deep">Pasted links</button>
+      </div>
+      <div class="menu-col">
+        <h4>Engine</h4>
+        <button type="button" data-open="engine">Status</button>
+        <button type="button" data-open="settings">Settings</button>
+        <a data-route="vault">Your index</a>
+        <a id="open-app" data-route="api/docs">API docs</a>
+      </div>
+      <div class="menu-col">
+        <h4>First time here?</h4>
+        <button type="button" data-open="practice">Try a sample site</button>
+        <button type="button" data-open="deploy">Run it yourself</button>
+      </div>
     </div>
   </div>
 </header>
 
 <main id="top">
-  <section class="hero">
+  <section class="hero" id="search">
     <div class="wrap hero-in">
-      <span class="eyebrow"><span class="pulse"></span>119 sources · 86 site crawlers · no keys needed</span>
-      <h1 class="title">Find the files<br/><span class="grad">search engines bury.</span></h1>
-      <p class="lede">
-        Search the open web for what ordinary search skips — <b>documents, forms, notices and
-        data</b> sitting in upload folders, portals and old directories. Results are matched exactly
-        as you type them, nothing is quietly removed, and you can always see why something matched.
-      </p>
-
-      <div class="warn-strip" data-verbatim="1" role="note">
-        <span class="warn-mark">!</span>
-        <div>
-          <strong>No popularity ranking. No quiet filtering.</strong>
-          <p>
-            What you get is the material a normal results page demotes or drops: the PDF in
-            <span class="mono">/uploads/2019/03/</span>, the notice behind a portal search, the
-            “Index of /” listing nobody linked, the spreadsheet in a data dump.
-            Your words are matched <b>exactly</b> — no stemming, no synonyms, no guessing — and
-            nothing is taken out of the results: duplicates are labelled, low-quality pages are marked
-            and moved to the end. Type a file type (<b>pdf</b>, <b>apk</b>, <b>csv</b>) to keep only
-            that kind of file.
-          </p>
-        </div>
-      </div>
-
-      <div class="caps" role="list" aria-label="What this engine promises">
-        <span class="cap" role="listitem"><b>exact words</b> matched as typed</span>
-        <span class="cap" role="listitem"><b>newest first</b> down to the second</span>
-        <span class="cap" role="listitem"><b>nothing hidden</b> duplicates and junk are labelled</span>
-        <span class="cap" role="listitem"><b>pasted links</b> reach pages nothing links to</span>
-      </div>
+      <h1 class="title">Find the files search engines bury.</h1>
+      <p class="lede">Documents, forms, notices and data that ordinary search skips. Exact words, newest first, nothing removed.</p>
 
       <div class="panel" id="hunt">
         <form class="row" id="hunt-form" autocomplete="off">
@@ -1596,11 +1781,17 @@
           <button class="btn btn-primary" type="submit">Search</button>
           <button class="btn" type="button" id="crawl-btn" title="If you typed a URL, walk that site">Crawl a site</button>
         </form>
-        <div class="lens-row" id="lenses" role="group" aria-label="Search lens"></div>
-        <div class="lens-row" id="types" role="group" aria-label="File type"></div>
-        <div class="row" style="margin-top:10px">
-          <button class="link-btn" type="button" id="settings-toggle">connection settings</button>
+
+        <div class="sub-row">
+          <button class="link-btn" type="button" id="filters-toggle" aria-expanded="false" aria-controls="filters">filters</button>
+          <button class="link-btn" type="button" id="settings-toggle">engine settings</button>
         </div>
+
+        <div id="filters" hidden>
+          <div class="lens-row" id="lenses" role="group" aria-label="Search lens"></div>
+          <div class="lens-row" id="types" role="group" aria-label="File type"></div>
+        </div>
+
         <div class="settings" id="settings">
           <div>
             <label for="base">Engine URL</label>
@@ -1625,6 +1816,7 @@
         </div>
         <button class="btn btn-sm" type="button" id="banner-retry">retry</button>
         <button class="btn btn-sm" type="button" id="banner-settings">engine settings</button>
+      </div>
     </div>
   </section>
 
@@ -1638,71 +1830,18 @@
     <div class="deep-results" id="live-hits"></div>
   </section>
 
-  <section class="wrap section">
-    <div class="stats">
-      <div class="stat"><div class="n lime" id="s-remote">119</div><div class="l">sources</div></div>
-      <div class="stat"><div class="n cyan" id="s-arsenal">86</div><div class="l">site crawlers</div></div>
-      <div class="stat"><div class="n" id="s-ready">—</div><div class="l">ready now</div></div>
-      <div class="stat"><div class="n amber" id="s-portals">54</div><div class="l">portals</div></div>
-      <div class="stat"><div class="n" id="s-files">0</div><div class="l">files saved</div></div>
-      <div class="stat"><div class="n" id="s-docs">0</div><div class="l">documents</div></div>
+  <section class="wrap section panel-page" id="similar" data-panel hidden>
+    <div class="head">
+      <h2>Similar links</h2>
+      <button class="link-btn back" type="button" data-open="search">back to search</button>
     </div>
-  </section>
+    <p class="dim">Paste one link. Every link built the same way turns up — an id in it becomes a wildcard — and the ones your phrase rejects stay listed underneath.</p>
 
-  <section class="wrap section">
-    <div class="head"><h2>What you can do here</h2><span class="rule"></span><span class="tiny">search and crawling run on this page</span></div>
-    <div class="grid">
-      <a class="card" href="#live" data-route="hunt">
-        <div class="top"><span class="pill lime">federated</span></div>
-        <h3>Search</h3>
-        <p>One search across every working source: documents, forms, tenders, datasets and portals, newest first, with the deadline and the funder attached where they exist.</p>
-      </a>
-      <a class="card" href="#live" data-route="crawl">
-        <div class="top"><span class="pill cyan">primary</span></div>
-        <h3>Crawl a site</h3>
-        <p>Give it a URL and it walks the site — pages, PDFs, spreadsheets, downloads — then reads and saves what it finds.</p>
-      </a>
-      <a class="card" href="#arsenal-link" data-route="arsenal">
-        <div class="top"><span class="pill violet">86 engines</span></div>
-        <h3>Crawlers</h3>
-        <p>The tools it can call, and whether each one is working right now. Nothing is faked: a source that fails says so.</p>
-      </a>
-      <a class="card" href="#vault-link" data-route="vault">
-        <div class="top"><span class="pill amber">local</span></div>
-        <h3>Your index</h3>
-        <p>Everything it has saved, searchable offline — including the text inside the documents, not just their titles.</p>
-      </a>
-      <a class="card" href="#deep">
-        <div class="top"><span class="pill lime">deep links</span></div>
-        <h3>Pasted links</h3>
-        <p>Paste exact URLs no search engine has crawled — portal notices, unlinked annexes — and see why nothing else could reach them.</p>
-      </a>
-      <a class="card" href="#similar" data-route="similar">
-        <div class="top"><span class="pill">link patterns</span></div>
-        <h3>Similar links</h3>
-        <p>Paste one link — a form, a record, a file — and find every other link built the same way, filtered by a word or phrase.</p>
-      </a>
-      <a class="card" href="#api-link" data-route="api/docs">
-        <div class="top"><span class="pill cyan">rest</span></div>
-        <h3>API</h3>
-        <p>POST /hunt, /hunt/stream, /crawl/stream, /vault. SSE events for every page, file and block.</p>
-      </a>
-    </div>
-  </section>
-
-  <section class="wrap section" id="similar">
-    <div class="head"><h2>Similar links</h2><span class="rule"></span><span class="tiny">find every other link shaped like this one</span></div>
-    <p class="note" style="margin-bottom:16px">
-      Paste a link you already have. Its shape is kept — an id becomes a wildcard, so
-      <span class="mono">/forms/d/e/{id}/viewform</span> stays and the id does not — and every link with the
-      same shape turns up. Add a word or phrase to keep only the links that mention it. The ones it rejects
-      are still listed underneath, so a strict phrase never looks like an empty web.
-    </p>
     <form class="link-form" id="link-form" autocomplete="off">
       <label>Link
         <input id="link-seed" type="url" placeholder="https://docs.google.com/forms/d/e/…/viewform" required />
       </label>
-      <label>Word or phrase <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(optional — matched against the link and its text)</span>
+      <label>Word or phrase <span class="hint">optional — matched against the link and its text</span>
         <input id="link-phrase" type="text" placeholder="round 4" />
       </label>
       <div class="row">
@@ -1721,6 +1860,7 @@
         <button class="btn btn-primary" type="submit">Find similar links</button>
       </div>
     </form>
+
     <div class="deep-counts" id="link-counts"></div>
     <div class="row" style="margin:10px 0 4px">
       <span class="template-line" id="link-template"></span>
@@ -1729,118 +1869,149 @@
     <div class="deep-results" id="link-out"></div>
   </section>
 
-  <section class="wrap section deep" id="deep">
-    <div class="head"><h2>Pasted links — pages nothing links to</h2><span class="rule"></span><span class="tiny">no search engine involved</span></div>
-    <p class="dim" style="max-width:86ch;margin:0 0 14px">
-      A portal’s search form, an unlinked annex, a sitemap entry nothing points at, an attachment behind
-      a JavaScript link, a page the site deleted — none of that can be ranked by an engine that never
-      crawled it. Paste the exact links and Nighthawk crawls <b>from</b> them and then tells you, per
-      result, <b>why nothing else could have found it</b>. Same rules as the rest of the engine: matches
-      are verbatim, ordering is newest-first, and nothing is removed.
-    </p>
+  <section class="wrap section panel-page" id="continuous" data-panel hidden>
+    <div class="head">
+      <h2>Live crawl</h2>
+      <button class="link-btn back" type="button" data-open="search">back to search</button>
+    </div>
+    <p class="dim">Give it a site once. It keeps walking it, round after round, and saves what it finds to your index — after you close this page too. It stops when you press Stop, or when the server restarts.</p>
 
-    <div class="panel">
-      <label class="tiny" for="deep-seeds" style="display:block;margin-bottom:6px">exact links (one per line)</label>
-      <textarea id="deep-seeds" spellcheck="false" placeholder="https://portal.example.org/procurement/notice.cfm?notice_id=48213
+    <form class="link-form" id="cont-form" autocomplete="off">
+      <label>Site or page <span class="hint">one per line — leave empty to keep the sites it already knows</span>
+        <textarea id="cont-seeds" rows="2" spellcheck="false" placeholder="https://example.org"></textarea>
+      </label>
+      <div class="row">
+        <label style="flex:0 0 160px">Pause between rounds
+          <input id="cont-delay" type="number" min="0" max="3600" value="20" /><span class="hint">seconds</span>
+        </label>
+        <label style="flex:0 0 140px">Pages per round
+          <input id="cont-pages" type="number" min="1" max="200" value="25" />
+        </label>
+        <label class="inline"><input id="cont-same" type="checkbox" checked /> same site only</label>
+        <button class="btn btn-primary" type="submit" id="cont-start">Start</button>
+        <button class="btn" type="button" id="cont-stop" disabled>Stop</button>
+      </div>
+    </form>
+
+    <div class="deep-counts" id="cont-counts"></div>
+    <p class="dim" id="cont-state">Not running.</p>
+    <div class="deep-log" id="cont-log" aria-live="polite"></div>
+  </section>
+
+  <section class="wrap section panel-page" id="deep" data-panel hidden>
+    <div class="head">
+      <h2>Pasted links</h2>
+      <button class="link-btn back" type="button" data-open="search">back to search</button>
+    </div>
+    <p class="dim">Paste exact links nothing points at. Nighthawk crawls from them and says, per result, why nothing else could have found it.</p>
+
+    <label class="tiny" for="deep-seeds" style="display:block;margin-bottom:6px">exact links (one per line)</label>
+    <textarea id="deep-seeds" spellcheck="false" placeholder="https://portal.example.org/procurement/notice.cfm?notice_id=48213
 https://example.org/uploads/2019/03/annex-b-budget.pdf
 https://example.org/annex/off-cycle-notice.html"></textarea>
 
-      <div class="deep-controls">
-        <div class="field" style="max-width:320px;flex:1 1 260px">
-          <span class="glyph">⌕</span>
-          <input id="deep-q" type="search" placeholder="phrase to match verbatim (optional)" aria-label="Deep query" />
-        </div>
-        <label>depth <select id="deep-depth"><option>2</option><option selected>4</option><option>6</option><option>8</option></select></label>
-        <label>pages <input id="deep-pages" type="number" value="150" min="0" step="50" style="width:74px" /></label>
-        <label><input id="deep-external" type="checkbox" /> other hosts</label>
-        <label><input id="deep-sitemaps" type="checkbox" checked /> sitemaps</label>
-        <label><input id="deep-archive" type="checkbox" checked /> archives</label>
-        <label><input id="deep-pages-all" type="checkbox" checked /> every page</label>
-        <label title="robots.txt is advisory here; you chose the target"><input id="deep-robots" type="checkbox" /> obey robots.txt</label>
-        <button class="btn btn-primary" type="button" id="deep-run">Deep crawl →</button>
-        <button class="btn" type="button" id="deep-export" disabled>export .json</button>
+    <div class="deep-controls">
+      <div class="field" style="max-width:320px;flex:1 1 260px">
+        <span class="glyph">⌕</span>
+        <input id="deep-q" type="search" placeholder="phrase to match verbatim (optional)" aria-label="Deep query" />
       </div>
-
-      <div class="deep-counts" id="deep-counts"></div>
-      <div class="deep-log" id="deep-log" aria-live="polite"></div>
-      <div class="deep-results" id="deep-results"></div>
+      <label>depth <select id="deep-depth"><option>2</option><option selected>4</option><option>6</option><option>8</option></select></label>
+      <label>pages <input id="deep-pages" type="number" value="150" min="0" step="50" style="width:74px" /></label>
+      <label><input id="deep-external" type="checkbox" /> other hosts</label>
+      <label><input id="deep-sitemaps" type="checkbox" checked /> sitemaps</label>
+      <label><input id="deep-archive" type="checkbox" checked /> archives</label>
+      <label><input id="deep-pages-all" type="checkbox" checked /> every page</label>
+      <label title="robots.txt is advisory here; you chose the target"><input id="deep-robots" type="checkbox" /> obey robots.txt</label>
+      <button class="btn btn-primary" type="button" id="deep-run">Deep crawl →</button>
+      <button class="btn" type="button" id="deep-export" disabled>export .json</button>
     </div>
+
+    <div class="deep-counts" id="deep-counts"></div>
+    <div class="deep-log" id="deep-log" aria-live="polite"></div>
+    <div class="deep-results" id="deep-results"></div>
   </section>
 
-  <section class="wrap section" id="practice">
-    <div class="head"><h2>Try it on a sample site</h2><span class="rule"></span><span class="tiny">works without an internet connection</span></div>
+  <section class="wrap section panel-page" id="engine" data-panel hidden>
+    <div class="head">
+      <h2>Status</h2>
+      <button class="link-btn back" type="button" data-open="search">back to search</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n lime" id="s-remote">119</div><div class="l">sources</div></div>
+      <div class="stat"><div class="n cyan" id="s-arsenal">86</div><div class="l">site crawlers</div></div>
+      <div class="stat"><div class="n" id="s-ready">—</div><div class="l">ready now</div></div>
+      <div class="stat"><div class="n amber" id="s-portals">54</div><div class="l">portals</div></div>
+      <div class="stat"><div class="n" id="s-files">0</div><div class="l">files saved</div></div>
+      <div class="stat"><div class="n" id="s-docs">0</div><div class="l">documents</div></div>
+    </div>
+    <div class="row" style="margin-top:18px;gap:10px;flex-wrap:wrap">
+      <a class="btn btn-sm" data-route="arsenal">Check every crawler</a>
+      <a class="btn btn-sm" data-route="engines">Sources</a>
+      <a class="btn btn-sm" data-route="vault">Your index</a>
+      <a class="btn btn-sm" data-route="api/docs">API docs</a>
+    </div>
+    <p class="dim" style="margin-top:16px">Sources are remote sites; site crawlers are the tools the crawler calls. Nothing is faked — a source that fails says so.</p>
+  </section>
+
+  <section class="wrap section panel-page" id="practice" data-panel hidden>
+    <div class="head">
+      <h2>Try a sample site</h2>
+      <button class="link-btn back" type="button" data-open="search">back to search</button>
+    </div>
+    <p class="dim">A small local site — an “Index of /files” listing, three PDFs, a CSV, JSON, a ZIP and one page nothing links to. It works without an internet connection.</p>
     <div class="steps">
-      <div class="step">
-          <div>
-            <h4>Open the crawler</h4>
-            <p>Local fixture site with an “Index of /files” listing, three PDFs, a CSV, JSON, a ZIP and a robots-disallowed page.</p>
-          </div>
-        </div>
-      <div class="step">
-          <div>
-            <h4>Press “Load practice target”, then “Start crawl”</h4>
-            <p>Watch fetch → parse → extract → index, with each arsenal engine named in the log.</p>
-          </div>
-        </div>
-      <div class="step">
-          <div>
-            <h4>Search inside the documents</h4>
-            <p>Open the vault and search <span class="mono">solar mini-grid</span> — the match comes from inside the tender PDF.</p>
-          </div>
-        </div>
+      <div class="step"><div><h4>Crawl it</h4><p>Press “Run practice crawl” and watch fetch → parse → extract → index.</p></div></div>
+      <div class="step"><div><h4>Search inside the documents</h4><p>Search <span class="mono">solar mini-grid</span> — the match comes from inside the tender PDF.</p></div></div>
+      <div class="step"><div><h4>Reach the unlinked page</h4><p>One page there is linked from nowhere, so only a pasted link can reach it.</p></div></div>
     </div>
     <div class="row" style="margin-top:13px">
       <button class="btn btn-primary" type="button" id="practice-btn">Run practice crawl →</button>
       <button class="btn" type="button" id="practice-deep" title="This page is linked from nowhere, so only a pasted URL can reach it">Deep-crawl the unlinked page →</button>
-      <a class="btn" href="#vault-link" data-route="vault">Vault (engine JSON)</a>
+      <a class="btn" href="#vault-link" data-route="vault">Your index (engine JSON)</a>
     </div>
   </section>
 
-  <section class="wrap section" id="deploy">
-    <div class="head"><h2>Run it yourself</h2><span class="rule"></span><span class="tiny">no configuration, no API keys</span></div>
+  <section class="wrap section panel-page" id="deploy" data-panel hidden>
+    <div class="head">
+      <h2>Run it yourself</h2>
+      <button class="link-btn back" type="button" data-open="search">back to search</button>
+    </div>
     <div class="cmds">
-      
-        <div class="cmd">
-          <code>./run.sh</code>
-          <button class="copy" data-copy="./run.sh">copy</button>
-          <span class="dim">api :8000 · web :3000</span>
-        </div>
-      
-        <div class="cmd">
-          <code>docker compose up -d --build</code>
-          <button class="copy" data-copy="docker compose up -d --build">copy</button>
-          <span class="dim">self-hosted VPS</span>
-        </div>
-      
-        <div class="cmd">
-          <code>python scripts/selftest.py</code>
-          <button class="copy" data-copy="python scripts/selftest.py">copy</button>
-          <span class="dim">20 end-to-end assertions</span>
-        </div>
-      
-        <div class="cmd">
-          <code>python3 -m http.server 8080</code>
-          <button class="copy" data-copy="python3 -m http.server 8080">copy</button>
-          <span class="dim">serve this page alone</span>
-        </div>
+      <div class="cmd">
+        <code>./run.sh</code>
+        <button class="copy" data-copy="./run.sh">copy</button>
+        <span class="dim">api :8000 · web :3000</span>
+      </div>
+      <div class="cmd">
+        <code>docker compose up -d --build</code>
+        <button class="copy" data-copy="docker compose up -d --build">copy</button>
+        <span class="dim">self-hosted VPS</span>
+      </div>
+      <div class="cmd">
+        <code>python scripts/selftest.py</code>
+        <button class="copy" data-copy="python scripts/selftest.py">copy</button>
+        <span class="dim">90 end-to-end checks</span>
+      </div>
+      <div class="cmd">
+        <code>python3 -m http.server 8080</code>
+        <button class="copy" data-copy="python3 -m http.server 8080">copy</button>
+        <span class="dim">serve this page alone</span>
+      </div>
     </div>
-    <div class="note" style="margin-top:14px">
-      This page is a standalone launcher — one file, no build step. Drop it on Vercel, Netlify, S3 or a USB
-      stick. It has no server dependency: set the engine URL in <b>engine settings</b> (or leave it blank when
-      it is served from the same origin as the app). The crawler itself needs a long-running host, so the API
-      lives on a VPS or in Docker.
-    </div>
+    <p class="dim" style="margin-top:14px">
+      This page is one file with no build step — it can live on Vercel, Netlify, S3 or a USB stick.
+      The crawler needs a long-running host, so the API lives on a VPS or in Docker.
+    </p>
   </section>
 </main>
 
 <footer>
   <div class="wrap foot">
-    <span class="mono">NIGHTHAWK v1.3</span>
+    <span class="mono">NIGHTHAWK v1.4</span>
     <span class="dim">·</span>
-    <span>119 sources · 86 site crawlers · 54 portals · exact matching</span>
-    <span class="dim">·</span>
-    <a href="#api-link" data-route="api/docs">API</a>
-    <a href="#arsenal-link" data-route="arsenal">Engine status</a>
+    <a data-route="api/docs">API</a>
+    <a data-route="arsenal">Crawlers</a>
+    <button class="link-btn" type="button" data-open="engine">Status</button>
     <span style="margin-left:auto" class="mono">crawl responsibly — you own the targets you point it at</span>
   </div>
 </footer>
@@ -2284,6 +2455,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     var policy = report.policy || {};
 
     document.getElementById("live").hidden = false;
+    hidePanels();
     document.getElementById("live-title").textContent = headline;
     var intent = report.intent || {};
     var typed = intent.types || [];
@@ -2894,6 +3066,214 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     deepEl("deep-q").value = prefill.get("q") || "";
     location.hash = "#deep";
   })();
+
+  // --------------------------------------------------------- menu and panels
+  // Everything except the search box is one menu click away. The page is a
+  // search box and a headline; the rest is available, not in your face.
+  var PANELS = ["similar", "continuous", "deep", "practice", "deploy", "engine"];
+  var menuBtn = document.getElementById("menu-btn");
+  var menuBox = document.getElementById("menu");
+
+  function closeMenu() {
+    if (!menuBox || menuBox.hidden) return;
+    menuBox.hidden = true;
+    if (menuBtn) menuBtn.setAttribute("aria-expanded", "false");
+  }
+
+  function toggleMenu() {
+    if (!menuBox) return;
+    var open = menuBox.hidden;
+    menuBox.hidden = !open;
+    if (menuBtn) menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function scrollToNode(node) {
+    if (!node || typeof node.scrollIntoView !== "function") return;
+    node.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function hidePanels() {
+    var open = document.querySelectorAll("section[data-panel]:not([hidden])");
+    for (var i = 0; i < open.length; i++) open[i].hidden = true;
+  }
+
+  function showPanel(name) {
+    var wanted = PANELS.indexOf(name) >= 0 ? name : "";
+    var panels = document.querySelectorAll("section[data-panel]");
+    for (var i = 0; i < panels.length; i++) panels[i].hidden = panels[i].id !== wanted;
+    closeMenu();
+    if (wanted) {
+      scrollToNode(document.getElementById(wanted));
+      if (wanted === "continuous") contPoll();
+      return;
+    }
+    scrollToNode(document.getElementById("search"));
+  }
+
+  if (menuBtn && menuBox) {
+    menuBtn.addEventListener("click", function (event) {
+      event.stopPropagation();
+      toggleMenu();
+    });
+    document.addEventListener("click", function (event) {
+      var node = event.target;
+      if (menuBox.hidden || !node || !node.closest) return;
+      if (!node.closest("#menu") && !node.closest("#menu-btn")) closeMenu();
+    });
+  }
+
+  document.addEventListener("click", function (event) {
+    var node = event.target.closest ? event.target.closest("[data-open]") : null;
+    if (!node) return;
+    var name = node.getAttribute("data-open");
+    event.preventDefault();
+    if (name === "settings") {
+      showPanel("");
+      settings.classList.add("open");
+      document.getElementById("base").value = storedBase();
+      document.getElementById("base").focus();
+      scrollToNode(settings);
+      return;
+    }
+    if (name === "crawl") {
+      showPanel("");
+      var box = document.getElementById("q");
+      box.focus();
+      if (box.select) box.select();
+      toast("paste a URL, then press Crawl a site");
+      return;
+    }
+    showPanel(name === "search" ? "" : name);
+  });
+
+  var filtersToggle = document.getElementById("filters-toggle");
+  var filtersBox = document.getElementById("filters");
+  if (filtersToggle && filtersBox) {
+    filtersToggle.addEventListener("click", function () {
+      var open = filtersBox.hidden;
+      filtersBox.hidden = !open;
+      filtersToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      filtersToggle.textContent = open ? "hide filters" : "filters";
+    });
+  }
+
+  function panelFromHash() {
+    var id = (location.hash || "").replace(/^#/, "").split("?")[0];
+    if (PANELS.indexOf(id) >= 0) showPanel(id);
+    else if (id === "search" || id === "top" || id === "hunt") showPanel("");
+  }
+  window.addEventListener("hashchange", panelFromHash);
+  panelFromHash();
+
+  // --------------------------------------------------------- continuous crawl
+  var contCache = {};
+  var contRunning = false;
+
+  function contNode(id) {
+    if (!contCache[id]) contCache[id] = document.getElementById(id);
+    return contCache[id];
+  }
+
+  function contCountsHtml(state) {
+    var bits = [
+      [state.rounds || 0, "rounds"],
+      [state.pages || 0, "pages read"],
+      [state.files || 0, "files found"],
+      [state.documents || 0, "in your index"],
+      [(state.origins || []).length, "sites"]
+    ];
+    var html = "";
+    for (var i = 0; i < bits.length; i++) {
+      html += '<span class="tick"><b>' + bits[i][0] + "</b> " + bits[i][1] + "</span>";
+    }
+    return html;
+  }
+
+  function contRender(state) {
+    if (!state || typeof state !== "object") return;
+    contRunning = !!state.running;
+    var stop = contNode("cont-stop");
+    var start = contNode("cont-start");
+    if (stop) stop.disabled = !contRunning;
+    if (start) start.disabled = contRunning;
+    var counts = contNode("cont-counts");
+    if (counts) counts.innerHTML = contCountsHtml(state);
+    var line = contNode("cont-state");
+    if (line) {
+      var text;
+      if (contRunning) {
+        text = "Running";
+        if (state.origins && state.origins.length) text += " on " + state.origins.join(", ");
+        if (state.current) text += " — reading " + state.current;
+        if (state.next_in_s) text += " · next round in " + state.next_in_s + "s";
+      } else {
+        text = state.rounds
+          ? "Stopped after " + state.rounds + " rounds. Press Start to carry on."
+          : "Not running.";
+      }
+      if (state.errors && state.errors.length) {
+        text += " · " + state.errors.length + " problem" + (state.errors.length === 1 ? "" : "s") + " so far";
+      }
+      line.textContent = text;
+    }
+    var log = contNode("cont-log");
+    if (log) {
+      log.textContent = (state.errors || []).slice(-6).map(function (item) {
+        return "! " + item.message;
+      }).join("\n");
+    }
+  }
+
+  function contPoll() {
+    return fetch(url("/api/v1/continuous"), { cache: "no-store" })
+      .then(function (res) { return res && res.ok ? res.json() : null; })
+      .then(function (state) { contRender(state); return state; })
+      .catch(function () { return null; });
+  }
+
+  function contStart() {
+    var raw = (contNode("cont-seeds").value || "").split(/[\s,]+/);
+    var seeds = [];
+    for (var i = 0; i < raw.length; i++) if (raw[i]) seeds.push(raw[i]);
+    var body = {
+      seeds: seeds,
+      delay: Number(contNode("cont-delay").value) || 0,
+      pages_per_round: Number(contNode("cont-pages").value) || 25,
+      same_host: contNode("cont-same").checked,
+      respect_robots: true
+    };
+    return post("/api/v1/continuous", body).then(function (state) {
+      contRender(state);
+      toast(seeds.length ? "live crawl started" : "live crawl resumed");
+    }).catch(function (err) {
+      toast("could not start · " + err.message);
+    });
+  }
+
+  function contStop() {
+    return post("/api/v1/continuous/stop", {}).then(function (state) {
+      contRender(state);
+      toast("live crawl stopped");
+    }).catch(function (err) {
+      toast("could not stop · " + err.message);
+    });
+  }
+
+  var contForm = document.getElementById("cont-form");
+  if (contForm) {
+    contForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      contStart();
+    });
+    document.getElementById("cont-stop").addEventListener("click", contStop);
+  }
+
+  // Only poll when it matters: while a crawl is running, or while its panel is open.
+  setInterval(function () {
+    if (document.hidden) return;
+    var panel = document.getElementById("continuous");
+    if (contRunning || (panel && !panel.hidden)) contPoll();
+  }, 6000);
 
   renderLenses();
   wireRoutes();

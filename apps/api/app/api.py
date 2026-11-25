@@ -15,6 +15,7 @@ from .crawl import CrawlRequest, FusionCrawler
 from .deep import DeepRequest, deep_crawl
 from .links import LinkRequest, find_links
 from .change import content_hash, diff as diff_text
+from .continuous import ContinuousRequest, worker as continuous
 from .extract import canonical_url
 from .models import HuntRequest
 from .orchestrator import hunt
@@ -250,6 +251,43 @@ async def post_links(payload: LinkRequest, request: Request) -> dict[str, Any]:
     """
     rate_limit(request)
     return await find_links(payload)
+
+
+@router.post("/continuous")
+async def post_continuous(payload: ContinuousRequest, request: Request) -> dict[str, Any]:
+    """Start (or reconfigure) the background crawler.
+
+    One site in, and it keeps walking it round after round until it is told to
+    stop. The pause between rounds is `delay` seconds — a continuous crawler
+    that hammers a host is a denial of service, not a feature.
+    """
+    rate_limit(request)
+    try:
+        return await continuous.start(payload)
+    except ValueError as exc:
+        raise HTTPException(400, detail=str(exc))
+
+
+@router.get("/continuous")
+async def get_continuous() -> dict[str, Any]:
+    """What the background crawler is doing right now."""
+    return continuous.status()
+
+
+@router.post("/continuous/seeds")
+async def post_continuous_seeds(request: Request, payload: dict[str, Any]) -> dict[str, Any]:
+    """Add another site to a crawl that is already running."""
+    rate_limit(request)
+    raw = payload.get("seeds") or []
+    if isinstance(raw, str):
+        raw = [raw]
+    return continuous.add_sites([str(item) for item in raw])
+
+
+@router.post("/continuous/stop")
+async def post_continuous_stop() -> dict[str, Any]:
+    """Stop the background crawler. Rounds in flight are cancelled, not left running."""
+    return await continuous.stop()
 
 
 @router.get("/demo-target")

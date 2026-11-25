@@ -293,6 +293,56 @@ Nighthawk attacks that gap from four directions at once:
   every engine which found it. Reciprocal-rank fusion decides the order.
 - **Watchers.** Save a hunt; every run reports only URLs it has never seen before.
 
+## Live crawl — start it once and it keeps going
+
+Every other mode here is a request: ask, get an answer, done. **Live crawl** is the one that keeps
+working. You give it a site once and a background worker walks it round after round — new pages get
+fetched, changed pages get read again, and everything lands in the same local index a normal crawl
+writes to. Closing the page does not stop it; it lives on the server.
+
+```
+POST /api/v1/continuous
+{
+  "seeds": ["https://example.org"],
+  "delay": 20,             // seconds of real pause between rounds
+  "pages_per_round": 25,
+  "same_host": true,
+  "respect_robots": true
+}
+```
+
+The response is the live status, and `GET /api/v1/continuous` gives the same thing any time:
+
+```json
+{
+  "running": true,
+  "origins": ["https://example.org"],
+  "rounds": 14,
+  "pages": 312,
+  "files": 27,
+  "documents": 288,
+  "current": "https://example.org/reports/2024",
+  "next_in_s": 11,
+  "delay_s": 20,
+  "pages_per_round": 25,
+  "errors": [],
+  "notes": ["Each round is a real crawl of one site, using the same engines a one-off crawl uses.", "..."]
+}
+```
+
+What it honestly is, and is not:
+
+| | |
+|---|---|
+| **a round** | one real `FusionCrawler` pass over one site — same engines, same robots checks, same extractors as a one-off crawl |
+| **rotation** | add several sites and each round takes the next one, so none is starved (`POST /api/v1/continuous/seeds`) |
+| **the pause** | `delay` seconds between rounds, default 20. A crawler that hammers a host is a denial of service, not a feature |
+| **stop** | answers immediately: the worker checks its flag every couple of seconds and cancels a round in flight |
+| **restarts** | state is per-process and in memory. Restart the service, or let a free host sleep, and it stops — that is stated in `notes`, not hidden |
+
+The page has a panel for it (menu → **Live crawl**): start, watch rounds/pages/index size tick over,
+add a site, stop.
+
 ## The crawler (primary engine)
 
 `/crawl` takes seeds, a domain or a query and then:
@@ -375,6 +425,10 @@ POST /api/v1/hunt/stream     same, as Server-Sent Events
 POST /api/v1/deep            crawl pasted exact links + why each hit is deep-only
 POST /api/v1/deep/stream     same, as SSE
 POST /api/v1/links           one link in, every link of the same shape out
+POST /api/v1/continuous      start (or reconfigure) the background crawler
+GET  /api/v1/continuous      what it is doing: rounds, pages, index size, next round
+POST /api/v1/continuous/seeds  add another site while it is running
+POST /api/v1/continuous/stop   stop it
 POST /api/v1/crawl           run the crawler to completion
 POST /api/v1/crawl/stream    live crawl events (page, file, pagehit, blocked, done)
 GET  /api/v1/engines         remote engines + status
@@ -462,9 +516,14 @@ That matters on a one-container deployment, where `/hunt` and `/vault` — pages
 do not exist at all. Before this, clicking **Hunt** on `nighthawk-*.onrender.com` returned
 `{"detail":"Not Found"}`; now the same click lists results without leaving the page.
 
-The look is deliberately quiet: a serif heading face, one warm accent, rounded panels, and plain words
-on the buttons (`Search`, `Crawl a site`, `Similar links`) instead of feature names. Nothing on the page
-explains itself in jargon before it helps you.
+The page opens as a search box and a sentence. Everything else — Crawl a site, Similar links,
+Live crawl, Pasted links, Status, Settings, the sample site, the deploy commands — sits in one **Menu**
+in the top bar, one panel at a time, and each panel has a *back to search* line. Filters and the engine
+URL are two small links under the box, folded away until you want them. Type chips are inside filters.
+
+The look follows the same rule: a serif heading face, one warm accent, no gradients, no card wall, no
+pitch banner, no numbers strip on the front page. Google is simple because the thing you came to do is
+in front of you and the rest is one click away; that is the whole idea here.
 
 If the page is the half you already deployed to Netlify or Vercel, give that deployment an engine
 with the proxy / meta / `?api=` options in *Deploying the launcher on a static host* above. The

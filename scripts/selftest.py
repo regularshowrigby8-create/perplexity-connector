@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,6 +26,7 @@ _TMP = Path(tempfile.mkdtemp(prefix="nighthawk-selftest-"))
 os.environ["NH_DATA_DIR"] = str(_TMP)
 
 from app import fixtures, freshness, local_index, registry  # noqa: E402
+from app.api import router  # noqa: E402
 from app.crawl import CrawlRequest, FusionCrawler  # noqa: E402
 from app.models import HuntRequest  # noqa: E402
 from app.orchestrator import hunt, rank  # noqa: E402
@@ -445,6 +447,53 @@ async def main() -> int:
                 "/api/v1/links" in launcher_html)
     ok &= check("the refined look replaced the neon tokens",
                 "--accent:" in launcher_html and "Iowan Old Style" in launcher_html)
+    ok &= check("the clutter is gone: no card wall, no caps strip, no pitch banner",
+                'class="caps"' not in launcher_html and 'class="warn-strip"' not in launcher_html
+                and 'class="grid"' not in launcher_html)
+    ok &= check("everything but the search box sits behind the menu",
+                'id="menu"' in launcher_html and 'id="menu-btn"' in launcher_html
+                and launcher_html.count("data-panel hidden") >= 6,
+                str(launcher_html.count("data-panel hidden")))
+    ok &= check("the menu lists the live crawl",
+                'data-open="continuous"' in launcher_html and 'id="cont-form"' in launcher_html)
+
+    print("\n\u25b8 10. live crawl: start it once, it keeps working, stop it")
+    from app.continuous import ContinuousRequest, ContinuousWorker
+
+    live = ContinuousWorker()
+    started = await live.start(ContinuousRequest(
+        seeds=[f"http://127.0.0.1:{PORT}/demo/index.html"], delay=0.0, pages_per_round=5))
+    ok &= check("starting a live crawl takes one site and reports running",
+                started["running"] is True and started["origins"] == [f"http://127.0.0.1:{PORT}"],
+                str(started["origins"]))
+    deadline = time.time() + 90
+    state = started
+    while time.time() < deadline and state["rounds"] < 2:
+        await asyncio.sleep(0.25)
+        state = live.status()
+    ok &= check("it runs round after round without being asked again",
+                state["rounds"] >= 2, str(state["rounds"]))
+    ok &= check("the rounds really crawl pages", state["pages"] > 0, str(state["pages"]))
+    ok &= check("what it finds lands in the index", state["documents"] > 0, str(state["documents"]))
+    ok &= check("the status explains itself (delay, pages per round, notes)",
+                state["delay_s"] == 0.0 and state["pages_per_round"] == 5 and bool(state["notes"]))
+    more = live.add_sites(["example.org"])
+    ok &= check("another site can be added while it runs",
+                "https://example.org" in more["origins"], str(more.get("added")))
+    stopped = await live.stop()
+    ok &= check("stop ends it, and says it had been running",
+                stopped["running"] is False and stopped["was_running"] is True)
+    fresh_worker = ContinuousWorker()
+    refused = False
+    try:
+        await fresh_worker.start(ContinuousRequest(seeds=[]))
+    except ValueError:
+        refused = True
+    ok &= check("a live crawl with no site is refused instead of spinning", refused)
+    paths = {getattr(route, "path", "") for route in router.routes}
+    ok &= check("the API has start, status, more-sites and stop",
+                {"/api/v1/continuous", "/api/v1/continuous/seeds",
+                 "/api/v1/continuous/stop"} <= paths)
 
     httpd.shutdown()
     print("\n" + ("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED"))
