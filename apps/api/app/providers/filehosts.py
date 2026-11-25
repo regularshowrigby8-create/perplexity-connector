@@ -246,7 +246,7 @@ def archive_candidates(payload: Any, wanted: set[str], text: str) -> list[dict]:
 
     usable = [row for row in rows if isinstance(row, dict) and row.get("identifier") and has_wanted(row)]
     usable.sort(key=score, reverse=True)
-    return usable[:5]
+    return usable[:4]
 
 
 def archive_files(payload: Any, wanted: set[str], default_title: str = "") -> list[dict]:
@@ -320,7 +320,7 @@ class ArchiveFiles(Provider):
             identifier = _one(item.get("identifier"))
             try:
                 meta = await asyncio.wait_for(
-                    ctx.client.get(f"https://archive.org/metadata/{identifier}"), timeout=3.0)
+                    ctx.client.get(f"https://archive.org/metadata/{identifier}"), timeout=1.6)
                 if meta.status_code >= 400:
                     return []
                 files = archive_files(meta.json(), wanted, _one(item.get("title")))
@@ -337,11 +337,19 @@ class ArchiveFiles(Provider):
                       "filename": file["name"], "size": file["size"]},
             ) for file in files]
 
-        batches = await asyncio.gather(*(one(item) for item in candidates), return_exceptions=True)
+        # The budget is shared with 79 other engines: answer with whatever came
+        # back in time instead of being killed while the last item downloads its
+        # metadata. A partial answer beats a "still working" label.
+        tasks = [asyncio.create_task(one(item)) for item in candidates]
+        done, pending = await asyncio.wait(tasks, timeout=2.2)
+        for task in pending:
+            task.cancel()
         out: list[RawHit] = []
-        for batch in batches:
-            if isinstance(batch, list):
-                out.extend(batch)
+        for task in done:
+            try:
+                out.extend(task.result())
+            except Exception:
+                continue
         return out
 
 

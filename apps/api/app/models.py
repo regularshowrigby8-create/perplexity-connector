@@ -94,6 +94,9 @@ class HuntRequest(BaseModel):
     # the demo site this engine ships with is practice material, not the web:
     # it is left out of an answer unless a test asks for it by name
     include_practice: bool = False
+    # the 2-year window is the default for every search; a person who asks for
+    # something older (a book from 2007) can lift it for that one search
+    window_days: int | None = Field(default=None, ge=0, le=36500)
     fresh: bool = False
     # how long to wait for engines before answering with what has arrived;
     # 0 means "use the server's budget" (2.5 s by default)

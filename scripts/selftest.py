@@ -754,6 +754,11 @@ async def main() -> int:
     ok &= check("the vault stores a publication date, so old rows are judged, not guessed",
                 "published" in vault_cols, str(sorted(vault_cols)))
 
+    widened = await hunt(HuntRequest(q="annex 2011", limit=0, fresh=True, window_days=36500),
+                         use_cache=False)
+    ok &= check("the window can be lifted for one search, when a person asks for something old",
+                widened.stats.window_days == 36500, str(widened.stats.window_days))
+
     launcher_window = (ROOT / "index.html").read_text(encoding="utf-8")
     ok &= check("the page says the window out loud, and what it cut",
                 "cut as too old" in launcher_window and "nothing older than" in launcher_window)

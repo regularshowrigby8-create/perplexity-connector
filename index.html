@@ -2881,7 +2881,11 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (stats.slow_providers) note.push(stats.slow_providers + " still answering");
     if (stats.local_excluded) note.push(stats.local_excluded + " practice-site results left out");
     if (stats.off_topic) note.push(stats.off_topic + " contain none of your words, sorted last");
-    if (stats.cut_older) note.push(stats.cut_older + " older than " + (stats.window_days || 730) + " days left out");
+    if (stats.window_days >= 36500) {
+      note.push("the two-year window is off for this answer \u2014 you asked for older results");
+    } else if (stats.cut_older) {
+      note.push(stats.cut_older + " older than " + (stats.window_days || 730) + " days left out");
+    }
     var noteEl = document.getElementById("live-note");
     noteEl.textContent = note.join(" · ");
     if (stats.cached) {
@@ -3069,7 +3073,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     hidePanels();
   }
 
-  function runHunt(forceFresh, matchMode) {
+  function runHunt(forceFresh, matchMode, opts) {
     var q = inputValue();
     if (!q) return;
     var headline = "Hunt · " + q;
@@ -3081,6 +3085,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       q: q, lens: lens, limit: 0, sort: "accuracy", match: matchMode || "exact",
       only_exact: false, unrestricted: true, fresh: !!forceFresh
     };
+    if (opts && opts.ignoreWindow) body.window_days = 36500;
     var nudge = setTimeout(function () {
       var note = document.getElementById("live-note");
       if (note) note.textContent = "still gathering — a slow source does not hold the whole page";
@@ -3320,6 +3325,13 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       });
       row.appendChild(dropType);
     }
+    var older = document.createElement("button");
+    older.type = "button";
+    older.className = "btn btn-sm";
+    older.textContent = "Include results older than two years";
+    older.title = "the engine only returns the last two years by default — this lifts that for one search";
+    older.addEventListener("click", function () { runHunt(false, "exact", { ignoreWindow: true }); });
+    row.appendChild(older);
     var loosen = document.createElement("button");
     loosen.type = "button";
     loosen.className = "btn btn-sm";

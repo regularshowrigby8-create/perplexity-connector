@@ -600,7 +600,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
             {"id": p.id, "name": p.name, "status": "needs_key", "count": 0, "ms": 0,
              "message": "credentials not set"} for p in waiting
         ]
-        window = recency.Window.current()
+        window = (recency.Window(days=int(req.window_days), future_days=settings.future_days)
+                  if req.window_days else recency.Window.current())
 
         def stream_view() -> list[Hit]:
             """What the answer would be right now, with the caller's own filters applied.
@@ -727,7 +728,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     # The window is applied before anything else reads the set: older than two
     # years is cut here, once, so ranking, dedup, limits and the stream all see
     # the same list. Nothing downstream can put a 2019 page back.
-    window = recency.Window.current()
+    window = (recency.Window(days=int(req.window_days), future_days=settings.future_days)
+              if req.window_days else recency.Window.current())
     fused, window_stats = recency.apply(fused, window)
     before = len(fused)
     collapsed = 0
