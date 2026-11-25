@@ -1,0 +1,1068 @@
+{
+ "query": "diary of a wimpy kid",
+ "lens": "all",
+ "site": null,
+ "hits": [],
+ "providers": [
+  {
+   "id": "searxng",
+   "name": "SearXNG",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "brave",
+   "name": "Brave Search",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "tavily",
+   "name": "Tavily",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "exa",
+   "name": "Exa",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "serper",
+   "name": "Serper",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "serpapi",
+   "name": "SerpApi",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "searchapi",
+   "name": "SearchApi",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "google_cse",
+   "name": "Google Programmable Search",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "perplexity",
+   "name": "Perplexity",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "you",
+   "name": "You.com",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "bing",
+   "name": "Bing",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "yahoo",
+   "name": "Yahoo",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "ecosia",
+   "name": "Ecosia",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "startpage",
+   "name": "Startpage",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "yandex",
+   "name": "Yandex",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "google_scholar",
+   "name": "Google Scholar",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "google_news",
+   "name": "Google News",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "mojeek",
+   "name": "Mojeek",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "qwant",
+   "name": "Qwant",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "metager",
+   "name": "MetaGer",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "whoogle",
+   "name": "Whoogle",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "librex",
+   "name": "LibreX",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "4get",
+   "name": "4get",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "yacy",
+   "name": "YaCy",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "gigablast",
+   "name": "Gigablast",
+   "status": "empty",
+   "count": 0,
+   "ms": 22,
+   "message": ""
+  },
+  {
+   "id": "wayback",
+   "name": "Wayback CDX",
+   "status": "empty",
+   "count": 0,
+   "ms": 22,
+   "message": ""
+  },
+  {
+   "id": "commoncrawl",
+   "name": "Common Crawl Index",
+   "status": "empty",
+   "count": 0,
+   "ms": 392,
+   "message": ""
+  },
+  {
+   "id": "wiby",
+   "name": "Wiby",
+   "status": "empty",
+   "count": 0,
+   "ms": 631,
+   "message": ""
+  },
+  {
+   "id": "internetarchive",
+   "name": "Internet Archive",
+   "status": "error",
+   "count": 0,
+   "ms": 657,
+   "message": "expected string or bytes-like object, got 'list'"
+  },
+  {
+   "id": "marginalia",
+   "name": "Marginalia",
+   "status": "empty",
+   "count": 0,
+   "ms": 657,
+   "message": ""
+  },
+  {
+   "id": "grantsgov",
+   "name": "Grants.gov",
+   "status": "ok",
+   "count": 25,
+   "ms": 836,
+   "message": ""
+  },
+  {
+   "id": "reliefweb",
+   "name": "ReliefWeb Jobs",
+   "status": "error",
+   "count": 0,
+   "ms": 836,
+   "message": "Client error '410 Gone' for url 'https://api.reliefweb.int/v1/jobs?appname=nighthawk&profile=list&limit=20&query%5Bvalue%5D=diary+of+a+wimpy+kid&sort%5B%5D=date"
+  },
+  {
+   "id": "reliefweb_reports",
+   "name": "ReliefWeb Reports",
+   "status": "error",
+   "count": 0,
+   "ms": 2863,
+   "message": "Client error '410 Gone' for url 'https://api.reliefweb.int/v1/reports?appname=nighthawk&profile=list&limit=20&query%5Bvalue%5D=diary+of+a+wimpy+kid&sort%5B%5D=d"
+  },
+  {
+   "id": "doaj",
+   "name": "DOAJ",
+   "status": "ok",
+   "count": 10,
+   "ms": 2906,
+   "message": ""
+  },
+  {
+   "id": "semanticscholar",
+   "name": "Semantic Scholar",
+   "status": "error",
+   "count": 0,
+   "ms": 2902,
+   "message": "Client error '429 ' for url 'https://api.semanticscholar.org/graph/v1/paper/search?query=diary+of+a+wimpy+kid&limit=20&fields=title%2Cabstract%2Curl%2CopenAcces"
+  },
+  {
+   "id": "crossref",
+   "name": "Crossref",
+   "status": "ok",
+   "count": 20,
+   "ms": 2902,
+   "message": ""
+  },
+  {
+   "id": "pubmed",
+   "name": "PubMed",
+   "status": "empty",
+   "count": 0,
+   "ms": 2906,
+   "message": ""
+  },
+  {
+   "id": "nih_reporter",
+   "name": "NIH RePORTER",
+   "status": "ok",
+   "count": 20,
+   "ms": 2902,
+   "message": ""
+  },
+  {
+   "id": "openalex",
+   "name": "OpenAlex",
+   "status": "ok",
+   "count": 25,
+   "ms": 2906,
+   "message": ""
+  },
+  {
+   "id": "eu_sedia",
+   "name": "EU Funding & Tenders",
+   "status": "error",
+   "count": 0,
+   "ms": 3092,
+   "message": "Client error '404 Not Found' for url 'https://api.tech.ec.europa.eu/search-api/search?apiKey=SEDIA&text=diary+of+a+wimpy+kid&pageSize=20&pageNumber=1'\nFor more "
+  },
+  {
+   "id": "wikipedia",
+   "name": "Wikipedia",
+   "status": "ok",
+   "count": 8,
+   "ms": 3109,
+   "message": ""
+  },
+  {
+   "id": "stackexchange",
+   "name": "Stack Exchange",
+   "status": "ok",
+   "count": 15,
+   "ms": 3270,
+   "message": ""
+  },
+  {
+   "id": "datagov",
+   "name": "Data.gov",
+   "status": "error",
+   "count": 0,
+   "ms": 3295,
+   "message": "Client error '404 Not Found' for url 'https://catalog.data.gov/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://d"
+  },
+  {
+   "id": "wikidata",
+   "name": "Wikidata",
+   "status": "ok",
+   "count": 10,
+   "ms": 3295,
+   "message": ""
+  },
+  {
+   "id": "dataeuropa",
+   "name": "EU Open Data",
+   "status": "error",
+   "count": 0,
+   "ms": 3535,
+   "message": "Client error '404 Not Found' for url 'https://data.europa.eu/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://dev"
+  },
+  {
+   "id": "ckan",
+   "name": "CKAN Portal",
+   "status": "error",
+   "count": 0,
+   "ms": 3295,
+   "message": "Client error '404 Not Found' for url 'https://catalog.data.gov/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://d"
+  },
+  {
+   "id": "crates",
+   "name": "crates.io",
+   "status": "empty",
+   "count": 0,
+   "ms": 3513,
+   "message": ""
+  },
+  {
+   "id": "opencanada",
+   "name": "Open Canada",
+   "status": "error",
+   "count": 0,
+   "ms": 3642,
+   "message": "Client error '404 Not Found' for url 'https://open.canada.ca/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://dev"
+  },
+  {
+   "id": "openlibrary",
+   "name": "Open Library",
+   "status": "ok",
+   "count": 10,
+   "ms": 3642,
+   "message": ""
+  },
+  {
+   "id": "gitlab",
+   "name": "GitLab",
+   "status": "empty",
+   "count": 0,
+   "ms": 3642,
+   "message": ""
+  },
+  {
+   "id": "npm",
+   "name": "npm Registry",
+   "status": "ok",
+   "count": 12,
+   "ms": 3629,
+   "message": ""
+  },
+  {
+   "id": "datagovau",
+   "name": "Data.gov.au",
+   "status": "error",
+   "count": 0,
+   "ms": 3642,
+   "message": "Client error '404 Not Found' for url 'https://data.gov.au/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://develo"
+  },
+  {
+   "id": "github",
+   "name": "GitHub",
+   "status": "ok",
+   "count": 15,
+   "ms": 3692,
+   "message": ""
+  },
+  {
+   "id": "reddit-new",
+   "name": "Reddit (new)",
+   "status": "error",
+   "count": 0,
+   "ms": 3069,
+   "message": "Client error '403 Blocked' for url 'https://www.reddit.com/search.json?q=diary+of+a+wimpy+kid&sort=new&t=week&limit=25&raw_json=1'\nFor more information check: h"
+  },
+  {
+   "id": "hackernews",
+   "name": "Hacker News",
+   "status": "empty",
+   "count": 0,
+   "ms": 3733,
+   "message": ""
+  },
+  {
+   "id": "reddit-subs",
+   "name": "Reddit (curated subs)",
+   "status": "empty",
+   "count": 0,
+   "ms": 3210,
+   "message": ""
+  },
+  {
+   "id": "lobsters",
+   "name": "Lobsters",
+   "status": "error",
+   "count": 0,
+   "ms": 1016,
+   "message": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "id": "bluesky",
+   "name": "Bluesky (latest)",
+   "status": "error",
+   "count": 0,
+   "ms": 981,
+   "message": "Client error '403 Forbidden' for url 'https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=diary+of+a+wimpy+kid&limit=25&sort=latest'\nFor more informati"
+  },
+  {
+   "id": "crates-new",
+   "name": "crates.io (newest)",
+   "status": "empty",
+   "count": 0,
+   "ms": 816,
+   "message": ""
+  },
+  {
+   "id": "gitlab-projects",
+   "name": "GitLab (last activity)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "grantsgov-live",
+   "name": "Grants.gov (posted today)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "s2-new",
+   "name": "Semantic Scholar (bulk)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "fdroid",
+   "name": "F-Droid",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "openalex-new",
+   "name": "OpenAlex (by date)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "usaspending-new",
+   "name": "USAspending (new awards)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "gdelt",
+   "name": "GDELT 2.0",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "ghsa",
+   "name": "GitHub advisories (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "ted",
+   "name": "TED (EU tenders)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "datagovuk",
+   "name": "Data.gov.uk",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "archivefiles",
+   "name": "Internet Archive (files)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "europepmc",
+   "name": "Europe PMC (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "data-gouv-fr",
+   "name": "data.gouv.fr",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "rss-firehose",
+   "name": "Institutional RSS (20 feeds)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "arxiv",
+   "name": "arXiv",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "wikipedia-rev",
+   "name": "Wikipedia (last revision)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "ukri",
+   "name": "UKRI Gateway to Research",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "pubmed-new",
+   "name": "PubMed (in press)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "sourceforge",
+   "name": "SourceForge",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "data-europa",
+   "name": "data.europa.eu",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "se-new",
+   "name": "Stack Exchange (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "find-a-tender",
+   "name": "Find a Tender (UK OCDS)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "vault",
+   "name": "Nighthawk Vault",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "doaj-new",
+   "name": "DOAJ (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "ckan-recent",
+   "name": "CKAN portals (latest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "wb-procurement",
+   "name": "World Bank procurement",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "arquivo",
+   "name": "Arquivo.pt",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "vault_docs",
+   "name": "Vault Deep Text",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "datacite",
+   "name": "DataCite (newest DOIs)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "arcgis-hub",
+   "name": "ArcGIS Hub",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "hn-new",
+   "name": "Hacker News (by date)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "npm-new",
+   "name": "npm registry (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "cordis-live",
+   "name": "CORDIS projects (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "portals",
+   "name": "Portal Universe",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "dryad",
+   "name": "Dryad",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "clinicaltrials",
+   "name": "ClinicalTrials.gov (updated)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "arxiv-new",
+   "name": "arXiv (submitted today)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "fundsforngos",
+   "name": "FundsforNGOs search",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "dorklaunch",
+   "name": "Dork Hand-off",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "hal",
+   "name": "HAL (French archive)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "sec-edgar",
+   "name": "SEC EDGAR (latest filings)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "mastodon",
+   "name": "Mastodon (tag timeline)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "biorxiv-new",
+   "name": "bioRxiv (last 10 days)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "undp-procurement",
+   "name": "UNDP procurement",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "openaire",
+   "name": "OpenAIRE Graph",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "zenodo-new",
+   "name": "Zenodo (most recent)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "medrxiv-new",
+   "name": "medRxiv (last 10 days)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "mediafire",
+   "name": "MediaFire",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "osf-preprints",
+   "name": "OSF Preprints",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "hf-models",
+   "name": "Hugging Face (last modified)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "github-commits",
+   "name": "GitHub commits (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "crossref-new",
+   "name": "Crossref (published today)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "apkpure",
+   "name": "APKPure",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "socrata",
+   "name": "Socrata catalog",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "wikidata-recent",
+   "name": "Wikidata (last modified)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "github-issues",
+   "name": "GitHub issues (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "zenodo",
+   "name": "Zenodo",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "apkmirror",
+   "name": "APKMirror",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "federal-register",
+   "name": "Federal Register",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  }
+ ],
+ "facets": {
+  "domain": [],
+  "provider": [],
+  "file_ext": [],
+  "kind": [],
+  "deadline": []
+ },
+ "stats": {
+  "hits": 170,
+  "unique": 0,
+  "providers_ok": 11,
+  "providers_failed": 13,
+  "files": 0,
+  "opportunities": 0,
+  "closing_soon": 0,
+  "duplicates_collapsed": 5,
+  "dropped_noise": 0,
+  "verbatim": 0,
+  "near_verbatim": 0,
+  "not_verbatim": 0,
+  "copies_reported": 5,
+  "junk_retained": 0,
+  "noise_retained": 0,
+  "truncated": false,
+  "dropped_spam": 0,
+  "fresh_seconds": 0,
+  "fresh_minutes": 0,
+  "fresh_hours": 0,
+  "fresh_days": 0,
+  "dated": 0,
+  "undated": 0,
+  "newest_age_seconds": null,
+  "newest_age_human": null,
+  "took_ms": 4810,
+  "cached": false,
+  "budget_ms": 4000,
+  "slow_providers": 59,
+  "post_ms": 541,
+  "copies_scanned": 80,
+  "window_days": 730,
+  "local_excluded": 0,
+  "off_topic": 0,
+  "cut_older": 66,
+  "cut_future": 0,
+  "undated_kept": 26
+ },
+ "plays": [
+  "diary of a wimpy kid (filetype:pdf)",
+  "diary of a wimpy kid (filetype:pdf) (inurl:upload OR inurl:files OR inurl:documents OR inurl:download OR inurl:archive)",
+  "diary of a wimpy kid (\"call for proposals\" OR \"call for applications\" OR \"request for proposals\" OR grant OR tender OR fellowship OR scholarship OR accelerator OR \"open call\" OR RFP OR \"expression of interest\" OR procurement OR bounty OR \"applications open\")",
+  "diary of a wimpy kid (\"deadline\" OR \"closes\" OR \"apply by\" OR \"applications close\") (filetype:pdf OR filetype:docx)",
+  "diary of a wimpy kid (\"application form\" OR \"apply now\" OR \"applications close\" OR \"application deadline\" OR \"call for applications\" OR \"admissions\" OR \"apply by\" OR \"online application\")",
+  "diary of a wimpy kid (\"guidelines\" OR \"eligibility\" OR \"terms of reference\") (filetype:pdf OR filetype:docx)"
+ ],
+ "sort": "newest",
+ "match": "exact",
+ "only_exact": false,
+ "unrestricted": true,
+ "understanding": {
+  "query": "diary of a wimpy kid pdf",
+  "subject": "wimpy kid",
+  "phrases": [
+   "wimpy kid",
+   "diary"
+  ],
+  "keywords": [
+   "diary",
+   "wimpy",
+   "kid"
+  ],
+  "kind": "document",
+  "kind_label": "a document or report",
+  "kind_score": 0.61,
+  "kind_cue": "pdf",
+  "suggested_lens": "files",
+  "file_types": [
+   "pdf",
+   "docx"
+  ],
+  "places": [],
+  "orgs": [],
+  "quoted": [],
+  "negatives": [],
+  "years": [],
+  "asked_days": null,
+  "window_days": 730,
+  "future_days": 120,
+  "warnings": [],
+  "summary": "A document or report, about \u201cwimpy kid\u201d \u2014 as pdf / docx",
+  "engine": "rules + RAKE (vendored)",
+  "note": "what the search was read as, before any source was asked; the words matched against a result are still the words that were typed"
+ },
+ "as_of": "2026-11-25T22:36:48.469151+00:00",
+ "expanded": [],
+ "intent": {
+  "text": "diary of a wimpy kid pdf",
+  "query": "diary of a wimpy kid",
+  "types": [
+   "pdf"
+  ],
+  "hosts": [],
+  "matched": [
+   "pdf"
+  ],
+  "search_text": "diary of a wimpy kid",
+  "removed_by_type": 80,
+  "host_matches": 0,
+  "file_host_engines": [
+   "mediafire",
+   "apkpure",
+   "apkmirror",
+   "fdroid",
+   "archivefiles",
+   "sourceforge"
+  ]
+ }
+}
