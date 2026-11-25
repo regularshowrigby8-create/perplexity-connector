@@ -340,7 +340,11 @@ no "offline" banner.
 | **Netlify / Vercel** | **the page only** — no Python, no crawler | deploy, then give it an engine (below) |
 | **This sandbox preview** | both, until the session ends | open the `:8000` or `:3000` preview |
 
-The single-container path, in full:
+One click for the Render path (it reads `render.yaml` straight out of the repo):
+
+<https://render.com/deploy?repo=https://github.com/regularshowrigby8-create/perplexity-connector>
+
+The same image, by hand, in full:
 
 ```bash
 docker build -f Dockerfile.api -t nighthawk .
