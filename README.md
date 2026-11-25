@@ -366,6 +366,18 @@ Mount `/data` (or set `NH_DATA_DIR`) or the vault resets whenever the container 
 Next.js app; `./run.sh` does the same on a VPS with Python 3.11+ and Node 20+. The only persistent
 state is `data/` (SQLite vault, watchlist, extraction cache).
 
+### What the page does by itself
+
+The launcher is not a menu of links into the Next.js app — it **runs the hunt and the crawl in
+place**. `Hunt` POSTs `/api/v1/hunt` and renders the rows (verbatim badge, word distance, copies
+reported, junk/noise labelled, newest first); `Crawl` does the same through `/api/v1/crawl` when the
+box holds a URL; `Deep crawl` already had its own panel. Arsenal, Vault, Watchers and API open the
+engine's own JSON/docs in a new tab.
+
+That matters on a one-container deployment, where `/hunt` and `/vault` — pages of the Next.js app —
+do not exist at all. Before this, clicking **Hunt** on `nighthawk-*.onrender.com` returned
+`{"detail":"Not Found"}`; now the same click lists results without leaving the page.
+
 If the page is the half you already deployed to Netlify or Vercel, give that deployment an engine
 with the proxy / meta / `?api=` options in *Deploying the launcher on a static host* above. The
 engine itself has to live on one of the rows in the table that can run Python.

@@ -1100,7 +1100,7 @@
     <div class="nav-right">
       <span class="chip-warn" title="No popularity ranking, no freshness gate, no authority penalty — buried-first by design.">buried-first</span>
       <span class="chip" id="status"><span class="dot"></span><span id="status-text">checking engine</span></span>
-      <a class="btn btn-sm" id="open-app" href="#" target="_blank" rel="noreferrer">Open app ↗</a>
+      <a class="btn btn-sm" id="open-app" href="#" target="_blank" rel="noreferrer noopener">API docs ↗</a>
     </div>
   </div>
 </header>
@@ -1180,6 +1180,16 @@
     </div>
   </section>
 
+  <section class="wrap section" id="live" hidden>
+    <div class="head">
+      <h2 id="live-title">Results</h2>
+      <span class="rule"></span>
+      <span class="tiny" id="live-note"></span>
+    </div>
+    <div class="deep-counts" id="live-counts"></div>
+    <div class="deep-results" id="live-hits"></div>
+  </section>
+
   <section class="wrap section">
     <div class="stats">
       <div class="stat"><div class="n lime" id="s-remote">119</div><div class="l">remote engines</div></div>
@@ -1192,7 +1202,7 @@
   </section>
 
   <section class="wrap section">
-    <div class="head"><h2>Seven ways in</h2><span class="rule"></span><span class="tiny">all proxied through one origin</span></div>
+    <div class="head"><h2>Seven ways in</h2><span class="rule"></span><span class="tiny">hunt and crawl run on this page · the rest are the engine’s own endpoints</span></div>
     <div class="grid">
       <a class="card" href="/hunt" data-route="hunt">
         <div class="top"><span class="pill lime">federated</span></div>
@@ -1471,17 +1481,46 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     });
   }
 
+  // Routes that only exist in the Next.js app became calls into the engine:
+  // "hunt"/"crawl" run here, the rest are the engine's own JSON, opened in a new
+  // tab. Nothing points at a page that 404s on a one-container deployment.
+  var ROUTES = {
+    "hunt": "",
+    "crawl": "",
+    "deep": "#deep",
+    "arsenal": "/api/v1/arsenal",
+    "vault": "/api/v1/vault",
+    "hunts": "/api/v1/hunts",
+    "api/docs": "/api/docs"
+  };
+
   function wireRoutes() {
     var nodes = document.querySelectorAll("[data-route]");
     for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
-      node.setAttribute("href", url("/" + node.getAttribute("data-route")));
-      if (node.tagName === "A" && node.getAttribute("data-route") !== "api/docs") {
-        // same-tab navigation keeps the app feel
+      var route = node.getAttribute("data-route");
+      var dest = ROUTES.hasOwnProperty(route) ? ROUTES[route] : "/api/v1/" + route;
+      if (dest === "") {
+        node.setAttribute("href", "#live");
+        node.onclick = function (event) {
+          event.preventDefault();
+          if (this.getAttribute("data-route") === "crawl") { runCrawl(); } else { runHunt(); }
+        };
         node.removeAttribute("target");
+      } else if (dest.charAt(0) === "#") {
+        node.setAttribute("href", dest);
+        node.removeAttribute("target");
+      } else {
+        node.setAttribute("href", url(dest));
+        node.setAttribute("target", "_blank");
+        node.setAttribute("rel", "noreferrer noopener");
       }
     }
-    document.getElementById("open-app").setAttribute("href", url("/"));
+    // "Open app" used to hop to the Next.js app. On a one-container deploy there
+    // is no app to hop to — the engine is the product — so it points at the API
+    // docs, which exist on every deployment that answers /health.
+    var openApp = document.getElementById("open-app");
+    if (openApp) openApp.setAttribute("href", url("/api/docs"));
   }
 
   // ------------------------------------------------------------------- probe
@@ -1566,11 +1605,212 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     banner.hidden = false;
   }
 
+  // ------------------------------------------------- results, in this page
+  // On a one-container deploy (Render, Fly, a VPS) the engine *is* the whole
+  // product: /hunt and /crawl are Next.js pages and simply do not exist there,
+  // which is how clicking "Hunt" ended in {"detail":"Not Found"}. So the page
+  // asks the engine directly and draws the rows itself — same hits, same order,
+  // no navigation, and it works the same on a static host pointed at an engine.
+  function pill(text, className, title) {
+    var span = document.createElement("span");
+    span.className = className;
+    if (title) span.title = title;
+    span.textContent = text;
+    return span;
+  }
+
+  function post(path, body) {
+    return fetch(url(path), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store"
+    }).then(function (res) {
+      if (!res.ok) {
+        return res.text().then(function (text) {
+          throw new Error("HTTP " + res.status + " · " + text.slice(0, 140));
+        });
+      }
+      setStatus("online", "engine online");
+      document.getElementById("banner").hidden = true;
+      return res.json();
+    });
+  }
+
+  function hitRow(hit) {
+    var row = document.createElement("article");
+    row.className = "deep-row";
+
+    var top = document.createElement("div");
+    top.className = "t";
+    var link = document.createElement("a");
+    link.href = hit.url;
+    link.target = "_blank";
+    link.rel = "noreferrer noopener";
+    link.textContent = hit.title || hit.url;
+    top.appendChild(link);
+
+    if (hit.exact) {
+      top.appendChild(pill("verbatim" + (hit.occurrences > 1 ? " ×" + hit.occurrences : ""),
+        "pill lime", "the phrase appears word for word"));
+    } else if (hit.proximity !== null && hit.proximity !== undefined) {
+      top.appendChild(pill(hit.proximity + " words apart", "pill",
+        "how far this is from the literal phrase"));
+    }
+    if (hit.match_where) {
+      top.appendChild(pill("in " + hit.match_where, "pill muted", "where the match was found"));
+    }
+    row.appendChild(top);
+
+    var where = document.createElement("div");
+    where.className = "u";
+    where.textContent = hit.url;
+    row.appendChild(where);
+
+    if (hit.snippet) {
+      var snip = document.createElement("div");
+      snip.className = "s";
+      var span = hit.match_span;
+      if (hit.match_where === "snippet" && span) {
+        snip.appendChild(document.createTextNode(hit.snippet.slice(0, span[0])));
+        var mark = document.createElement("mark");
+        mark.textContent = hit.snippet.slice(span[0], span[1]);
+        snip.appendChild(mark);
+        snip.appendChild(document.createTextNode(hit.snippet.slice(span[1])));
+      } else {
+        snip.textContent = hit.snippet;
+      }
+      row.appendChild(snip);
+    }
+
+    var badges = document.createElement("div");
+    badges.className = "deep-badges";
+    if (hit.copies > 0) {
+      badges.appendChild(pill(hit.copies + " copies", "pill muted",
+        "near-duplicates reported and labelled, not folded away"));
+    }
+    if (hit.junk) {
+      badges.appendChild(pill("junk · kept", "pill amber",
+        "parked, login wall or error page — kept, sorted last"));
+    }
+    if (hit.noise) {
+      badges.appendChild(pill("noise · kept", "pill muted",
+        "a URL a mainstream engine would have dropped"));
+    }
+    if (hit.file_ext) {
+      badges.appendChild(pill(hit.file_ext.toUpperCase(), "pill cyan", "a file, not a page"));
+    }
+    if (hit.kind && hit.kind !== "page") {
+      badges.appendChild(pill(hit.kind, "pill", "what it is"));
+    }
+    if (hit.age_human) {
+      badges.appendChild(pill(hit.age_human + (hit.age_source === "first_seen" ? " · first seen" : ""),
+        "pill" + (hit.age_source === "first_seen" ? " muted" : ""),
+        hit.published_at || "how long ago this was published"));
+    }
+    if (hit.provider_name) {
+      badges.appendChild(pill(hit.provider_name, "pill muted", "where it came from"));
+    }
+    row.appendChild(badges);
+    return row;
+  }
+
+  function renderReport(report, headline) {
+    var hits = report.hits || [];
+    var stats = report.stats || {};
+    var policy = report.policy || {};
+
+    document.getElementById("live").hidden = false;
+    document.getElementById("live-title").textContent = headline;
+    var note = ["verbatim match"];
+    // HuntResponse has no policy block; the engine's contract is that nothing is
+    // removed, and the deep report states it explicitly. Believe either.
+    if (policy.result_removal === false || policy.result_removal === undefined) {
+      note.push("nothing removed");
+    }
+    if (policy.verbatim_only) note.push("verbatim only");
+    if (stats.took_ms !== undefined && stats.took_ms !== null) note.push(stats.took_ms + " ms");
+    if (stats.cached) note.push("cached");
+    document.getElementById("live-note").textContent = note.join(" · ");
+
+    var bar = document.getElementById("live-counts");
+    bar.innerHTML = "";
+    function tick(label, value, title) {
+      var node = document.createElement("span");
+      node.className = "tick";
+      node.title = title;
+      node.innerHTML = "<b>" + value + "</b> " + label;
+      bar.appendChild(node);
+    }
+    tick("results", hits.length, "everything the engine returned");
+    tick("verbatim", stats.verbatim !== undefined ? stats.verbatim
+      : hits.filter(function (h) { return h.exact; }).length, "the phrase, word for word");
+    if (stats.copies_reported) tick("copies reported", stats.copies_reported, "duplicates kept and labelled");
+    if (stats.junk_retained) tick("junk kept", stats.junk_retained, "kept, sorted last");
+    if (stats.noise_retained) tick("noise kept", stats.noise_retained, "kept, not dropped");
+    if (stats.undated) tick("undated", stats.undated, "no date anywhere — kept, last");
+    if (stats.newest_age_human) tick("newest", stats.newest_age_human, "age of the newest result");
+
+    var box = document.getElementById("live-hits");
+    box.innerHTML = "";
+    if (!hits.length) {
+      var empty = document.createElement("div");
+      empty.className = "note";
+      empty.textContent = "No results — and nothing was filtered to get here. " +
+        "That is everything every reachable engine had for that phrase.";
+      box.appendChild(empty);
+    }
+    hits.slice(0, 300).forEach(function (hit) { box.appendChild(hitRow(hit)); });
+    document.getElementById("live").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function inputValue() {
+    var input = document.getElementById("q");
+    var value = input.value.trim();
+    if (!value) { input.focus(); }
+    return value;
+  }
+
+  function runHunt() {
+    var q = inputValue();
+    if (!q) return;
+    var headline = "Hunt · " + q;
+    document.getElementById("live-title").textContent = headline;
+    post("/api/v1/hunt", {
+      q: q, lens: lens, limit: 0, sort: "newest", match: "exact",
+      only_exact: false, unrestricted: true, fresh: true
+    }).then(function (report) {
+      renderReport(report, headline);
+      toast((report.hits || []).length + " results");
+    }).catch(function (err) {
+      toast("hunt failed · " + err.message);
+    });
+  }
+
+  function runCrawl() {
+    var q = inputValue();
+    if (!q) return;
+    if (!/^https?:\/\//i.test(q)) {
+      toast("a crawl needs a URL — hunting instead");
+      runHunt();
+      return;
+    }
+    var headline = "Crawl · " + q;
+    document.getElementById("live-title").textContent = headline;
+    post("/api/v1/crawl", {
+      seeds: [q], query: "", depth: 2, max_pages: 40, max_files: 40,
+      serp_engines: [], keep_pages: true, extract_files: true
+    }).then(function (report) {
+      renderReport(report, headline);
+    }).catch(function (err) {
+      toast("crawl failed · " + err.message);
+    });
+  }
+
   // ------------------------------------------------------------------ actions
   function go(mode) {
-    var q = document.getElementById("q").value.trim();
-    if (!q) { document.getElementById("q").focus(); return; }
-    location.href = url("/" + mode + "?q=" + encodeURIComponent(q) + "&lens=" + lens);
+    if (mode === "crawl") { runCrawl(); return; }
+    runHunt();
   }
 
   document.getElementById("hunt-form").addEventListener("submit", function (event) {

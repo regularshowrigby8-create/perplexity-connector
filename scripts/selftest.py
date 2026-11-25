@@ -296,6 +296,13 @@ async def main() -> int:
                 target["seeds"][0].endswith(":12345/demo/index.html"), target["seeds"][0])
     ok &= check("the launcher does not pin the practice target to 8000",
                 "demoBase()" in launcher and "127.0.0.1:8000/demo" not in launcher)
+    # /hunt and /crawl are Next.js pages; a one-container deploy has neither, so
+    # the page must ask the engine itself instead of navigating into a 404.
+    ok &= check("the launcher hunts on the page instead of navigating to /hunt",
+                "/api/v1/hunt" in launcher and 'id="live-hits"' in launcher
+                and 'location.href = url("/" + mode' not in launcher)
+    ok &= check("its route links target engine endpoints, not app pages",
+                "api/v1/arsenal" in launcher and "api/v1/hunts" in launcher)
     hosts = {
         "render.yaml": "Dockerfile.api",
         "fly.toml": "Dockerfile.api",
