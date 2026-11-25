@@ -58,6 +58,16 @@ class Hit(BaseModel):
     quality: float = 1.0
     quality_flags: list[str] = Field(default_factory=list)
     language: str | None = None
+    # verbatim matching (exact.py) — the literal query, word for word
+    exact: bool = False
+    proximity: int | None = None       # extra words inside the literal window
+    occurrences: int = 0
+    match_span: list[int] | None = None
+    match_where: str | None = None     # title | snippet | url
+    # nothing is discarded; these say what would have been in a filtered engine
+    copies: int = 0                    # near-duplicates reported, not removed
+    junk: bool = False                 # parked / login wall / error — kept, sorted last
+    noise: bool = False                # URL a mainstream engine would drop outright
     sources: list[ProviderRef] = Field(default_factory=list)
     meta: dict[str, Any] = Field(default_factory=dict)
 
@@ -68,8 +78,15 @@ class HuntRequest(BaseModel):
     site: str | None = Field(default=None, max_length=253)
     file_types: list[str] = Field(default_factory=list)
     providers: list[str] = Field(default_factory=list)
-    limit: int = Field(default=40, ge=5, le=200)
+    # 0 means "everything found". The caller's own display cap is their business.
+    limit: int = Field(default=40, ge=0, le=1000)
     sort: Literal["relevance", "depth", "deadline", "newest"] = "newest"
+    # word-for-word by default: the literal phrase, in order, nothing added
+    match: Literal["exact", "loose"] = "exact"
+    # opt-in filter, off by default: results are never narrowed without being asked
+    only_exact: bool = False
+    # no dedup folding, no junk removal, no diversity penalty, no truncation
+    unrestricted: bool = True
     fresh: bool = False
     # session-supplied optional credentials — used for this request only, never stored
     keys: dict[str, str] = Field(default_factory=dict)
@@ -98,6 +115,14 @@ class HuntStats(BaseModel):
     closing_soon: int = 0
     duplicates_collapsed: int = 0
     dropped_noise: int = 0
+    # verbatim ledger
+    verbatim: int = 0
+    near_verbatim: int = 0
+    not_verbatim: int = 0
+    copies_reported: int = 0
+    junk_retained: int = 0
+    noise_retained: int = 0
+    truncated: bool = False
     dropped_spam: int = 0
     # freshness ledger — second granularity for the first minute
     fresh_seconds: int = 0      # < 60s
@@ -122,6 +147,9 @@ class HuntResponse(BaseModel):
     stats: HuntStats
     plays: list[str] = Field(default_factory=list)
     sort: str = "newest"
+    match: str = "exact"
+    only_exact: bool = False
+    unrestricted: bool = True
     as_of: str | None = None
     expanded: list[str] = Field(default_factory=list)
 

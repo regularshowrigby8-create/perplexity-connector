@@ -169,7 +169,40 @@ undated last. Portal/dork launch links are held outside the limit, so a burst of
 cannot evict the hand-off links. The crawler fills the same fields from response headers, HTML
 metadata and sitemap `<lastmod>` (which also reorders its own frontier, newest seeds first).
 
-### 8.2 Clean results, not cleaner filters
+### 8.2 Verbatim matching (`exact.py`)
+
+The query is a literal phrase. `exact.Phrase.parse` strips operators and quotes and keeps the
+words; `find()` returns a `Match` with `verbatim` (contiguous, in order), `slack` (extra words
+inside the smallest in-order window), `occurrences` and character offsets. There is no stemming,
+no synonym table, no expansion — a plural query does not match a singular page, and the tests
+assert exactly that.
+
+`annotate()` stamps `exact`, `proximity`, `occurrences`, `match_where` and `match_span` on every
+hit, preferring a title match over a snippet match over the URL. Portal/dork launch links are
+excluded: they are generated search URLs with no text, so claiming a verbatim match would be a
+fiction.
+
+Under `sort=newest` the ordering is `(junk, not exact, proximity, age, score, depth)`: the literal
+phrase leads, the closest near-misses follow, and undated material trails. Verbatim hits also get
+a 1.45× score multiplier for the other sort modes. `only_exact` narrows to the verbatim tier, and
+it is off unless the caller asks.
+
+### 8.3 Nothing is removed
+
+`unrestricted=true` (the default) disables every removal step in the fusion path:
+
+| step | unrestricted | filtered (`unrestricted=false`) |
+|---|---|---|
+| `near_dup.cluster` | runs on copies; `copies_reported` only | folds duplicates into one hit |
+| spam (`quality.is_spam`) | `junk = true`, sorted last | removed, counted as `dropped_spam` |
+| URL noise (`priority.NOISE`) | `noise = true`, kept | dropped before ranking |
+| `diversify()` | not applied | geometric per-site demotion |
+| `limit` | `0` = every hit found | capped by the caller |
+| `truncated` | reports when the caller's own limit cut the tail | same |
+
+The filtered path still exists — it is one flag away — but it is not what the default hunt does.
+
+### 8.4 Clean results, not cleaner filters
 
 `quality.py` is the second half: `ftfy` repair, language detection (`py3langid`, label only when
 the margin is decisive), stopword ratio, link density, keyword stuffing and gibberish scoring.

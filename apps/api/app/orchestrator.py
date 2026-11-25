@@ -9,7 +9,7 @@ from typing import Any, Awaitable, Callable
 
 import httpx
 
-from . import freshness, local_index, near_dup, quality, registry
+from . import exact, freshness, local_index, near_dup, quality, registry
 from .config import settings
 from .extract import (canonical_url, depth_score, fingerprint, find_deadline, opportunity_tags,
                       truncate)
@@ -53,7 +53,8 @@ def _urgency(days: int) -> str:
 
 
 def build_hit(raw: RawHit, provider: Provider, rank: int, lens: str,
-              terms: list[str] | None = None) -> Hit | None:
+              terms: list[str] | None = None, phrase: exact.Phrase | None = None,
+              unrestricted: bool = True) -> Hit | None:
     url = (raw.url or "").strip()
     if not url.startswith(("http://", "https://")):
         return None
@@ -80,8 +81,9 @@ def build_hit(raw: RawHit, provider: Provider, rank: int, lens: str,
     elif snippet:
         deadline = find_deadline(snippet)
     text = f"{title} {snippet}"
-    if raw.url and provider.layer != "portal" and NOISE.search(raw.url):
-        return None  # login walls, carts and cookie pages are not answers
+    noise = bool(raw.url and provider.layer != "portal" and NOISE.search(raw.url))
+    if noise and not unrestricted:
+        return None  # only when the caller asked for the filtered view
     coverage = 0.0
     if terms:
         haystack = f"{title} {snippet} {url}".lower()
@@ -179,6 +181,15 @@ def build_hit(raw: RawHit, provider: Provider, rank: int, lens: str,
         hit.meta["spam"] = True
     boost *= 0.6 + 0.4 * assessment.score        # junk ranks low, never disappears
     boost *= 1.0 + 0.55 * hit.freshness          # recency is a signal, not a gate
+
+    # Generated portal/dork links are entry points, not documents: they have no
+    # text of their own, so claiming a verbatim match would be a fiction.
+    exact.annotate(hit, None if hit.kind in LAUNCHER_KINDS else phrase)
+    hit.noise = noise
+    if noise:
+        hit.meta["noise"] = True
+    if hit.exact:
+        boost *= 1.45                            # the literal phrase outweighs a near miss
 
     # specificity is only known once the fields are populated
     if hit.funder and hit.amount and hit.deadline:
@@ -304,26 +315,34 @@ def refresh_ages(hits: list[Hit], now=None) -> None:
             hit.age_source = None
 
 
-def rank(hits: list[Hit], sort: str) -> list[Hit]:
+def verbatim_key(hit: Hit) -> tuple:
+    """Word-for-word first: literal match, then how far apart the words are."""
+    proximity = hit.proximity if hit.proximity is not None else 10**6
+    return (0 if hit.exact else 1, proximity)
+
+
+def rank(hits: list[Hit], sort: str, verbatim: bool = True) -> list[Hit]:
     now = freshness.utcnow()
     if sort == "depth":
-        hits.sort(key=lambda h: (-h.depth, -h.score))
+        hits.sort(key=lambda h: (h.junk, -h.depth, -h.score))
     elif sort == "deadline":
-        hits.sort(key=lambda h: (h.deadline is None,
+        hits.sort(key=lambda h: (h.junk, h.deadline is None,
                                  abs(h.deadline.days_left) if h.deadline else 10**6, -h.score))
     elif sort == "newest":
         # undated results are sorted last, never removed — ordering, not a filter
         def newest_key(hit: Hit):
             stamp = stamp_of(hit)
             age = freshness.age_seconds(stamp, now)
+            tier = (*verbatim_key(hit),) if verbatim else ()
             if age is None:
-                return (1, 0.0, -hit.score, -hit.depth)
-            return (0, float(age), -hit.score, -hit.depth)
+                return (hit.junk, *tier, 1, 0.0, -hit.score, -hit.depth)
+            return (hit.junk, *tier, 0, float(age), -hit.score, -hit.depth)
 
         hits.sort(key=newest_key)
     else:
-        hits.sort(key=lambda h: (-h.score, -h.depth))
-        hits = diversify(hits)
+        key = (lambda h: (h.junk, *verbatim_key(h), -h.score, -h.depth)) if verbatim             else (lambda h: (h.junk, -h.score, -h.depth))
+        hits.sort(key=key)
+        hits = diversify(hits) if not verbatim else hits
     refresh_ages(hits, now)
     return hits
 
@@ -403,6 +422,7 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     expanded = expand_terms(plan.terms, plan.lens)
     terms = [t for t in plan.terms.lower().replace(":", " ").split() if len(t) > 2][:8]
     domains = portal_domains(plan.terms, plan.lens, plan.site, cap=settings.max_domains_per_hunt)
+    phrase = exact.Phrase.parse(req.q) if req.match == "exact" else None
     providers, waiting = select_providers(req, explicit=bool(req.providers))
     if not providers:
         providers = registry.LOCAL
@@ -424,7 +444,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         limits=httpx.Limits(max_connections=40, max_keepalive_connections=20),
     ) as client:
         ctx = HuntContext(plan=plan, client=client, keys=req.keys,
-                          limit=max(8, min(req.limit, 25)), domains=domains)
+                          limit=25 if req.limit == 0 else max(8, min(req.limit, 50)),
+                          domains=domains)
         # 119 engines fan out at once; the semaphore keeps sockets sane without
         # turning the hunt into a queue that hides the fast sources behind the slow.
         gate = asyncio.Semaphore(32)
@@ -444,7 +465,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
             provider, raws, ms, error = await finished
             batch: list[Hit] = []
             for index, raw in enumerate(raws):
-                hit = build_hit(raw, provider, index + 1, plan.lens, terms)
+                hit = build_hit(raw, provider, index + 1, plan.lens, terms, phrase,
+                                req.unrestricted)
                 if hit:
                     batch.append(hit)
                 else:
@@ -464,25 +486,45 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
 
     fused = merge_hits(collected)
     before = len(fused)
-    fused, collapsed = near_dup.cluster(fused)
-    for hit in fused:
-        hit.near_dupes = int((hit.meta or {}).get("near_dupes") or 0)
+    collapsed = 0
+    if req.unrestricted:
+        # near-duplicate detection still runs — it just reports instead of deleting
+        try:
+            _kept, collapsed = near_dup.cluster([hit.model_copy(deep=True) for hit in fused])
+        except Exception:
+            collapsed = 0
+        for hit in fused:
+            hit.near_dupes = 0
+    else:
+        fused, collapsed = near_dup.cluster(fused)
+        for hit in fused:
+            hit.near_dupes = int((hit.meta or {}).get("near_dupes") or 0)
     _ = before
+
     spam = [hit for hit in fused if hit.meta.get("spam")]
-    fused = [hit for hit in fused if not hit.meta.get("spam")]
-    dropped_spam = len(spam)
+    if req.unrestricted:
+        for hit in spam:
+            hit.junk = True
+        dropped_spam = 0            # nothing is dropped; junk is labelled and sorted last
+    else:
+        fused = [hit for hit in fused if not hit.meta.get("spam")]
+        dropped_spam = len(spam)
 
     # Portal entry points are not documents and have no upload time; they are
     # kept outside the limit so the newest-first tail cannot evict them.
+    if req.only_exact:
+        fused = [hit for hit in fused if hit.exact]
+
     launchers = [hit for hit in fused if hit.kind in LAUNCHER_KINDS] if req.sort == "newest" else []
     if launchers:
         fused = [hit for hit in fused if hit.kind not in LAUNCHER_KINDS]
 
-    fused = rank(fused, req.sort)
-    if len(fused) > req.limit:
+    fused = rank(fused, req.sort, verbatim=bool(phrase))
+    truncated = bool(req.limit) and len(fused) > req.limit
+    if truncated:
         fused = fused[: req.limit]
     if launchers:
-        fused = [*fused, *rank(launchers, req.sort)[:5]]
+        fused = [*fused, *rank(launchers, req.sort, verbatim=False)[:5]]
 
     try:
         local_index.upsert_hits(fused)
@@ -508,13 +550,22 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         newest_age_seconds=next((h.age_seconds for h in fused if h.age_seconds is not None), None),
         newest_age_human=next((h.age_human for h in fused if h.age_seconds is not None), None),
         dropped_noise=int(dropped),
+        verbatim=sum(1 for h in fused if h.exact),
+        near_verbatim=sum(1 for h in fused if not h.exact and h.proximity is not None),
+        not_verbatim=sum(1 for h in fused if h.proximity is None),
+        copies_reported=int(collapsed),
+        junk_retained=sum(1 for h in fused if h.junk),
+        noise_retained=sum(1 for h in fused if h.noise),
+        truncated=truncated,
         took_ms=int((time.perf_counter() - started) * 1000),
         cached=False,
     )
     response = HuntResponse(query=plan.terms, lens=plan.lens, site=plan.site, hits=fused,
                             providers=statuses, facets=facets(fused), stats=stats,
                             plays=[p.dork for p in plan.plays], expanded=expanded,
-                            sort=req.sort, as_of=freshness.utcnow().isoformat())
+                            sort=req.sort, as_of=freshness.utcnow().isoformat(),
+                            match=req.match, only_exact=req.only_exact,
+                            unrestricted=req.unrestricted)
     _cache[key] = (time.time(), response)
     if len(_cache) > settings.cache_max:
         for stale in sorted(_cache, key=lambda k: _cache[k][0])[:50]:

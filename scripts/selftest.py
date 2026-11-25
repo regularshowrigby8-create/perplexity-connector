@@ -124,11 +124,23 @@ async def main() -> int:
     ok &= check("portal fallback present", any(h.portal or h.kind == "dork" for h in response.hits))
     ok &= check("facets computed", bool(response.facets.get("domain")))
     ok &= check("newest is the default order", response.sort == "newest", response.sort)
+    ok &= check("word-for-word is the default match", response.match == "exact", response.match)
+    ok &= check("nothing is capped or trimmed", response.unrestricted and not response.stats.truncated)
     ages = [h.age_seconds for h in response.hits]
     dated = [age for age in ages if age is not None]
-    ok &= check("newest first: ages never go backwards",
-                all(dated[i] <= dated[i + 1] for i in range(len(dated) - 1)),
-                f"{len(dated)} dated")
+    tiers = [(h.junk, not h.exact) for h in response.hits if h.kind not in ("portal", "dork")]
+    ordered_tiers = all(tiers[i] <= tiers[i + 1] for i in range(len(tiers) - 1))
+    ok &= check("verbatim results lead, junk last", ordered_tiers)
+    verbatim_ages = [h.age_seconds for h in response.hits if h.exact and h.age_seconds is not None]
+    ok &= check("newest first inside the verbatim tier",
+                all(verbatim_ages[i] <= verbatim_ages[i + 1]
+                    for i in range(len(verbatim_ages) - 1)),
+                f"{len(verbatim_ages)} verbatim")
+    rest_ages = [h.age_seconds for h in response.hits
+                 if not h.exact and not h.junk and h.age_seconds is not None]
+    ok &= check("newest first inside the rest",
+                all(rest_ages[i] <= rest_ages[i + 1] for i in range(len(rest_ages) - 1)),
+                f"{len(rest_ages)} other")
     ok &= check("undated hits are kept, sorted last", ages == dated + [None] * (len(ages) - len(dated)))
     ok &= check("every hit carries an age badge", all(h.age_human for h in response.hits))
     ok &= check("freshness ledger adds up",
@@ -136,12 +148,51 @@ async def main() -> int:
                 f"dated={response.stats.dated} undated={response.stats.undated}")
     ok &= check("quality scored on every hit", all(0.0 <= h.quality <= 1.0 for h in response.hits))
 
-    print("\n▸ 4b. the same hunt, sorted by relevance")
+    ok &= check("verbatim ledger accounts for every hit",
+                response.stats.verbatim + response.stats.near_verbatim
+                + response.stats.not_verbatim == len(response.hits),
+                f"{response.stats.verbatim} verbatim / {response.stats.near_verbatim} near / "
+                f"{response.stats.not_verbatim} none")
+
+    print("\n▸ 4b. verbatim matching is literal, not fuzzy")
+
+    from app.exact import Phrase, find
+
+    phrase = Phrase.parse('"climate grant"')
+    ok &= check("contiguous phrase matches", bool(find("a new climate grant for kenya", phrase).verbatim))
+    near = find("the climate resilience grant", phrase)
+    ok &= check("gap is measured, not guessed", near is not None and near.proximity == 1,
+                f"proximity={getattr(near, 'proximity', None)}")
+    ok &= check("word order matters", find("grant for the climate", phrase) is None)
+    ok &= check("no stemming or synonyms",
+                find("climatic grants", phrase) is None
+                and find("climate funding grant", phrase).verbatim is False)
+    hyphen = find("Climate-Grant toolkit", phrase)
+    ok &= check("hyphens are word boundaries", bool(hyphen and hyphen.verbatim))
+
+    strict = await hunt(HuntRequest(q="climate grant", lens="opportunities", limit=0,
+                                    fresh=True, only_exact=True), use_cache=False)
+    ok &= check("verbatim-only returns only verbatim hits",
+                all(hit.exact for hit in strict.hits), str(len(strict.hits)))
+    ok &= check("verbatim-only does not silently cap",
+                not strict.stats.truncated and strict.stats.not_verbatim == 0)
+    ok &= check("verbatim-only finds the literal phrase", len(strict.hits) > 0,
+                f"{len(strict.hits)} hits")
+    plural = await hunt(HuntRequest(q="climate grants", lens="opportunities", limit=0,
+                                    fresh=True, only_exact=True), use_cache=False)
+    ok &= check("no stemming: a plural query does not match the singular",
+                all(hit.exact for hit in plural.hits))
+
+    print("\n▸ 4c. the same hunt, sorted by relevance")
     scored = await hunt(HuntRequest(q="climate grants kenya", lens="opportunities", limit=30,
-                                    fresh=True, sort="relevance"), use_cache=False)
+                                    fresh=True, sort="relevance", match="loose"), use_cache=False)
     ok &= check("relevance sort still ranks by score", all(
         scored.hits[i].score >= scored.hits[i + 1].score
         for i in range(len(scored.hits) - 1)))
+    loose = await hunt(HuntRequest(q="climate grants kenya", lens="opportunities", limit=0,
+                                   fresh=True, match="loose"), use_cache=False)
+    ok &= check("loose mode still returns everything", len(loose.hits) >= len(strict.hits),
+                f"{len(loose.hits)} vs {len(strict.hits)}")
     ok &= check("no duplicate canonical URLs",
                 len({h.url for h in response.hits}) == len(response.hits))
 

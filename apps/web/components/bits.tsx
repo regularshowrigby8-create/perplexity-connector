@@ -9,8 +9,8 @@ export function ThemeBanner({ variant = "full" }: { variant?: "full" | "compact"
       <div className="theme-banner compact" role="note">
         <span className="theme-mark">!</span>
         <span>
-          <b>Not a news feed.</b> Newest-first is an ordering, never a filter — the buried PDFs,
-          listings and open calls that typical engines drop stay in these results.
+          <b>Word for word.</b> Matches are literal — no stemming, no synonyms, no expansion —
+          and nothing is removed: junk is labelled, duplicates are reported, everything stays.
         </span>
       </div>
     );
@@ -26,9 +26,10 @@ export function ThemeBanner({ variant = "full" }: { variant?: "full" | "compact"
           portal search, the directory listing nobody linked, the spreadsheet in a data dump, the
           page deleted from the site. No freshness gate, no “helpful content” scorer, no
           domain-authority penalty — old, ugly, unlinked and machine-generated is the point.
-          Results are ordered newest-first, to the second, straight from each source's own
-          publication clock; anything undated follows rather than disappearing. Sort order can
-          change; that filtering policy does not.
+          The query is matched word for word — no stemming, no synonyms, no expansion — and no
+          result is deleted, folded away or capped: duplicates are reported, junk is labelled and
+          sorted last, undated material trails. Ordering is newest-first, to the second, from each
+          source's own publication clock. Sort order can change; that policy does not.
         </p>
       </div>
     </div>
@@ -62,6 +63,49 @@ export function DeadlineChip({ deadline }: { deadline: Deadline }) {
       {fmtDays(deadline.days_left)}
     </span>
   );
+}
+
+/** Word-for-word: the literal phrase, or the measured distance from it. */
+export function VerbatimBadge({ hit }: { hit: Hit }) {
+  if (hit.exact) {
+    return (
+      <span className="pill verbatim" title="The query appears word for word, in order">
+        verbatim{hit.occurrences > 1 ? ` ×${hit.occurrences}` : ""}
+      </span>
+    );
+  }
+  if (hit.proximity !== null && hit.proximity !== undefined) {
+    return (
+      <span
+        className="pill muted"
+        title="Every query word is present, in order — these are the words that sit between them"
+      >
+        {hit.proximity} word{hit.proximity === 1 ? "" : "s"} apart
+      </span>
+    );
+  }
+  return (
+    <span className="pill muted" title="The exact phrase is not on this page. Kept, because nothing is removed.">
+      no verbatim match
+    </span>
+  );
+}
+
+/** Snippet with the literal match marked, when the match landed here. */
+function Snippet({ hit }: { hit: Hit }) {
+  if (!hit.snippet) return null;
+  const span = hit.match_span;
+  if (hit.match_where === "snippet" && span && span.length === 2) {
+    const [start, end] = span;
+    return (
+      <p className="result-snip">
+        {hit.snippet.slice(0, start)}
+        <mark>{hit.snippet.slice(start, end)}</mark>
+        {hit.snippet.slice(end)}
+      </p>
+    );
+  }
+  return <p className="result-snip">{hit.snippet}</p>;
 }
 
 /** The publication clock, in the words a human would use for it. */
@@ -138,7 +182,7 @@ export function ResultCard({
           </a>
           <div className="result-url">{hostOf(hit.url)} · {hit.url.replace(/^https?:\/\//, "").slice(0, 110)}</div>
           <Facts hit={hit} />
-          {hit.snippet && <p className="result-snip">{hit.snippet}</p>}
+          <Snippet hit={hit} />
           {hit.keyphrases?.length > 0 && (
             <div className="phrases">
               {hit.keyphrases.slice(0, 4).map((phrase) => (
@@ -147,6 +191,7 @@ export function ResultCard({
             </div>
           )}
           <div className="result-meta">
+            <VerbatimBadge hit={hit} />
             <ExtBadge ext={hit.file_ext} />
             <Depth value={hit.depth} />
             {hit.deadline && <DeadlineChip deadline={hit.deadline} />}
@@ -159,9 +204,16 @@ export function ResultCard({
                 magic: {hit.sniffed}
               </span>
             ) : null}
+            {hit.junk && <span className="pill red" title="Parked, login wall or error page — labelled, not removed">junk</span>}
+            {hit.noise && <span className="pill red" title="A URL a mainstream engine drops outright (login, cart, tag page)">noise</span>}
             {hit.near_dupes > 0 && (
               <span className="pill violet" title="near-identical copies folded into this result">
                 +{hit.near_dupes} folded
+              </span>
+            )}
+            {hit.copies > 0 && (
+              <span className="pill violet" title="near-identical copies reported but kept">
+                {hit.copies} copies
               </span>
             )}
             {hit.provider_name && <span className="pill">{hit.provider_name}</span>}

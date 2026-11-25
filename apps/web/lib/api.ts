@@ -27,6 +27,14 @@ export type Hit = {
   quality: number;
   quality_flags: string[];
   language: string | null;
+  exact: boolean;
+  proximity: number | null;
+  occurrences: number;
+  match_span: number[] | null;
+  match_where: "title" | "snippet" | "url" | null;
+  copies: number;
+  junk: boolean;
+  noise: boolean;
   deadline: Deadline | null;
   depth: number;
   score: number;
@@ -74,6 +82,13 @@ export type HuntResponse = {
     duplicates_collapsed: number;
     dropped_noise: number;
     dropped_spam: number;
+    verbatim: number;
+    near_verbatim: number;
+    not_verbatim: number;
+    copies_reported: number;
+    junk_retained: number;
+    noise_retained: number;
+    truncated: boolean;
     fresh_seconds: number;
     fresh_minutes: number;
     fresh_hours: number;
@@ -86,6 +101,9 @@ export type HuntResponse = {
     cached: boolean;
   };
   sort?: string;
+  match?: "exact" | "loose";
+  only_exact?: boolean;
+  unrestricted?: boolean;
   as_of?: string | null;
   expanded: string[];
   plays: string[];
@@ -99,6 +117,9 @@ export type HuntParams = {
   providers?: string[];
   limit?: number;
   sort?: "relevance" | "depth" | "deadline" | "newest";
+  match?: "exact" | "loose";
+  only_exact?: boolean;
+  unrestricted?: boolean;
   fresh?: boolean;
 };
 

@@ -27,6 +27,8 @@ function HuntView() {
   const site = params.get("site");
   const types = params.get("types");
   const sort = (params.get("sort") ?? "newest") as "relevance" | "depth" | "deadline" | "newest";
+  const match = (params.get("match") ?? "exact") as "exact" | "loose";
+  const onlyExact = params.get("only") === "1";
 
   const [hits, setHits] = useState<Hit[]>([]);
   const [final, setFinal] = useState<HuntResponse | null>(null);
@@ -54,7 +56,10 @@ function HuntView() {
 
     streamSSE(
       "/api/v1/hunt/stream",
-      { q, lens, site: site ?? null, file_types: types ? types.split(",") : [], sort, limit: 80 },
+      {
+        q, lens, site: site ?? null, file_types: types ? types.split(",") : [], sort, limit: 0,
+        match, only_exact: onlyExact, unrestricted: true,
+      },
       (event) => {
         if (event.type === "meta") {
           setMeta({ plan: event.plan as Meta["plan"], domains: event.domains as string[],
@@ -88,7 +93,7 @@ function HuntView() {
     });
 
     return () => controller.abort();
-  }, [q, lens, site, types, sort]);
+  }, [q, lens, site, types, sort, match, onlyExact]);
 
   useEffect(() => {
     if (!toast) return;
@@ -283,6 +288,32 @@ function HuntView() {
               </div>
             </div>
             <div className="toolbar-right">
+              <button
+                className="btn btn-sm"
+                data-on={match === "exact"}
+                title={match === "exact"
+                  ? "Word for word: the literal phrase, in order. Nothing is expanded, stemmed or approximated."
+                  : "Any of the words — the old keyword behaviour"}
+                onClick={() => {
+                  const next = new URLSearchParams(params.toString());
+                  next.set("match", match === "exact" ? "loose" : "exact");
+                  router.replace(`/hunt?${next.toString()}`);
+                }}
+              >
+                {match === "exact" ? "verbatim" : "any word"}
+              </button>
+              <button
+                className="btn btn-sm"
+                data-on={onlyExact}
+                title="Show only results containing the phrase word for word. Off by default — nothing is hidden unless you ask."
+                onClick={() => {
+                  const next = new URLSearchParams(params.toString());
+                  if (onlyExact) next.delete("only"); else next.set("only", "1");
+                  router.replace(`/hunt?${next.toString()}`);
+                }}
+              >
+                {onlyExact ? "verbatim only ✓" : "verbatim only"}
+              </button>
               <select className="chip" value={sort} style={{ padding: "6px 8px" }}
                 onChange={(e) => {
                   const next = new URLSearchParams(params.toString());
@@ -309,9 +340,20 @@ function HuntView() {
               <span className="tick"><b>{final.stats.fresh_minutes}</b> this hour</span>
               <span className="tick"><b>{final.stats.fresh_hours}</b> today</span>
               <span className="tick"><b>{final.stats.fresh_days}</b> this week</span>
-              {final.stats.dropped_spam > 0 && (
-                <span className="tick" title="parked domains, login walls, error pages — ranked out, not filtered out of the count">
-                  <b>{final.stats.dropped_spam}</b> junk ranked out
+              <span className="tick" title="results containing the query word for word">
+                <b>{final.stats.verbatim}</b> verbatim
+              </span>
+              <span className="tick" title="every query word present, in order, with words in between">
+                <b>{final.stats.near_verbatim}</b> near
+              </span>
+              {final.stats.not_verbatim > 0 && (
+                <span className="tick" title="kept because nothing is removed — the phrase is not on the page">
+                  <b>{final.stats.not_verbatim}</b> not verbatim
+                </span>
+              )}
+              {final.stats.junk_retained > 0 && (
+                <span className="tick" title="parked domains, login walls, error pages — labelled and sorted last, never deleted">
+                  <b>{final.stats.junk_retained}</b> junk kept
                 </span>
               )}
               <span className="tick">

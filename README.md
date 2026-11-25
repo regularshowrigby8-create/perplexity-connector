@@ -46,11 +46,53 @@ the copy:
   "popularity_ranking": false,
   "freshness_gate": false,
   "authority_penalty": false,
-  "buried_boost": true
+  "buried_boost": true,
+  "match_default": "exact",
+  "constraints": {
+    "result_removal": false, "result_cap": false,
+    "dedup": "reported, not applied", "junk": "labelled, sorted last",
+    "noise": "labelled, kept", "diversity_penalty": false,
+    "query_expansion": false, "stemming": false, "synonyms": false
+  }
 }
 ```
 
 ---
+
+## Verbatim results, and no restrictions on them
+
+The query is matched **word for word**. No stemming, no synonyms, no query expansion, no fuzzy
+similarity, no "related concepts" — `climate grant` matches `climate grant`, not `climatic grants`
+and not `grant for the climate`.
+
+`match=exact` is the default. Each result reports the literal outcome:
+
+```json
+{ "exact": true,  "occurrences": 2, "match_where": "snippet", "proximity": 0 }
+{ "exact": false, "proximity": 1,  "match_where": "title" }      // "climate resilience grant"
+{ "exact": false, "proximity": null }                            // no in-order match at all
+```
+
+`proximity` is measured in words: `0` means contiguous, `1` means one word sat inside the smallest
+window that still contains every query word in order. Word order is part of the match — reversed
+keywords are not a hit. Offsets come back in `match_span`, so the matched words can be marked in
+the snippet instead of approximating where they are.
+
+**Nothing is done to the result set.** `unrestricted` defaults to true, and under it the engine:
+
+| would-be constraint | what happens instead |
+|---|---|
+| near-duplicate folding | `copies`/`copies_reported` reported, every copy kept |
+| spam / parked / error removal | hit flagged `junk`, sorted last, kept |
+| URL noise (`login`, `/tag/`, `.js`) | hit flagged `noise`, kept |
+| diversity penalty on one host | not applied |
+| result cap | only your own `limit` — `0` means everything found |
+| truncation | `stats.truncated` says if *you* capped it |
+
+`only_exact=true` is the one filter that exists, it is opt-in, and it only ever narrows to results
+that contain the phrase word for word. The `/api/v1/health` policy block publishes all of this
+(`constraints: {result_removal: false, result_cap: false, dedup: "reported, not applied", …}`)
+so an integration can assert it rather than trust the copy.
 
 ## Newest first, to the second
 
@@ -216,7 +258,7 @@ and can be enabled with an environment variable *or* a per-request key that is n
 ## API
 
 ```
-POST /api/v1/hunt            federated search (JSON, newest-first by default)
+POST /api/v1/hunt            federated search (verbatim, newest-first, nothing removed)
 POST /api/v1/hunt/stream     same, as Server-Sent Events
 POST /api/v1/crawl           run the crawler to completion
 POST /api/v1/crawl/stream    live crawl events (page, file, pagehit, blocked, done)

@@ -518,3 +518,20 @@ h1.title .grad {
   font-variant-numeric: tabular-nums;
 }
 .fresh-strip .tick b { color: var(--fg, #e8eef7); font-weight: 600; }
+
+/* ---------- verbatim ---------- */
+.pill.verbatim {
+  border-color: rgba(190, 255, 120, 0.6);
+  color: var(--lime, #b6ff6e);
+  background: rgba(150, 255, 90, 0.1);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.result-snip mark {
+  background: rgba(194, 255, 61, 0.16);
+  color: var(--fg, #eef6ff);
+  border-bottom: 1px solid rgba(194, 255, 61, 0.55);
+  padding: 0 1px;
+  border-radius: 2px;
+}
+.btn[data-on="true"] { border-color: rgba(194, 255, 61, 0.5); color: var(--lime, #c2ff3d); }

@@ -199,7 +199,7 @@
         <b>hosted files, open calls and portals</b> that a normal results page never shows you.
       </p>
 
-      <div class="warn-strip" role="note">
+      <div class="warn-strip" data-verbatim="1" role="note">
         <span class="warn-mark">!</span>
         <div>
           <strong>This engine does not rank by popularity, and it does not filter like one.</strong>
@@ -207,8 +207,10 @@
             The point of Nighthawk is the material a normal results page demotes or drops: the PDF in
             <span class="mono">/uploads/2019/03/</span>, the tender notice behind a portal search, the
             “Index of /” listing nobody linked, the spreadsheet in a data dump, the page the site deleted.
-            No freshness gate, no “helpful content” scorer, no domain-authority penalty. Sort order can
-            change — this filtering policy does not.
+            No freshness gate, no “helpful content” scorer, no domain-authority penalty.
+            Queries are matched <b>word for word</b> — no stemming, no synonyms, no expansion — and
+            nothing is removed from the result set: duplicates are reported, junk is labelled and
+            sorted last. Sort order can change; that policy does not.
           </p>
         </div>
       </div>

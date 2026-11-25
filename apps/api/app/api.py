@@ -96,6 +96,18 @@ async def health() -> dict[str, Any]:
             "buried_boost": True,
             "note": "sort order is an ordering, not a filter: old, unlinked, ugly and "
                     "machine-generated material stays in the result set",
+            "match_default": "exact",
+            "constraints": {
+                "result_removal": False,
+                "result_cap": False,
+                "dedup": "reported, not applied",
+                "junk": "labelled, sorted last",
+                "noise": "labelled, kept",
+                "diversity_penalty": False,
+                "query_expansion": False,
+                "stemming": False,
+                "synonyms": False,
+            },
         },
     }
 
