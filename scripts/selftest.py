@@ -24,10 +24,10 @@ sys.path.insert(0, str(ROOT / "apps" / "api"))
 _TMP = Path(tempfile.mkdtemp(prefix="nighthawk-selftest-"))
 os.environ["NH_DATA_DIR"] = str(_TMP)
 
-from app import fixtures, local_index  # noqa: E402
+from app import fixtures, freshness, local_index, registry  # noqa: E402
 from app.crawl import CrawlRequest, FusionCrawler  # noqa: E402
 from app.models import HuntRequest  # noqa: E402
-from app.orchestrator import hunt  # noqa: E402
+from app.orchestrator import hunt, rank  # noqa: E402
 
 def free_port() -> int:
     import socket
@@ -330,6 +330,73 @@ async def main() -> int:
     compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
     ok &= check("compose publishes the engine on its own",
                 '"8000:8000"' in compose and "nh-data:/data" in compose)
+
+    print("\n\u25b8 8. what the query asked for: type, host, and a clock that lies")
+    from app import intent as query_intent
+
+    typed = query_intent.parse("minecraft apk")
+    ok &= check("a type word becomes a filter, not a search term",
+                typed.query == "minecraft" and "apk" in typed.types, str(typed.as_meta()))
+    bare = query_intent.parse("apk")
+    ok &= check("a bare type is a browse, not a phrase",
+                bare.query == "" and bare.types[:1] == ["apk"])
+    aimed = query_intent.parse("budget csv mediafire")
+    ok &= check("a host word aims the crawl and is not a filter",
+                aimed.hosts == ["mediafire.com"] and aimed.query == "budget"
+                and "csv" in aimed.types, str(aimed.hosts))
+    plain = query_intent.parse("water")
+    ok &= check("a query with no type word filters nothing",
+                plain.types == [] and plain.hosts == [] and plain.query == "water")
+    ok &= check("file-host engines are registered",
+                {"mediafire", "archivefiles", "apkpure"} <= {p.id for p in registry.file_hosts()},
+                str([p.id for p in registry.file_hosts()]))
+
+    # a vault with one of each type, so the filter has something to be right about
+    from app.models import Hit as HitModel
+    now_iso = freshness.utcnow().isoformat()
+    local_index.upsert_hits([
+        HitModel(url="http://vault/reports/annual-report-2025.pdf", title="Annual report 2025",
+                 snippet="annual report 2025 expenditure", provider="vault",
+                 provider_name="Nighthawk Vault", kind="document", file_ext="pdf",
+                 domain="vault", published=now_iso, first_seen=now_iso, age_source="published"),
+        HitModel(url="http://vault/data/budget.csv", title="Annual report budget table",
+                 snippet="annual report budget rows", provider="vault",
+                 provider_name="Nighthawk Vault", kind="dataset", file_ext="csv",
+                 domain="vault", published=now_iso, first_seen=now_iso, age_source="published"),
+        HitModel(url="http://vault/pages/annual-report.html", title="Annual report landing page",
+                 snippet="annual report landing page", provider="vault",
+                 provider_name="Nighthawk Vault", kind="page", file_ext="html",
+                 domain="vault", published=now_iso, first_seen=now_iso, age_source="published"),
+    ])
+    only_pdf = await hunt(HuntRequest(q="annual report pdf", limit=0, fresh=True), use_cache=False)
+    ok &= check("searching 'pdf' returns pdfs and only pdfs",
+                bool(only_pdf.hits) and {h.file_ext for h in only_pdf.hits} == {"pdf"},
+                str({h.file_ext for h in only_pdf.hits}))
+    ok &= check("and it says how many of another type it set aside",
+                only_pdf.intent.get("removed_by_type", 0) > 0,
+                str(only_pdf.intent.get("removed_by_type")))
+    untyped = await hunt(HuntRequest(q="annual report", limit=0, fresh=True), use_cache=False)
+    ok &= check("no type word, no filter at all",
+                untyped.intent.get("removed_by_type") == 0
+                and len({h.file_ext for h in untyped.hits}) > 1,
+                str(sorted({str(h.file_ext) for h in untyped.hits})))
+
+    import datetime
+    stamp = lambda **kw: (freshness.utcnow() - datetime.timedelta(**kw)).isoformat()
+    clocked = [
+        HitModel(url="http://x/future", title="future", provider="p", provider_name="P",
+                 published="2027-09-01T00:00:00Z"),
+        HitModel(url="http://x/old", title="old", provider="p", provider_name="P",
+                 published=stamp(days=5)),
+        HitModel(url="http://x/seconds", title="seconds", provider="p", provider_name="P",
+                 published=stamp(seconds=16)),
+        HitModel(url="http://x/hours", title="hours", provider="p", provider_name="P",
+                 published=stamp(hours=3)),
+    ]
+    order = [h.title for h in rank(clocked, "newest", verbatim=False)]
+    ok &= check("newest-first puts seconds-old first", order[0] == "seconds", str(order))
+    ok &= check("a record dated in the future no longer outranks the past",
+                order.index("old") < order.index("future"), str(order))
 
     httpd.shutdown()
     print("\n" + ("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED"))

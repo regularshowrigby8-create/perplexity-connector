@@ -9,7 +9,7 @@ from typing import Any, Awaitable, Callable
 
 import httpx
 
-from . import exact, freshness, local_index, near_dup, quality, registry
+from . import exact, freshness, intent as query_intent, local_index, near_dup, quality, registry
 from .config import settings
 from .extract import (canonical_url, depth_score, fingerprint, find_deadline, opportunity_tags,
                       truncate)
@@ -331,11 +331,18 @@ def rank(hits: list[Hit], sort: str, verbatim: bool = True) -> list[Hit]:
     elif sort == "newest":
         # undated results are sorted last, never removed — ordering, not a filter
         def newest_key(hit: Hit):
+            # Three bands, because a clock can lie: dated in the past (the newest
+            # of those first, to the second), dated in the future (a wrong clock —
+            # it used to sort *above* everything, pushing 16-second-old results
+            # below records stamped ten months ahead), then undated. Nothing is
+            # removed; the bands only decide order.
             stamp = stamp_of(hit)
             age = freshness.age_seconds(stamp, now)
             tier = (*verbatim_key(hit),) if verbatim else ()
             if age is None:
-                return (hit.junk, *tier, 1, 0.0, -hit.score, -hit.depth)
+                return (hit.junk, *tier, 2, 0.0, -hit.score, -hit.depth)
+            if age < 0:
+                return (hit.junk, *tier, 1, float(-age), -hit.score, -hit.depth)
             return (hit.junk, *tier, 0, float(age), -hit.score, -hit.depth)
 
         hits.sort(key=newest_key)
@@ -418,12 +425,31 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
             return response
 
     started = time.perf_counter()
-    plan = build_plan(req.q, req.lens, req.site, req.file_types)
+
+    # What is being asked for, before anything is crawled: a file type ("apk",
+    # "pdf report") and/or a host ("mediafire"). A type word becomes the one
+    # filter the engine has; a host word becomes an aim, not a filter.
+    asked = query_intent.parse(req.q)
+    search_text = asked.query if asked.wants_files else req.q
+    if not search_text.strip():
+        search_text = " ".join(asked.matched) or req.q
+    file_types = list(dict.fromkeys([*(req.file_types or []), *asked.types]))
+    plan = build_plan(search_text, req.lens, req.site, file_types)
     expanded = expand_terms(plan.terms, plan.lens)
     terms = [t for t in plan.terms.lower().replace(":", " ").split() if len(t) > 2][:8]
     domains = portal_domains(plan.terms, plan.lens, plan.site, cap=settings.max_domains_per_hunt)
-    phrase = exact.Phrase.parse(req.q) if req.match == "exact" else None
+    verbatim_text = asked.query if asked.wants_files else req.q
+    # A bare type ("apk") is a browse, not a phrase: there is nothing to match
+    # word for word, so no verbatim claim is made about it.
+    phrase = (exact.Phrase.parse(verbatim_text)
+              if req.match == "exact" and verbatim_text.strip() else None)
     providers, waiting = select_providers(req, explicit=bool(req.providers))
+    if asked.wants_files and not req.providers:
+        # the file hosts are the only engines that look inside MediaFire, APKPure
+        # or archive.org's software collection — dispatch them whenever the query
+        # names a file type or a host
+        have = {p.id for p in providers}
+        providers = [*providers, *[p for p in registry.file_hosts() if p.id not in have]]
     if not providers:
         providers = registry.LOCAL
     if emit:
@@ -515,11 +541,24 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     if req.only_exact:
         fused = [hit for hit in fused if hit.exact]
 
+    # The typed filter, and only the typed filter: "apk" means APKs. Everything
+    # else the engine believes about not removing results still holds.
+    type_dropped = 0
+    if asked.types:
+        fused, type_dropped = query_intent.filter_by_type(fused, asked.types)
+    host_lifted = 0
+    if asked.hosts:
+        fused, host_lifted = query_intent.boost_hosts(fused, asked.hosts)
+
     launchers = [hit for hit in fused if hit.kind in LAUNCHER_KINDS] if req.sort == "newest" else []
     if launchers:
         fused = [hit for hit in fused if hit.kind not in LAUNCHER_KINDS]
 
     fused = rank(fused, req.sort, verbatim=bool(phrase))
+    if asked.hosts:
+        # after ranking too, so a named host leads the newest-first order instead
+        # of being buried under it
+        fused, _ = query_intent.boost_hosts(fused, asked.hosts)
     truncated = bool(req.limit) and len(fused) > req.limit
     if truncated:
         fused = fused[: req.limit]
@@ -560,12 +599,20 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         took_ms=int((time.perf_counter() - started) * 1000),
         cached=False,
     )
+    intent_meta = asked.as_meta()
+    intent_meta.update({
+        "search_text": plan.terms,
+        "removed_by_type": int(type_dropped),
+        "host_matches": int(host_lifted),
+        "file_host_engines": [p.id for p in registry.file_hosts()]
+        if asked.wants_files and not req.providers else [],
+    })
     response = HuntResponse(query=plan.terms, lens=plan.lens, site=plan.site, hits=fused,
                             providers=statuses, facets=facets(fused), stats=stats,
                             plays=[p.dork for p in plan.plays], expanded=expanded,
                             sort=req.sort, as_of=freshness.utcnow().isoformat(),
                             match=req.match, only_exact=req.only_exact,
-                            unrestricted=req.unrestricted)
+                            unrestricted=req.unrestricted, intent=intent_meta)
     _cache[key] = (time.time(), response)
     if len(_cache) > settings.cache_max:
         for stale in sorted(_cache, key=lambda k: _cache[k][0])[:50]:

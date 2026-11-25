@@ -1150,6 +1150,7 @@
           <button class="btn" type="button" id="crawl-btn" title="Take the query into the crawler">Crawl instead</button>
         </form>
         <div class="lens-row" id="lenses" role="group" aria-label="Search lens"></div>
+        <div class="lens-row" id="types" role="group" aria-label="File type"></div>
         <div class="row" style="margin-top:10px">
           <button class="link-btn" type="button" id="settings-toggle">engine settings</button>
         </div>
@@ -1348,7 +1349,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
 <footer>
   <div class="wrap foot">
-    <span class="mono">NIGHTHAWK v1.1 · inline hunt</span>
+    <span class="mono">NIGHTHAWK v1.2 · type-aware</span>
     <span class="dim">·</span>
     <span>119 remote engines · 86 arsenal engines · 54 portals · verbatim &amp; unrestricted</span>
     <span class="dim">·</span>
@@ -1494,6 +1495,37 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     "api/docs": "/api/docs"
   };
 
+  // Typing "apk" already means APKs on the engine side; these chips just save
+  // typing. They append the word to the query, which is what the intent reader
+  // looks for, so the filter and the crawl aim come from the same place.
+  var TYPES = ["pdf", "apk", "zip", "mp3", "mp4", "csv", "epub", "exe", "iso", "docx"];
+
+  function renderTypes() {
+    var box = document.getElementById("types");
+    if (!box) return;
+    box.innerHTML = "";
+    var label = document.createElement("span");
+    label.className = "tiny";
+    label.textContent = "type:";
+    label.style.alignSelf = "center";
+    box.appendChild(label);
+    TYPES.forEach(function (word) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "lens";
+      b.textContent = word;
+      b.title = "only " + word + " files — this is the one filter the engine has";
+      b.addEventListener("click", function () {
+        var input = document.getElementById("q");
+        var stripped = input.value.replace(/\b(pdf|apk|zip|mp3|mp4|csv|epub|exe|iso|docx)\b/gi, "")
+          .replace(/\s+/g, " ").trim();
+        input.value = (stripped ? stripped + " " : "") + word;
+        runHunt();
+      });
+      box.appendChild(b);
+    });
+  }
+
   function wireRoutes() {
     var nodes = document.querySelectorAll("[data-route]");
     for (var i = 0; i < nodes.length; i++) {
@@ -1547,6 +1579,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   }, true);
 
   wireRoutes();
+  renderTypes();
 
   // ------------------------------------------------------------------- probe
   function setStatus(state, text) {
@@ -1736,6 +1769,9 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
         "pill" + (hit.age_source === "first_seen" ? " muted" : ""),
         hit.published_at || "how long ago this was published"));
     }
+    if (hit.meta && hit.meta.host_match) {
+      badges.appendChild(pill("named host", "pill lime", "this result is on the host you asked for"));
+    }
     if (hit.provider_name) {
       badges.appendChild(pill(hit.provider_name, "pill muted", "where it came from"));
     }
@@ -1750,12 +1786,21 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
     document.getElementById("live").hidden = false;
     document.getElementById("live-title").textContent = headline;
-    var note = ["verbatim match"];
-    // HuntResponse has no policy block; the engine's contract is that nothing is
-    // removed, and the deep report states it explicitly. Believe either.
-    if (policy.result_removal === false || policy.result_removal === undefined) {
-      note.push("nothing removed");
+    var intent = report.intent || {};
+    var typed = intent.types || [];
+    var hosts = intent.hosts || [];
+    var note = [];
+    if (typed.length) {
+      // the one filter, and it exists because it was typed
+      note.push("only " + typed.slice(0, 4).join(" / "));
+      note.push((intent.removed_by_type || 0) + " not that type, set aside");
+    } else {
+      note.push("verbatim match");
+      if (policy.result_removal === false || policy.result_removal === undefined) {
+        note.push("nothing removed");
+      }
     }
+    if (hosts.length) note.push("aimed at " + hosts.slice(0, 3).join(", "));
     if (policy.verbatim_only) note.push("verbatim only");
     if (stats.took_ms !== undefined && stats.took_ms !== null) note.push(stats.took_ms + " ms");
     if (stats.cached) note.push("cached");
@@ -1771,6 +1816,14 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       bar.appendChild(node);
     }
     tick("results", hits.length, "everything the engine returned");
+    if (typed.length) {
+      tick("type", typed.slice(0, 2).join("|"), "the extension that was asked for");
+      if (intent.removed_by_type) {
+        tick("set aside", intent.removed_by_type,
+          "results of another type — the only filter in the engine, and it is only applied when a type is typed");
+      }
+    }
+    if (intent.host_matches) tick("named host", intent.host_matches, "results on a host you named");
     tick("verbatim", stats.verbatim !== undefined ? stats.verbatim
       : hits.filter(function (h) { return h.exact; }).length, "the phrase, word for word");
     if (stats.copies_reported) tick("copies reported", stats.copies_reported, "duplicates kept and labelled");

@@ -152,6 +152,9 @@ class HuntResponse(BaseModel):
     unrestricted: bool = True
     as_of: str | None = None
     expanded: list[str] = Field(default_factory=list)
+    # what the query asked for, read before crawling: file types, hosts, and what
+    # the typed filter set aside. Empty when the query named no type or host.
+    intent: dict[str, Any] = Field(default_factory=dict)
 
 
 class ScoutRequest(BaseModel):

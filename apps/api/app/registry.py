@@ -1,8 +1,9 @@
 """One registry of every independent engine the monster can call."""
 from __future__ import annotations
 
-from .providers import (archives, code, datasets, launchers, metasearch, opendata, openscience,
-                        opportunities, opportunities_live, realtime, scholar, vault, web)
+from .providers import (archives, code, datasets, filehosts, launchers, metasearch, opendata,
+                        openscience, opportunities, opportunities_live, realtime, scholar, vault,
+                        web)
 from .providers.base import Provider
 
 WEB = [
@@ -65,12 +66,16 @@ OPPORTUNITIES_LIVE = [
     opportunities_live.WorldBankProcurement(), opportunities_live.CORDIS(),
     opportunities_live.FundsforNGOsSearch(), opportunities_live.UNDPProcurement(),
 ]
+# The file hosts: the only engines here that look inside MediaFire, APKPure,
+# archive.org's software collection or SourceForge. Dispatched when a query
+# names a file type or a host, and alongside the files lens.
+FILE_HOSTS = [engine() for engine in filehosts.FILE_HOSTS]
 LOCAL = [vault.Vault(), vault.VaultFullText()]
 LAUNCHERS = [launchers.Portals(), launchers.DorkLauncher()]
 
 PROVIDERS: list[Provider] = [*WEB, *METASEARCH, *ARCHIVES, *OPPORTUNITIES, *SCHOLAR,
                              *DATASETS, *CODE, *REALTIME, *OPEN_SCIENCE, *OPEN_DATA,
-                             *OPPORTUNITIES_LIVE, *LOCAL, *LAUNCHERS]
+                             *OPPORTUNITIES_LIVE, *FILE_HOSTS, *LOCAL, *LAUNCHERS]
 
 CRAWLER = {
     "id": "crawler",
@@ -93,6 +98,11 @@ def for_lens(lens: str) -> list[Provider]:
     if lens == "all":
         return [p for p in PROVIDERS if "all" in p.lenses]
     return [p for p in PROVIDERS if lens in p.lenses or "all" in p.lenses]
+
+
+def file_hosts() -> list[Provider]:
+    """The file-host engines, dispatched when the query asks for files."""
+    return list(FILE_HOSTS)
 
 
 def describe() -> list[dict]:

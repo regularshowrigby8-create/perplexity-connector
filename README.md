@@ -123,7 +123,40 @@ reasons arrive. The offline practice target includes a page that is linked from 
 (`demo/annex/off-cycle-notice.html`) so the feature can be proven without the internet — the self-test
 asserts that a normal crawl cannot find it and a pasted deep crawl can.
 
+## Typing a file type means that file type
+
+`apk` used to be read as the word "apk": you got papers about water that happened to contain those
+three letters. The query is now read for its *shape* before anything is crawled
+(`apps/api/app/intent.py`):
+
+| you type | the engine does |
+|---|---|
+| `apk` | browses APKs — the matched word is not required to appear in the text |
+| `minecraft apk` | searches "minecraft", returns **only** APK-family files |
+| `climate grant pdf` | searches "climate grant", returns **only** PDFs |
+| `budget csv mediafire` | searches "budget", returns CSVs, and aims the crawl at MediaFire |
+| `water` | no type word, no filter — exactly as before |
+
+Families are generous on purpose: `zip` covers zip/rar/7z/tar, `video` covers mp4/mkv/avi/webm, and
+an APKPure or F-Droid page counts as an APK even though its URL has no extension.
+
+This is the **only filter in the engine**, it is applied because it was typed, and the response says
+exactly what it did: `intent.types`, `intent.hosts`, `intent.removed_by_type`. No type word in the
+query means `removed_by_type: 0` and the old "nothing removed" rule stands untouched.
+
+A host word (`mediafire`, `mega`, `drive`, `dropbox`, `apkmirror`, `archive.org`, `sourceforge` …) is a
+**pointer, not a filter**: it dispatches the file-host engines (`mediafire`, `apkpure`, `apkmirror`,
+`fdroid`, `archivefiles`, `sourceforge`) and lifts those results to the front. A host we cannot reach
+returns nothing and says so — it never turns into "no results".
+
 ## Newest first, to the second
+
+### A clock that lies
+
+Future-dated records used to sort *above* everything, because their age is negative — which is how a
+document stamped "in 10 months" ended up over results that were 16 seconds old. Newest-first now has
+three bands: dated in the past (newest first, to the second), dated in the future (a wrong clock,
+sorted after every real date), then undated. Nothing is removed; only the order changed.
 
 `sort=newest` is the **default**. It is not a guess at what is fresh — every engine in the
 freshness layer hands back the source's own publication timestamp, and the API normalises it to
