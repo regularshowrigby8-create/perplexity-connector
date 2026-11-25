@@ -48,6 +48,16 @@ class Hit(BaseModel):
     sniffed: str | None = None
     keyphrases: list[str] = Field(default_factory=list)
     near_dupes: int = 0
+    # freshness — every clock the web exposes, normalised to "how long ago"
+    published_at: str | None = None
+    age_seconds: int | None = None
+    age_human: str | None = None
+    freshness: float = 0.0
+    first_seen: str | None = None
+    age_source: str | None = None      # published | first_seen | none
+    quality: float = 1.0
+    quality_flags: list[str] = Field(default_factory=list)
+    language: str | None = None
     sources: list[ProviderRef] = Field(default_factory=list)
     meta: dict[str, Any] = Field(default_factory=dict)
 
@@ -59,7 +69,7 @@ class HuntRequest(BaseModel):
     file_types: list[str] = Field(default_factory=list)
     providers: list[str] = Field(default_factory=list)
     limit: int = Field(default=40, ge=5, le=200)
-    sort: Literal["relevance", "depth", "deadline", "newest"] = "relevance"
+    sort: Literal["relevance", "depth", "deadline", "newest"] = "newest"
     fresh: bool = False
     # session-supplied optional credentials — used for this request only, never stored
     keys: dict[str, str] = Field(default_factory=dict)
@@ -88,6 +98,16 @@ class HuntStats(BaseModel):
     closing_soon: int = 0
     duplicates_collapsed: int = 0
     dropped_noise: int = 0
+    dropped_spam: int = 0
+    # freshness ledger — second granularity for the first minute
+    fresh_seconds: int = 0      # < 60s
+    fresh_minutes: int = 0      # < 60m
+    fresh_hours: int = 0        # < 24h
+    fresh_days: int = 0         # < 7d
+    dated: int = 0
+    undated: int = 0
+    newest_age_seconds: int | None = None
+    newest_age_human: str | None = None
     took_ms: int = 0
     cached: bool = False
 
@@ -101,6 +121,8 @@ class HuntResponse(BaseModel):
     facets: dict[str, list[dict[str, Any]]]
     stats: HuntStats
     plays: list[str] = Field(default_factory=list)
+    sort: str = "newest"
+    as_of: str | None = None
     expanded: list[str] = Field(default_factory=list)
 
 

@@ -1,6 +1,6 @@
 # Engine reference
 
-Generated from the live registry: **69 remote engines**, **86 arsenal engines** (29 resolved here), **54 portals**, plus the fusion crawler.
+Generated from the live registry: **119 remote engines**, **86 arsenal engines** (29 resolved here), **54 portals**, plus the fusion crawler.
 
 Regenerate with `.venv/bin/python scripts/gen_engines_doc.py`.
 
@@ -73,10 +73,60 @@ Regenerate with `.venv/bin/python scripts/gen_engines_doc.py`.
 | 63 | Stack Exchange | remote | community | all | — | ready |
 | 64 | npm Registry | remote | code | all, exposed | — | ready |
 | 65 | crates.io | remote | code | all, exposed | — | ready |
-| 66 | Nighthawk Vault | core | local | all, files, opportunities, applications, datasets, exposed | — | local |
-| 67 | Vault Deep Text | core | local | all, files, opportunities, datasets | — | local |
-| 68 | Portal Universe | portal | launcher | all, opportunities, files, applications, datasets, exposed | — | ready |
-| 69 | Dork Hand-off | portal | launcher | all, exposed, files, opportunities | — | ready |
+| 66 | GDELT 2.0 | remote | realtime | all, files, opportunities | — | ready |
+| 67 | Institutional RSS (20 feeds) | remote | realtime | all, files, opportunities, datasets | — | ready |
+| 68 | Reddit (new) | remote | realtime | all, opportunities | — | ready |
+| 69 | Reddit (curated subs) | remote | realtime | all, opportunities, datasets | — | ready |
+| 70 | Hacker News (by date) | remote | realtime | all, datasets | — | ready |
+| 71 | Lobsters | remote | realtime | all, datasets | — | ready |
+| 72 | Mastodon (tag timeline) | remote | realtime | all | — | ready |
+| 73 | Bluesky (latest) | remote | realtime | all | — | ready |
+| 74 | GitHub commits (newest) | remote | realtime | all, datasets | — | ready |
+| 75 | GitHub issues (newest) | remote | realtime | all, opportunities, datasets | — | ready |
+| 76 | GitLab (last activity) | remote | realtime | all, datasets | — | ready |
+| 77 | GitHub advisories (newest) | remote | realtime | all, datasets | — | ready |
+| 78 | Wikipedia (last revision) | remote | realtime | all | — | ready |
+| 79 | Stack Exchange (newest) | remote | realtime | all, datasets | — | ready |
+| 80 | crates.io (newest) | remote | realtime | all, datasets | — | ready |
+| 81 | npm registry (newest) | remote | realtime | all, datasets | — | ready |
+| 82 | arXiv (submitted today) | remote | open-science | all, files, datasets | — | ready |
+| 83 | bioRxiv (last 10 days) | remote | open-science | all, files, datasets | — | ready |
+| 84 | medRxiv (last 10 days) | remote | open-science | all, files, datasets, opportunities | — | ready |
+| 85 | Crossref (published today) | remote | open-science | all, files, datasets | — | ready |
+| 86 | OpenAlex (by date) | remote | open-science | all, files, datasets | — | ready |
+| 87 | Semantic Scholar (bulk) | remote | open-science | all, files | — | ready |
+| 88 | Europe PMC (newest) | remote | open-science | all, files, datasets | — | ready |
+| 89 | PubMed (in press) | remote | open-science | all, files | — | ready |
+| 90 | DOAJ (newest) | remote | open-science | all, files | — | ready |
+| 91 | DataCite (newest DOIs) | remote | open-science | all, datasets, files | — | ready |
+| 92 | Dryad | remote | open-science | all, datasets, files | — | ready |
+| 93 | HAL (French archive) | remote | open-science | all, files, datasets | — | ready |
+| 94 | OpenAIRE Graph | remote | open-science | all, files, datasets, opportunities | — | ready |
+| 95 | OSF Preprints | remote | open-science | all, files, datasets | — | ready |
+| 96 | Socrata catalog | remote | opendata | all, datasets, files | — | ready |
+| 97 | Federal Register | remote | opendata | all, opportunities, files | — | ready |
+| 98 | USAspending (new awards) | remote | opendata | all, opportunities, datasets | — | ready |
+| 99 | data.gouv.fr | remote | opendata | all, datasets, files | — | ready |
+| 100 | data.europa.eu | remote | opendata | all, datasets, files | — | ready |
+| 101 | CKAN portals (latest) | remote | opendata | all, datasets, files | — | ready |
+| 102 | ArcGIS Hub | remote | opendata | all, datasets, files | — | ready |
+| 103 | ClinicalTrials.gov (updated) | remote | opendata | all, datasets, opportunities | — | ready |
+| 104 | SEC EDGAR (latest filings) | remote | opendata | all, files, opportunities | — | ready |
+| 105 | Zenodo (most recent) | remote | opendata | all, datasets, files | — | ready |
+| 106 | Hugging Face (last modified) | remote | opendata | all, datasets, files | — | ready |
+| 107 | Wikidata (last modified) | remote | opendata | all, datasets | — | ready |
+| 108 | Grants.gov (posted today) | remote | opportunities | all, opportunities, files | — | ready |
+| 109 | TED (EU tenders) | remote | opportunities | all, opportunities, files | — | ready |
+| 110 | UKRI Gateway to Research | remote | opportunities | all, opportunities, files | — | ready |
+| 111 | Find a Tender (UK OCDS) | remote | opportunities | all, opportunities, files | — | ready |
+| 112 | World Bank procurement | remote | opportunities | all, opportunities | — | ready |
+| 113 | CORDIS projects (newest) | remote | opportunities | all, opportunities, files, datasets | — | ready |
+| 114 | FundsforNGOs search | remote | opportunities | all, opportunities | — | ready |
+| 115 | UNDP procurement | remote | opportunities | all, opportunities | — | ready |
+| 116 | Nighthawk Vault | core | local | all, files, opportunities, applications, datasets, exposed | — | local |
+| 117 | Vault Deep Text | core | local | all, files, opportunities, datasets | — | local |
+| 118 | Portal Universe | portal | launcher | all, opportunities, files, applications, datasets, exposed | — | ready |
+| 119 | Dork Hand-off | portal | launcher | all, exposed, files, opportunities | — | ready |
 
 ## Arsenal engines
 

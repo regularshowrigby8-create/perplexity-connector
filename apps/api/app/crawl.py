@@ -26,6 +26,7 @@ from .extract import (FILE_MAP, canonical_url, depth_score, fingerprint, find_de
                       human_size, opportunity_tags, pretty_name, safe_domain, truncate)
 from .magic import pdf_title, sniff
 from .priority import score as url_priority
+from . import freshness
 from .keyterms import keyphrases
 from .schemaorg import extract as schema_extract, guess_fields
 from .models import Hit
@@ -129,6 +130,7 @@ class FusionCrawler:
         self.files: dict[str, Hit] = {}
         self.page_hits: dict[str, Hit] = {}
         self._pdf_titles: dict[str, str] = {}
+        self.lastmod: dict[str, str] = {}
         self.robots: dict[str, Any] = {}
         self.gates: dict[str, float] = {}
         self.pages_lock = asyncio.Lock()
@@ -210,7 +212,8 @@ class FusionCrawler:
         return True
 
     # ---------------------------------------------------------------------- fetch
-    async def _fetch(self, url: str) -> tuple[int, str, bytes, str]:
+    async def _fetch_meta(self, url: str) -> tuple[int, str, bytes, str, dict[str, str]]:
+        """Fetch and keep the response headers — they carry the document's clock."""
         engine = self.req.fetch_engine
         if engine == "aiohttp" and "aiohttp" in READY:
             try:
@@ -222,7 +225,7 @@ class FusionCrawler:
                     async with session.get(url) as resp:
                         body = await resp.content.read(self.req.max_bytes)
                         ctype = resp.headers.get("content-type", "")
-                        return resp.status, ctype, body, "aiohttp"
+                        return resp.status, ctype, body, "aiohttp", dict(resp.headers)
             except Exception:
                 pass
         if engine in ("cloudscraper", "hrequests", "mechanicalsoup") and engine.replace("-", "_") in READY:
@@ -237,8 +240,10 @@ class FusionCrawler:
                 client = HttpxHttpClient()
                 response = await client.send_request(url, headers={"User-Agent": settings.user_agent})
                 body = response.read()[: self.req.max_bytes]
-                ctype = (response.headers.get("content-type") or [""])[0]
-                return response.status_code, ctype, body, "crawlee"
+                flat = {k: (v[0] if isinstance(v, list) and v else str(v))
+                        for k, v in dict(getattr(response, "headers", {}) or {}).items()}
+                ctype = flat.get("content-type") or flat.get("Content-Type") or ""
+                return response.status_code, ctype, body, "crawlee", flat
             except Exception:
                 pass
         # default + universal fallback
@@ -250,25 +255,33 @@ class FusionCrawler:
                 size += len(chunk)
                 if size >= self.req.max_bytes:
                     break
-            return resp.status_code, resp.headers.get("content-type", ""), b"".join(chunks), "httpx"
+            return (resp.status_code, resp.headers.get("content-type", ""), b"".join(chunks),
+                    "httpx", dict(resp.headers))
 
-    def _sync_fetch(self, url: str, engine: str) -> tuple[int, str, bytes, str]:
+    async def _fetch(self, url: str) -> tuple[int, str, bytes, str]:
+        status, ctype, body, engine, _headers = await self._fetch_meta(url)
+        return status, ctype, body, engine
+
+    def _sync_fetch(self, url: str, engine: str) -> tuple[int, str, bytes, str, dict[str, str]]:
         if engine == "cloudscraper":
             import cloudscraper
 
             resp = cloudscraper.create_scraper().get(url, timeout=settings.provider_timeout)
-            return resp.status_code, resp.headers.get("content-type", ""), resp.content[: self.req.max_bytes], "cloudscraper"
+            return (resp.status_code, resp.headers.get("content-type", ""),
+                    resp.content[: self.req.max_bytes], "cloudscraper", dict(resp.headers))
         if engine == "hrequests":
             import hrequests
 
             resp = hrequests.get(url, timeout=settings.provider_timeout)
-            return resp.status_code, resp.headers.get("content-type", ""), resp.content[: self.req.max_bytes], "hrequests"
+            return (resp.status_code, resp.headers.get("content-type", ""),
+                    resp.content[: self.req.max_bytes], "hrequests", dict(resp.headers))
         import mechanicalsoup
 
         browser = mechanicalsoup.StatefulBrowser()
         resp = browser.open(url, timeout=settings.provider_timeout)
         html = str(resp.soup).encode()
-        return resp.status_code, resp.headers.get("content-type", ""), html[: self.req.max_bytes], "mechanicalsoup"
+        return (resp.status_code, resp.headers.get("content-type", ""),
+                html[: self.req.max_bytes], "mechanicalsoup", dict(resp.headers))
 
     async def _head(self, url: str) -> dict[str, Any]:
         try:
@@ -326,6 +339,20 @@ class FusionCrawler:
                 break
         return out
 
+    def _remember_lastmod(self, xml: str) -> None:
+        """Keep ``<url><loc>…</loc><lastmod>…</lastmod></url>`` pairs.
+
+        Sitemaps are the only place a site tells you, in bulk, when each page
+        changed. That clock is what makes a focused crawl able to lead with the
+        newest documents instead of the most-linked ones.
+        """
+        for match in re.finditer(
+                r"<url>.*?<loc>\s*([^<\s]+)\s*</loc>.*?<lastmod>\s*([^<\s]+)\s*</lastmod>",
+                xml, re.I | re.S):
+            url, stamp = match.group(1), match.group(2)
+            if freshness.parse(stamp):
+                self.lastmod[canonical_url(url)] = stamp
+
     async def _sitemap_seeds(self, origin: str, cap: int = 120) -> list[str]:
         urls: list[str] = []
         candidates: list[str] = []
@@ -348,11 +375,14 @@ class FusionCrawler:
                 if resp.status_code >= 400:
                     continue
                 locs = re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", resp.text, re.I)
+                self._remember_lastmod(resp.text)
                 if "<sitemapindex" in resp.text.lower():
                     for sub in locs[:3]:
                         try:
                             sub_resp = await self.client.get(sub, timeout=8.0)
-                            urls += re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", sub_resp.text, re.I)
+                            sub_locs = re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", sub_resp.text, re.I)
+                            urls += sub_locs
+                            self._remember_lastmod(sub_resp.text)
                         except Exception:
                             continue
                 else:
@@ -362,6 +392,12 @@ class FusionCrawler:
                     break
             except Exception:
                 continue
+        def recency_key(url: str) -> float:
+            stamp = freshness.parse(self.lastmod.get(canonical_url(url)))
+            return -(stamp.timestamp() if stamp else 0.0)
+
+        urls = list(dict.fromkeys(urls))
+        urls.sort(key=recency_key)      # sitemap with lastmod → freshest seeds first
         return urls[:cap]
 
     async def resolve_seeds(self) -> list[tuple[str, str]]:
@@ -429,7 +465,8 @@ class FusionCrawler:
         return seeds
 
     # --------------------------------------------------------------------- files
-    async def _register_file(self, url: str, referrer: str | None, depth: int) -> Hit | None:
+    async def _register_file(self, url: str, referrer: str | None, depth: int,
+                             headers: dict[str, str] | None = None) -> Hit | None:
         canon = canonical_url(url)
         if canon in self.files:
             return None
@@ -478,6 +515,9 @@ class FusionCrawler:
                 pass
 
         size = size or (body_len or None)
+        published = (freshness.from_headers(headers or {})
+                     or freshness.parse(head.get("modified"))
+                     or freshness.parse(self.lastmod.get(canonical_url(url))))
         deadline = find_deadline(text[:4000]) if text else None
         title = self._pdf_titles.get(canon) or pretty_name(url)
         snippet_bits = [f"{(ext or 'file').upper()} · {title}"]
@@ -499,6 +539,13 @@ class FusionCrawler:
         hit.sniffed = sniffed
         hit.mime = head.get("mime") or mime
         hit.schema_type = None  # files carry no schema.org type of their own
+        _stamp = freshness.describe(published or freshness.utcnow())
+        hit.published_at = _stamp["published_at"]
+        hit.age_seconds = _stamp["age_seconds"]
+        hit.age_human = _stamp["age_human"]
+        hit.freshness = _stamp["freshness"]
+        hit.age_source = "published" if published else "first_seen"
+        hit.first_seen = freshness.utcnow().isoformat()
         if text:
             try:
                 hit.keyphrases = await asyncio.to_thread(keyphrases, text, 5)
@@ -527,7 +574,7 @@ class FusionCrawler:
             return []
         await self._gate(url)
         try:
-            status, ctype, body, fetch_engine = await self._fetch(url)
+            status, ctype, body, fetch_engine, headers = await self._fetch_meta(url)
         except Exception as exc:
             self.stats.errors += 1
             await self._send("error", url=url, message=str(exc)[:160])
@@ -539,7 +586,7 @@ class FusionCrawler:
         self.stats.bytes += len(body)
         is_html = "html" in ctype.lower() or (not ctype and b"<html" in body[:600].lower())
         if not is_html:
-            await self._register_file(url, None, depth)
+            await self._register_file(url, None, depth, headers=headers)
             return []
 
         self.stats.pages += 1
@@ -547,6 +594,16 @@ class FusionCrawler:
         links = await asyncio.to_thread(parse_links_rich, html, url)
         text, text_engine = await asyncio.to_thread(extract_text, html, url)
         meta = await asyncio.to_thread(meta_extract, html)
+        published, modified, clock_source = await asyncio.to_thread(
+            freshness.from_html, html, url)
+        if published is None:
+            published = freshness.from_headers(headers)
+            clock_source = clock_source or ("headers" if published else "")
+        if published is None:
+            lastmod = self.lastmod.get(canonical_url(url))
+            if lastmod:
+                published = freshness.parse(lastmod)
+                clock_source = "sitemap" if published else ""
         records = await asyncio.to_thread(schema_extract, html, url)
         best = next((r for r in records if r["category"] == "opportunity"), None)
         title = meta.get("title") or ""
@@ -606,6 +663,14 @@ class FusionCrawler:
                       "currency": (best or {}).get("currency")},
             )
             page_hit.schema_type = page_hit.structured
+            _stamp = freshness.describe(published or freshness.utcnow())
+            page_hit.published_at = _stamp["published_at"]
+            page_hit.age_seconds = _stamp["age_seconds"]
+            page_hit.age_human = _stamp["age_human"]
+            page_hit.freshness = _stamp["freshness"]
+            page_hit.age_source = "published" if published else "first_seen"
+            page_hit.first_seen = freshness.utcnow().isoformat()
+            page_hit.meta["published_source"] = clock_source
             page_hit.depth = depth_score(url, None, False, text[:2000])
             page_hit.score = 35 + page_hit.depth * 0.5 + (12 if structured else 0)
             self.page_hits[canon] = page_hit

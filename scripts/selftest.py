@@ -123,9 +123,25 @@ async def main() -> int:
                 str(response.stats.unique))
     ok &= check("portal fallback present", any(h.portal or h.kind == "dork" for h in response.hits))
     ok &= check("facets computed", bool(response.facets.get("domain")))
-    ok &= check("ranked by score", all(
-        response.hits[i].score >= response.hits[i + 1].score
-        for i in range(len(response.hits) - 1)))
+    ok &= check("newest is the default order", response.sort == "newest", response.sort)
+    ages = [h.age_seconds for h in response.hits]
+    dated = [age for age in ages if age is not None]
+    ok &= check("newest first: ages never go backwards",
+                all(dated[i] <= dated[i + 1] for i in range(len(dated) - 1)),
+                f"{len(dated)} dated")
+    ok &= check("undated hits are kept, sorted last", ages == dated + [None] * (len(ages) - len(dated)))
+    ok &= check("every hit carries an age badge", all(h.age_human for h in response.hits))
+    ok &= check("freshness ledger adds up",
+                response.stats.dated + response.stats.undated == len(response.hits),
+                f"dated={response.stats.dated} undated={response.stats.undated}")
+    ok &= check("quality scored on every hit", all(0.0 <= h.quality <= 1.0 for h in response.hits))
+
+    print("\n▸ 4b. the same hunt, sorted by relevance")
+    scored = await hunt(HuntRequest(q="climate grants kenya", lens="opportunities", limit=30,
+                                    fresh=True, sort="relevance"), use_cache=False)
+    ok &= check("relevance sort still ranks by score", all(
+        scored.hits[i].score >= scored.hits[i + 1].score
+        for i in range(len(scored.hits) - 1)))
     ok &= check("no duplicate canonical URLs",
                 len({h.url for h in response.hits}) == len(response.hits))
 

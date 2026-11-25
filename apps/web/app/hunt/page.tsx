@@ -26,7 +26,7 @@ function HuntView() {
   const lens = (params.get("lens") ?? "all") as Lens;
   const site = params.get("site");
   const types = params.get("types");
-  const sort = (params.get("sort") ?? "relevance") as "relevance" | "depth" | "deadline" | "newest";
+  const sort = (params.get("sort") ?? "newest") as "relevance" | "depth" | "deadline" | "newest";
 
   const [hits, setHits] = useState<Hit[]>([]);
   const [final, setFinal] = useState<HuntResponse | null>(null);
@@ -278,6 +278,8 @@ function HuntView() {
                 {final?.stats.providers_failed ? ` · ${final.stats.providers_failed} unreachable` : ""}
                 {final && ` · ${fmtMs(final.stats.took_ms)}`}
                 {final?.stats.cached && " · cached"}
+                {final && final.stats.newest_age_human
+                  ? ` · newest ${final.stats.newest_age_human}` : ""}
               </div>
             </div>
             <div className="toolbar-right">
@@ -287,10 +289,10 @@ function HuntView() {
                   next.set("sort", e.target.value);
                   router.replace(`/hunt?${next.toString()}`);
                 }}>
+                <option value="newest">newest first</option>
                 <option value="relevance">relevance</option>
                 <option value="depth">most buried</option>
                 <option value="deadline">closing soonest</option>
-                <option value="newest">newest</option>
               </select>
               <button className="btn btn-sm" onClick={() => setWhyOpen(!whyOpen)}>why these?</button>
               <button className="btn btn-sm" onClick={crawlDomains} title="Crawl the top hosts">
@@ -300,6 +302,23 @@ function HuntView() {
               <button className="btn btn-sm" onClick={() => exportHits("json")}>json</button>
             </div>
           </div>
+
+          {final && (
+            <div className="fresh-strip">
+              <span className="tick"><b>{final.stats.fresh_seconds}</b> under a minute</span>
+              <span className="tick"><b>{final.stats.fresh_minutes}</b> this hour</span>
+              <span className="tick"><b>{final.stats.fresh_hours}</b> today</span>
+              <span className="tick"><b>{final.stats.fresh_days}</b> this week</span>
+              {final.stats.dropped_spam > 0 && (
+                <span className="tick" title="parked domains, login walls, error pages — ranked out, not filtered out of the count">
+                  <b>{final.stats.dropped_spam}</b> junk ranked out
+                </span>
+              )}
+              <span className="tick">
+                newest: <b>{final.stats.newest_age_human ?? "undated"}</b>
+              </span>
+            </div>
+          )}
 
           {final && (final.expanded?.length > 0 || final.stats.duplicates_collapsed > 0) && (
             <div className="expand-row">

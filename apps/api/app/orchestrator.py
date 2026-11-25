@@ -9,7 +9,7 @@ from typing import Any, Awaitable, Callable
 
 import httpx
 
-from . import local_index, near_dup, registry
+from . import freshness, local_index, near_dup, quality, registry
 from .config import settings
 from .extract import (canonical_url, depth_score, fingerprint, find_deadline, opportunity_tags,
                       truncate)
@@ -23,6 +23,14 @@ from .urlnorm import registrable
 from .providers.base import HuntContext, Provider, RawHit
 
 Emit = Callable[[dict], Awaitable[None]]
+
+# kinds that name a real artefact we could have "just discovered"; portals and
+# generated search links are excluded because they have no upload time at all.
+LAUNCHER_KINDS = {"portal", "dork"}
+
+UNDATED_KINDS_SAFE = {"page", "document", "file", "dataset", "opportunity", "application",
+                      "archive", "release", "commit", "repo", "paper", "image", "media",
+                      "video", "spreadsheet", "presentation", "code", "package"}
 
 _cache: dict[str, tuple[float, HuntResponse]] = {}
 
@@ -52,26 +60,47 @@ def build_hit(raw: RawHit, provider: Provider, rank: int, lens: str,
     ext, kind, mime, domain = fingerprint(url)
     if raw.kind:
         kind = raw.kind if kind == "page" else kind
+    title = quality.repair(raw.title or url)
+    snippet = quality.normalise(raw.snippet)
+    meta = raw.meta or {}
+    published_dt = (freshness.parse(raw.published)
+                    or freshness.parse(meta.get("published_at"))
+                    or freshness.parse(meta.get("published")))
+    first_seen_dt = freshness.parse(meta.get("first_seen")) or freshness.utcnow()
+    # Publication time when the page states one; otherwise *our* clock: the moment
+    # this engine first saw it. Both are honest, and the badge says which.
+    # Generated entries (a portal's search URL) have no clock of their own and are
+    # left undated rather than dressed up as something new.
+    has_own_clock = bool(published_dt) or raw.kind in UNDATED_KINDS_SAFE
+    age_source = "published" if published_dt else ("first_seen" if has_own_clock else None)
+    stamp = freshness.describe((published_dt or first_seen_dt) if has_own_clock else None)
     deadline: Deadline | None = None
     if raw.deadline:
-        deadline = find_deadline(raw.snippet, explicit=raw.deadline)
-    elif raw.snippet:
-        deadline = find_deadline(raw.snippet)
-    text = f"{raw.title} {raw.snippet}"
+        deadline = find_deadline(snippet, explicit=raw.deadline)
+    elif snippet:
+        deadline = find_deadline(snippet)
+    text = f"{title} {snippet}"
     if raw.url and provider.layer != "portal" and NOISE.search(raw.url):
         return None  # login walls, carts and cookie pages are not answers
     coverage = 0.0
     if terms:
-        haystack = f"{raw.title} {raw.snippet} {raw.url}".lower()
+        haystack = f"{title} {snippet} {url}".lower()
         matched = sum(1 for term in terms if term and term in haystack)
         coverage = matched / max(1, len(terms))
     hit = Hit(
-        url=url, title=raw.title or url, snippet=truncate(raw.snippet, 360),
+        url=url, title=title or url, snippet=truncate(snippet, 360),
         provider=provider.id, provider_name=provider.name, kind=kind, file_ext=ext,
-        mime=mime, domain=domain, published=raw.published, deadline=deadline,
+        mime=mime, domain=domain, deadline=deadline,
         depth=depth_score(url, ext, raw.archive, text),
         archive=raw.archive, portal=raw.kind == "portal",
-        tags=list(dict.fromkeys([*raw.tags, *opportunity_tags(text)])), meta=raw.meta,
+        tags=list(dict.fromkeys([*raw.tags, *opportunity_tags(text)])),
+        meta=dict(meta),
+        published=raw.published or (published_dt.date().isoformat() if published_dt else None),
+        published_at=(stamp["published_at"] if published_dt else None),
+        age_seconds=stamp["age_seconds"],
+        age_human=stamp["age_human"], freshness=stamp["freshness"],
+        first_seen=(first_seen_dt.isoformat() if has_own_clock else None),
+        age_source=age_source,
     )
     hit.sources = [ProviderRef(provider=provider.id, name=provider.name, rank=rank, url=url)]
 
@@ -141,6 +170,16 @@ def build_hit(raw: RawHit, provider: Provider, rank: int, lens: str,
         hit.amount = hit.amount or (guessed.get("amount") or None)
         hit.currency = hit.currency or (guessed.get("currency") or None)
         hit.location = hit.location or (guessed.get("location") or None)
+    assessment = quality.assess(url, title, snippet, text=text, terms=terms)
+    hit.quality = round(assessment.score, 3)
+    hit.quality_flags = list(assessment.flags)
+    hit.language = assessment.language or None
+    hit.meta["quality_flags"] = list(assessment.flags)
+    if quality.is_spam(assessment):
+        hit.meta["spam"] = True
+    boost *= 0.6 + 0.4 * assessment.score        # junk ranks low, never disappears
+    boost *= 1.0 + 0.55 * hit.freshness          # recency is a signal, not a gate
+
     # specificity is only known once the fields are populated
     if hit.funder and hit.amount and hit.deadline:
         boost *= 1.3      # a complete record answers the question by itself
@@ -239,17 +278,53 @@ def diversify(hits: list[Hit], per_site: int = 2, window: int = 24,
     return hits
 
 
+def stamp_of(hit: Hit):
+    """The best clock a hit has: publication time, else when we first saw it."""
+    return (freshness.parse(hit.published_at)
+            or freshness.parse(hit.published)
+            or freshness.parse(hit.first_seen))
+
+
+def refresh_ages(hits: list[Hit], now=None) -> None:
+    """Recompute ages at response time so the UI can say *4 seconds ago*."""
+    now = now or freshness.utcnow()
+    for hit in hits:
+        published = freshness.parse(hit.published_at) or freshness.parse(hit.published)
+        stamp = published or (freshness.parse(hit.first_seen) if hit.age_source != "none" else None)
+        described = freshness.describe(stamp, now)
+        hit.age_seconds = described["age_seconds"]
+        hit.age_human = described["age_human"]
+        hit.freshness = described["freshness"]
+        if published:
+            hit.published_at = described["published_at"]
+            hit.age_source = "published"
+        elif stamp:
+            hit.age_source = "first_seen"
+        else:
+            hit.age_source = None
+
+
 def rank(hits: list[Hit], sort: str) -> list[Hit]:
+    now = freshness.utcnow()
     if sort == "depth":
         hits.sort(key=lambda h: (-h.depth, -h.score))
     elif sort == "deadline":
         hits.sort(key=lambda h: (h.deadline is None,
                                  abs(h.deadline.days_left) if h.deadline else 10**6, -h.score))
     elif sort == "newest":
-        hits.sort(key=lambda h: (h.published or "", -h.score), reverse=True)
+        # undated results are sorted last, never removed — ordering, not a filter
+        def newest_key(hit: Hit):
+            stamp = stamp_of(hit)
+            age = freshness.age_seconds(stamp, now)
+            if age is None:
+                return (1, 0.0, -hit.score, -hit.depth)
+            return (0, float(age), -hit.score, -hit.depth)
+
+        hits.sort(key=newest_key)
     else:
         hits.sort(key=lambda h: (-h.score, -h.depth))
         hits = diversify(hits)
+    refresh_ages(hits, now)
     return hits
 
 
@@ -350,7 +425,15 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     ) as client:
         ctx = HuntContext(plan=plan, client=client, keys=req.keys,
                           limit=max(8, min(req.limit, 25)), domains=domains)
-        tasks = [asyncio.create_task(_run_provider(p, ctx)) for p in providers]
+        # 119 engines fan out at once; the semaphore keeps sockets sane without
+        # turning the hunt into a queue that hides the fast sources behind the slow.
+        gate = asyncio.Semaphore(32)
+
+        async def _gated(provider: Provider):
+            async with gate:
+                return await _run_provider(provider, ctx)
+
+        tasks = [asyncio.create_task(_gated(p)) for p in providers]
         collected: list[Hit] = []
         statuses: list[dict[str, Any]] = [
             {"id": p.id, "name": p.name, "status": "needs_key", "count": 0, "ms": 0,
@@ -372,7 +455,7 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                              "count": len(batch), "ms": int(ms),
                              "message": error or ""})
             if emit and batch:
-                preview = sorted(batch, key=lambda h: -h.score)[:12]
+                preview = rank(batch, req.sort)[:12]
                 await emit({"type": "results", "final": False,
                             "provider": provider.id, "provider_name": provider.name,
                             "hits": [h.model_dump() for h in preview]})
@@ -385,9 +468,21 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     for hit in fused:
         hit.near_dupes = int((hit.meta or {}).get("near_dupes") or 0)
     _ = before
+    spam = [hit for hit in fused if hit.meta.get("spam")]
+    fused = [hit for hit in fused if not hit.meta.get("spam")]
+    dropped_spam = len(spam)
+
+    # Portal entry points are not documents and have no upload time; they are
+    # kept outside the limit so the newest-first tail cannot evict them.
+    launchers = [hit for hit in fused if hit.kind in LAUNCHER_KINDS] if req.sort == "newest" else []
+    if launchers:
+        fused = [hit for hit in fused if hit.kind not in LAUNCHER_KINDS]
+
     fused = rank(fused, req.sort)
     if len(fused) > req.limit:
         fused = fused[: req.limit]
+    if launchers:
+        fused = [*fused, *rank(launchers, req.sort)[:5]]
 
     try:
         local_index.upsert_hits(fused)
@@ -403,13 +498,23 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         opportunities=sum(1 for h in fused if h.kind in ("opportunity", "application")),
         closing_soon=sum(1 for h in fused if h.deadline and 0 <= h.deadline.days_left <= 30),
         duplicates_collapsed=int(collapsed),
+        dropped_spam=dropped_spam,
+        fresh_seconds=sum(1 for h in fused if h.age_seconds is not None and h.age_seconds < 60),
+        fresh_minutes=sum(1 for h in fused if h.age_seconds is not None and 60 <= h.age_seconds < 3600),
+        fresh_hours=sum(1 for h in fused if h.age_seconds is not None and 3600 <= h.age_seconds < 86400),
+        fresh_days=sum(1 for h in fused if h.age_seconds is not None and 86400 <= h.age_seconds < 604800),
+        dated=sum(1 for h in fused if h.age_source == "published"),
+        undated=sum(1 for h in fused if h.age_source != "published"),
+        newest_age_seconds=next((h.age_seconds for h in fused if h.age_seconds is not None), None),
+        newest_age_human=next((h.age_human for h in fused if h.age_seconds is not None), None),
         dropped_noise=int(dropped),
         took_ms=int((time.perf_counter() - started) * 1000),
         cached=False,
     )
     response = HuntResponse(query=plan.terms, lens=plan.lens, site=plan.site, hits=fused,
                             providers=statuses, facets=facets(fused), stats=stats,
-                            plays=[p.dork for p in plan.plays], expanded=expanded)
+                            plays=[p.dork for p in plan.plays], expanded=expanded,
+                            sort=req.sort, as_of=freshness.utcnow().isoformat())
     _cache[key] = (time.time(), response)
     if len(_cache) > settings.cache_max:
         for stale in sorted(_cache, key=lambda k: _cache[k][0])[:50]:

@@ -1,7 +1,8 @@
 """One registry of every independent engine the monster can call."""
 from __future__ import annotations
 
-from .providers import archives, code, datasets, launchers, metasearch, opportunities, scholar, vault, web
+from .providers import (archives, code, datasets, launchers, metasearch, opendata, openscience,
+                        opportunities, opportunities_live, realtime, scholar, vault, web)
 from .providers.base import Provider
 
 WEB = [
@@ -37,11 +38,39 @@ CODE = [
     code.GitHub(), code.GitLab(), code.HackerNews(), code.StackExchange(), code.Npm(),
     code.Crates(),
 ]
+# ---- the freshness layer (added to make newest-first truthful) -------------
+REALTIME = [
+    realtime.GDelt(), realtime.RSSFirehose(), realtime.RedditNew(), realtime.RedditSubreddit(),
+    realtime.HackerNewsNew(), realtime.Lobsters(), realtime.MastodonTag(), realtime.BlueskySearch(),
+    realtime.GitHubCommits(), realtime.GitHubIssues(), realtime.GitLabProjects(),
+    realtime.GitHubAdvisories(), realtime.WikipediaRevisions(), realtime.StackExchangeNew(),
+    realtime.CratesNew(), realtime.NpmNew(),
+]
+OPEN_SCIENCE = [
+    openscience.ArxivNewest(), openscience.BioRxivNewest(), openscience.MedRxivNewest(),
+    openscience.CrossrefNewest(), openscience.OpenAlexNewest(), openscience.SemanticScholarNewest(),
+    openscience.EuropePMC(), openscience.PubMedNewest(), openscience.DOAJNewest(),
+    openscience.DataCite(), openscience.Dryad(), openscience.HAL(), openscience.OpenAIRE(),
+    openscience.OSFPreprints(),
+]
+OPEN_DATA = [
+    opendata.SocrataCatalog(), opendata.FederalRegister(), opendata.USAspendingNew(),
+    opendata.DataGouvFr(), opendata.DataEuropa(), opendata.CKANRecent(), opendata.ArcGISHub(),
+    opendata.ClinicalTrials(), opendata.SECEdgarCurrent(), opendata.ZenodoNewest(),
+    opendata.HuggingFaceRecent(), opendata.WikidataRecent(),
+]
+OPPORTUNITIES_LIVE = [
+    opportunities_live.GrantsGovLive(), opportunities_live.TED(),
+    opportunities_live.UKRIGateway(), opportunities_live.FindATenderUK(),
+    opportunities_live.WorldBankProcurement(), opportunities_live.CORDIS(),
+    opportunities_live.FundsforNGOsSearch(), opportunities_live.UNDPProcurement(),
+]
 LOCAL = [vault.Vault(), vault.VaultFullText()]
 LAUNCHERS = [launchers.Portals(), launchers.DorkLauncher()]
 
 PROVIDERS: list[Provider] = [*WEB, *METASEARCH, *ARCHIVES, *OPPORTUNITIES, *SCHOLAR,
-                             *DATASETS, *CODE, *LOCAL, *LAUNCHERS]
+                             *DATASETS, *CODE, *REALTIME, *OPEN_SCIENCE, *OPEN_DATA,
+                             *OPPORTUNITIES_LIVE, *LOCAL, *LAUNCHERS]
 
 CRAWLER = {
     "id": "crawler",

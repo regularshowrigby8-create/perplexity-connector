@@ -26,7 +26,9 @@ export function ThemeBanner({ variant = "full" }: { variant?: "full" | "compact"
           portal search, the directory listing nobody linked, the spreadsheet in a data dump, the
           page deleted from the site. No freshness gate, no “helpful content” scorer, no
           domain-authority penalty — old, ugly, unlinked and machine-generated is the point.
-          Sort order can change; that filtering policy does not.
+          Results are ordered newest-first, to the second, straight from each source's own
+          publication clock; anything undated follows rather than disappearing. Sort order can
+          change; that filtering policy does not.
         </p>
       </div>
     </div>
@@ -58,6 +60,29 @@ export function DeadlineChip({ deadline }: { deadline: Deadline }) {
     <span className={`pill ${tone}`} title={`${deadline.phrase || "deadline"} — ${deadline.date}`}>
       <span className="dot" />
       {fmtDays(deadline.days_left)}
+    </span>
+  );
+}
+
+/** The publication clock, in the words a human would use for it. */
+export function AgeBadge({ hit }: { hit: Hit }) {
+  if (!hit.age_human) return null;
+  const seconds = hit.age_seconds ?? Number.POSITIVE_INFINITY;
+  const tone =
+    seconds < 60 ? "fresh-live" : seconds < 3600 ? "fresh" : seconds < 86400 ? "cyan" : "muted";
+  const firstSeen = hit.age_source === "first_seen";
+  return (
+    <span
+      className={`pill ${tone}`}
+      title={
+        firstSeen
+          ? "No publication date on the page — this is when Nighthawk first saw it"
+          : `Published ${hit.published_at ?? hit.age_human}`
+      }
+    >
+      {seconds < 60 && <span className="dot" />}
+      {hit.age_human}
+      {firstSeen ? " · first seen" : ""}
     </span>
   );
 }
@@ -143,7 +168,10 @@ export function ResultCard({
             {hit.sources.length > 1 && (
               <span className="pill lime">+{hit.sources.length - 1} engines agree</span>
             )}
-            {hit.published && <span className="pill">{String(hit.published).slice(0, 10)}</span>}
+            <AgeBadge hit={hit} />
+            {!hit.age_human && hit.published && (
+              <span className="pill">{String(hit.published).slice(0, 10)}</span>
+            )}
           </div>
         </div>
         <div className="result-actions">

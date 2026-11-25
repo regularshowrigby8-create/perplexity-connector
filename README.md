@@ -1,6 +1,6 @@
 # Nighthawk
 
-**One engine that finds what search engines bury.** A fusion crawler, 69 remote engines,
+**One engine that finds what search engines bury.** A fusion crawler, 119 remote engines,
 an 86-engine crawl arsenal and a local full-text vault — fused into a single ranked stream of
 **hosted files, open calls, application packs, exposed listings and datasets** — each result carrying
 the **funder, amount, currency, location, closing date and real file type** where the web exposes them.
@@ -49,6 +49,63 @@ the copy:
   "buried_boost": true
 }
 ```
+
+---
+
+## Newest first, to the second
+
+`sort=newest` is the **default**. It is not a guess at what is fresh — every engine in the
+freshness layer hands back the source's own publication timestamp, and the API normalises it to
+`published_at`, `age_seconds`, `age_human`, `freshness` and `age_source`:
+
+```
+"age_human": "12 seconds ago"      "age_source": "published"
+"age_human": "4 minutes ago"       "age_source": "published"
+"age_human": "undated"             "age_source": null
+```
+
+When a page states no date at all, Nighthawk falls back to **its own clock** — the moment the
+engine first saw that URL — and labels it `first_seen` in the badge, so "just now" never means
+"we made up a date". Undated results are sorted last and **kept**; they are never dropped for
+being old, and generated portal links (which have no upload time) are held outside the limit so
+they cannot be pushed off the page by a wave of new items.
+
+Sorting is stable and total: publication time → first-seen time → score → depth. The same rule
+runs in the crawler, where `Last-Modified`, `<meta>`/JSON-LD dates, `<time>` tags and sitemap
+`<lastmod>` values are all harvested, and in the vault, where a hunt's timestamps are stored so
+the next hunt can still order them.
+
+## Clean results, without throwing anything away
+
+Two signals were added, and neither is a filter on age or popularity:
+
+- **quality** (`quality.py`) repairs mojibake, detects language, and scores a page on
+  stopword ratio, link density, keyword stuffing and boilerplate. Parked domains, login walls,
+  error pages, spam and doorways score low; the score sorts them down and only true junk
+  (parked/error/spam/empty) is removed — hidden-page false positives stay in.
+- **freshness** (`freshness.py`) supplies the clock above, from WARC/CDX, ISO, RFC 2822, epoch
+  and `"2 hours ago"` text, response headers, HTML metadata, feeds and sitemaps.
+
+## The freshness layer (50 new engines)
+
+Added to make the ordering truthful rather than decorative. Each one publishes a real timestamp
+with every hit, so the top of the page is genuinely "seconds ago" when something *is* seconds old.
+
+- **Real-time** — GDELT 2.0 · 20 institutional RSS feeds · Reddit (new + curated subs) ·
+  Hacker News by date · Lobsters · Mastodon tag timelines · Bluesky latest · GitHub commits ·
+  GitHub issues · GitLab activity · GitHub advisories · Wikipedia revisions · Stack Exchange new ·
+  crates.io new · npm registry.
+- **Open science** — arXiv by submission date · bioRxiv · medRxiv · Crossref (published) ·
+  OpenAlex (by date) · Semantic Scholar bulk · Europe PMC · PubMed in-press · DOAJ new · DataCite ·
+  Dryad · HAL · OpenAIRE Graph · OSF Preprints.
+- **Open data** — Socrata catalog · Federal Register · USAspending new awards · data.gouv.fr ·
+  data.europa.eu · CKAN (AU/IE/NZ) · ArcGIS Hub · ClinicalTrials.gov · SEC EDGAR current ·
+  Zenodo most-recent · Hugging Face · Wikidata.
+- **Opportunities** — Grants.gov (posted today) · TED (EU tenders) · UKRI Gateway to Research ·
+  Find a Tender (UK OCDS) · World Bank procurement · CORDIS · FundsforNGOs · UNDP procurement.
+
+Offline proof that each one parses and dates its hits: `python3 scripts/check_sources.py`
+(50/50 engines, plus the ordering contract).
 
 ---
 
@@ -134,7 +191,7 @@ Not a list of logos — each entry is probed and dispatched by role:
 Missing tiers are reported honestly in `/arsenal` and skipped at runtime. Drop a binary on `PATH`
 or `pip install` a Python engine and it lights up — no code change, no restart of the registry logic.
 
-## The remote engines (69)
+## The remote engines (119)
 
 `SearXNG · Brave · Tavily · Exa · Serper · SerpApi (+Bing, Yahoo, Ecosia, Startpage, Yandex,
 Scholar, News) · SearchApi · Google CSE · Perplexity · You.com · Mojeek · Qwant · MetaGer ·
@@ -146,13 +203,20 @@ Open Library · Zenodo · Figshare · Data.gov (+UK, EU, AU, CA) · World Bank d
 Hugging Face · GitHub · GitLab · Hacker News · Stack Exchange · npm · crates.io ·
 Nighthawk Vault + Vault Deep Text · Portal Universe · Dork Hand-off`
 
+Plus the freshness layer listed above: GDELT, institutional RSS, Reddit, Bluesky, Mastodon,
+GitHub commits/issues/advisories, GitLab, Wikipedia, Lobsters, Stack Exchange, npm, crates.io,
+arXiv/bioRxiv/medRxiv/Crossref/OpenAlex/Semantic Scholar/Europe PMC/PubMed/DOAJ/DataCite/Dryad/
+HAL/OpenAIRE/OSF, Socrata/Federal Register/USAspending/data.gouv.fr/data.europa.eu/CKAN/ArcGIS/
+ClinicalTrials/SEC EDGAR/Zenodo/Wikidata, Grants.gov live/TED/UKRI/Find a Tender/World Bank
+procurement/CORDIS/FundsforNGOs/UNDP.
+
 Open engines run with **zero configuration**. Keyed engines appear as `needs_key` in `/arsenal`
 and can be enabled with an environment variable *or* a per-request key that is never stored.
 
 ## API
 
 ```
-POST /api/v1/hunt            federated search (JSON)
+POST /api/v1/hunt            federated search (JSON, newest-first by default)
 POST /api/v1/hunt/stream     same, as Server-Sent Events
 POST /api/v1/crawl           run the crawler to completion
 POST /api/v1/crawl/stream    live crawl events (page, file, pagehit, blocked, done)
@@ -192,7 +256,7 @@ apps/api/app/
   crawl.py         fusion crawler: seeds → frontier → files → vault
   arsenal.py       the 86-engine manifest + probes
   textkit.py       parser/extractor dispatch
-  registry.py      the 69 remote engines
+  registry.py      the 119 remote engines
   orchestrator.py  fan-out, fusion, ranking, streaming
   local_index.py   SQLite FTS5 / Whoosh / Tantivy / BM25 vault
   portals.py       54 portals + archive targeting

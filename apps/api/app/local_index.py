@@ -206,14 +206,19 @@ def _terms(text: str) -> list[str]:
 
 
 RICH_FIELDS = ("funder", "amount", "currency", "location", "structured", "schema_type",
-               "size", "sniffed", "mime", "keyphrases", "near_dupes")
+               "size", "sniffed", "mime", "keyphrases", "near_dupes", "published_at",
+               "first_seen", "age_source", "language", "quality")
 
 
 def _payload_of(hit) -> dict:
-    return {"tags": getattr(hit, "tags", []), "published": getattr(hit, "published", None),
-            "archive": getattr(hit, "archive", False),
-            "meta": getattr(hit, "meta", {}) or {},
-            **{key: getattr(hit, key, None) for key in RICH_FIELDS}}
+    payload = {"tags": getattr(hit, "tags", []), "published": getattr(hit, "published", None),
+               "archive": getattr(hit, "archive", False),
+               "meta": getattr(hit, "meta", {}) or {},
+               **{key: getattr(hit, key, None) for key in RICH_FIELDS}}
+    if getattr(hit, "age_source", None) != "published":
+        # never launder "we just discovered it" into "it was published now"
+        payload["published_at"] = None
+    return payload
 
 
 def payload_richness(payload: dict) -> int:
@@ -289,7 +294,8 @@ def _payload_meta(payload: str | None) -> dict:
         return {}
     out = dict(data.get("meta") or {})
     for key in ("funder", "amount", "currency", "location", "structured", "size",
-                "schema_type", "sniffed", "mime", "keyphrases", "near_dupes"):
+                "schema_type", "sniffed", "mime", "keyphrases", "near_dupes",
+                "published_at", "first_seen", "age_source", "language", "quality"):
         if data.get(key):
             out[key] = data[key]
     return out

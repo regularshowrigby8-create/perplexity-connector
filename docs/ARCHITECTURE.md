@@ -142,10 +142,45 @@ applied as filters: publication recency, domain authority, inbound-link count, "
 scoring, content-type snobbery (HTML over PDF/XLS/SQL), or "ugliness" (directory listings, plain
 Apache indexes, machine-generated pages).
 
-What exists instead is ordering: `relevance` (default), `newest`, `deadline`, `depth`. Every sort
-keeps the full candidate set — a hit with no timestamp sorts last under `newest`, it is never
+What exists instead is ordering: **`newest` (default)**, `relevance`, `deadline`, `depth`. Every
+sort keeps the full candidate set — a hit with no timestamp sorts last under `newest`, it is never
 dropped. `/api/v1/health` publishes this as a machine-readable `policy` block so downstream tools
 can assert it, and the UI carries a persistent banner saying the same thing.
+
+### 8.1 The freshness model
+
+`freshness.py` turns any timestamp the web offers into one type of value: *how long ago*.
+Parsers cover WARC/CDX 14-digit stamps, ISO-8601, RFC 2822, epoch seconds/milliseconds,
+`"2 hours ago"` text, `Last-Modified`/`Date` headers (headers win), `<meta>` and JSON-LD dates,
+`<time datetime>`, and `htmldate` as the last resort. `describe()` returns the five fields the API
+and UI share: `published_at`, `age_seconds`, `age_human`, `freshness` (exponential decay,
+half-life 36 h) and `age_source`.
+
+`age_source` is the honesty mechanism:
+
+| value | meaning | badge |
+|---|---|---|
+| `published` | the source stated a publication time | `12 seconds ago` |
+| `first_seen` | no date on the page; this is when we first saw the URL | `4 minutes ago · first seen` |
+| `null` | generated entry (a portal's search URL) — no clock exists | `undated` |
+
+Ordering under `newest` is total and stable: `published_at` → `first_seen` → `score` → `depth`,
+undated last. Portal/dork launch links are held outside the limit, so a burst of new documents
+cannot evict the hand-off links. The crawler fills the same fields from response headers, HTML
+metadata and sitemap `<lastmod>` (which also reorders its own frontier, newest seeds first).
+
+### 8.2 Clean results, not cleaner filters
+
+`quality.py` is the second half: `ftfy` repair, language detection (`py3langid`, label only when
+the margin is decisive), stopword ratio, link density, keyword stuffing and gibberish scoring.
+`assess()` produces a `Quality` with flags (`parked`, `login-wall`, `error-page`, `spam`,
+`doorway`, `thin`, `boilerplate`, `shouting`, `low-prose`, `link-farm`, `off-topic`).
+
+The score **multiplies** rank (`0.6 + 0.4 * quality`) and freshness adds at most +55 %, so both
+change order without changing the candidate set. Only the explicit junk combination
+(`is_spam`, threshold 0.28) is removed, and the removed count is reported as
+`stats.dropped_spam`. A 2014 PDF in an unlinked directory keeps its place; a parked domain does
+not.
 
 ## 9. Security posture
 
