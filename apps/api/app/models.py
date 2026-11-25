@@ -150,6 +150,8 @@ class HuntStats(BaseModel):
     # a site search means that site: results from anywhere else are set aside,
     # counted, and the count is reported like every other cut
     off_site: int = 0
+    # results moved below the first ten because one site already had two there
+    same_site: int = 0
     # freshness ledger — second granularity for the first minute
     fresh_seconds: int = 0      # < 60s
     fresh_minutes: int = 0      # < 60m

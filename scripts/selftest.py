@@ -954,6 +954,31 @@ async def main() -> int:
                 all((h.domain or "").endswith("vault") for h in _site_hunt.hits),
                 str(sorted({h.domain for h in _site_hunt.hits}))[:80])
 
+    print("\n▸ 15f. fresh means published, and one site does not own the top")
+    from app.orchestrator import stamp_of as _stamp_of, spread as _spread, rank as _rank
+
+    _now = freshness.utcnow().isoformat()
+    _undated = Hit(url="https://doi.org/10.1/x", title="A paper", provider="crossref",
+                   provider_name="Crossref", kind="paper", first_seen=_now, domain="doi.org")
+    ok &= check("when we fetched a page is not when it was published",
+                _stamp_of(_undated) is None, str(_stamp_of(_undated)))
+
+    _ranked = _rank([
+        Hit(url="https://apkpure.com/signal/1", title="signal", provider="apkpure",
+            provider_name="APKPure", kind="file", domain="apkpure.com", score=300),
+        Hit(url="https://apkpure.com/signal/2", title="signal detector", provider="apkpure",
+            provider_name="APKPure", kind="file", domain="apkpure.com", score=290),
+        Hit(url="https://apkpure.com/signal/3", title="bipo signal", provider="apkpure",
+            provider_name="APKPure", kind="file", domain="apkpure.com", score=280),
+        Hit(url="https://signal.org/android/apk/", title="Signal APK", provider="bing-rss",
+            provider_name="Bing", kind="page", domain="signal.org", score=120),
+    ], "accuracy")
+    _head = [h.domain for h in _ranked[:3]]
+    ok &= check("one site cannot own the top of an accuracy answer",
+                _head.count("apkpure.com") <= 2, str(_head))
+    ok &= check("and nothing is lost when it is moved", len(_ranked) == 4,
+                str(len(_ranked)))
+
     print("\n▸ 16. the engine reads the question before it fetches anything")
     from app import understand
 

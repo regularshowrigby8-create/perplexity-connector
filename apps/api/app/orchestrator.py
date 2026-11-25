@@ -308,10 +308,15 @@ def diversify(hits: list[Hit], per_site: int = 2, window: int = 24,
 
 
 def stamp_of(hit: Hit):
-    """The best clock a hit has: publication time, else when we first saw it."""
-    return (freshness.parse(hit.published_at)
-            or freshness.parse(hit.published)
-            or freshness.parse(hit.first_seen))
+    """When the world published it — never when we happened to fetch it.
+
+    This used to fall back to `first_seen`, and that one line was the reason a
+    journal DOI stamped "5 seconds ago" outranked the page that actually
+    answered the question: every undated result looked seconds old the moment it
+    arrived, and accuracy-then-date put it first. When we first saw a page is our
+    clock, not the world's, and an undated result is undated.
+    """
+    return freshness.parse(hit.published_at) or freshness.parse(hit.published)
 
 
 def refresh_ages(hits: list[Hit], now=None) -> None:
@@ -319,7 +324,10 @@ def refresh_ages(hits: list[Hit], now=None) -> None:
     now = now or freshness.utcnow()
     for hit in hits:
         published = freshness.parse(hit.published_at) or freshness.parse(hit.published)
-        stamp = published or (freshness.parse(hit.first_seen) if hit.age_source != "none" else None)
+        # the same rule at response time: an undated hit says "undated", and the
+        # moment we fetched it is kept in `first_seen` for the vault to use, not
+        # dressed up as freshness in the answer
+        stamp = published
         described = freshness.describe(stamp, now)
         hit.age_seconds = described["age_seconds"]
         hit.age_human = described["age_human"]
@@ -327,8 +335,6 @@ def refresh_ages(hits: list[Hit], now=None) -> None:
         if published:
             hit.published_at = described["published_at"]
             hit.age_source = "published"
-        elif stamp:
-            hit.age_source = "first_seen"
         else:
             hit.age_source = None
 
@@ -402,6 +408,39 @@ def verbatim_key(hit: Hit) -> tuple:
     return (0 if hit.exact else 1, proximity)
 
 
+def spread(hits: list[Hit], per_domain: int = 2, within: int = 10) -> tuple[list[Hit], int]:
+    """Stop one site from owning the answer.
+
+    "signal apk" came back with six APKPure rows in a row: every one of them a
+    real result, and none of them the thing a person wants to see first. The
+    ordering keeps two rows per site in the first ten and moves the rest below
+    them — moved, never removed, and counted so the page can say so.
+    """
+    head: list[Hit] = []
+    tail: list[Hit] = []
+    seen: dict[str, int] = {}
+    moved = 0
+    local = {"vault", "vault_docs", "crawler"}
+    for hit in hits:
+        domain = (hit.domain or "").lower()
+        # your own corpus is not one site hogging the web, and neither is a site
+        # you asked the crawler to read: those keep their own order
+        if hit.provider in local or hit.provider_name == "Fusion Crawler":
+            head.append(hit)
+            continue
+        if len(head) >= within:
+            tail.append(hit)
+            continue
+        if domain and seen.get(domain, 0) >= per_domain:
+            moved += 1
+            hit.tags = sorted({*(hit.tags or []), "same-site"})
+            tail.append(hit)
+            continue
+        seen[domain] = seen.get(domain, 0) + 1
+        head.append(hit)
+    return [*head, *tail], moved
+
+
 def rank(hits: list[Hit], sort: str, verbatim: bool = True) -> list[Hit]:
     now = freshness.utcnow()
     if sort == "depth":
@@ -429,6 +468,7 @@ def rank(hits: list[Hit], sort: str, verbatim: bool = True) -> list[Hit]:
                     -hit.score, -hit.depth)
 
         hits.sort(key=accuracy_key)
+        hits, _ = spread(hits)
     elif sort == "newest":
         # undated results are sorted last, never removed — ordering, not a filter
         def newest_key(hit: Hit):
@@ -446,6 +486,9 @@ def rank(hits: list[Hit], sort: str, verbatim: bool = True) -> list[Hit]:
                 return (hit.off_topic, hit.junk, *tier, 1, float(-age), -hit.score, -hit.depth)
             return (hit.off_topic, hit.junk, *tier, 0, float(age), -hit.score, -hit.depth)
 
+        # "newest" promises newest first, so it stays a strict date order here;
+        # the same-site moves below belong to the accuracy order, where the date
+        # is already only the second thing that decides.
         hits.sort(key=newest_key)
     else:
         key = (lambda h: (h.junk, *verbatim_key(h), -h.score, -h.depth)) if verbatim             else (lambda h: (h.junk, -h.score, -h.depth))
@@ -886,6 +929,7 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         hop_skipped=int(hop_stats.get("skipped") or 0),
         cut_older_matches=int(cut_older_matches),
         off_site=int(off_site),
+        same_site=sum(1 for h in fused if "same-site" in (h.tags or [])),
         fresh_seconds=sum(1 for h in fused if h.age_seconds is not None and h.age_seconds < 60),
         fresh_minutes=sum(1 for h in fused if h.age_seconds is not None and 60 <= h.age_seconds < 3600),
         fresh_hours=sum(1 for h in fused if h.age_seconds is not None and 3600 <= h.age_seconds < 86400),
