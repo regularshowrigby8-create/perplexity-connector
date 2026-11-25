@@ -333,12 +333,19 @@ no "offline" banner.
 
 | Where | What runs there | What you do |
 |---|---|---|
-| **Render** | page + crawler, one Docker service, disk for the vault | New → Blueprint → this repo → Apply (`render.yaml`) |
-| **Fly.io** | same image, one machine, `jnb` region by default | `fly launch --copy-config --no-deploy`, `fly volumes create nighthawk_data -s 1`, `fly deploy` (`fly.toml`) |
-| **Railway** | same image, `$PORT` respected | New Project → Deploy from repo (`railway.json`) |
+| **Render** | page + crawler, one Docker service — **free plan** (sleeps when idle, vault resets) | New → Blueprint → this repo + this branch → Apply (`render.yaml`) |
+| **Fly.io** | same image, one machine, `jnb` region by default | `fly launch --copy-config --no-deploy`, `fly volumes create nighthawk_data -s 1`, `fly deploy` (`fly.toml`) — pay-as-you-go, needs a card |
+| **Railway** | same image, `$PORT` respected | New Project → Deploy from repo (`railway.json`) — trial credit, then paid |
 | **Any VPS** | both, on `http://host:8000/` | `docker compose up -d --build` |
 | **Netlify / Vercel** | **the page only** — no Python, no crawler | deploy, then give it an engine (below) |
 | **This sandbox preview** | both, until the session ends | open the `:8000` or `:3000` preview |
+
+**Free was the requirement, so read the trade-offs before picking a row.** Render's free plan runs this
+image at no cost but sleeps when idle and has no disk, which means the page may take ~30 s to wake and
+the vault forgets its documents between runs. Everything else on the list is either a card-required
+service or a machine you already pay for. Any host that can run a Docker container — Koyeb's free
+instance, a free Hugging Face Space, a Raspberry Pi under your desk — works with the same image and
+the same single-origin result; only the YAML differs.
 
 One click for the Render path (it reads `render.yaml` straight out of the repo):
 
