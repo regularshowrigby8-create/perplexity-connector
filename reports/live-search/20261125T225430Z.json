@@ -1,0 +1,4289 @@
+{
+ "query": "diary of a wimpy kid",
+ "lens": "all",
+ "site": null,
+ "hits": [
+  {
+   "url": "https://archive.org/details/OldSchool_201801",
+   "title": "Old School Diary Of A Wimpy Kid",
+   "snippet": "Diary of a wimpy kid old school by Jeff kiney",
+   "provider": "internetarchive",
+   "provider_name": "Internet Archive",
+   "kind": "document",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "archive.org",
+   "published": null,
+   "deadline": null,
+   "depth": 51,
+   "score": 107.01,
+   "tags": [
+    "internet-archive",
+    "texts",
+    "offers-type"
+   ],
+   "archive": true,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid diary",
+    "wimpy kid",
+    "jeff kiney",
+    "school diary",
+    "kid diary",
+    "school by jeff"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": 5,
+   "age_human": "5 seconds ago",
+   "freshness": 0.999973,
+   "first_seen": "2026-11-25T22:54:25.120043+00:00",
+   "age_source": "first_seen",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    11,
+    31
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "internetarchive",
+     "name": "Internet Archive",
+     "rank": 4,
+     "url": "https://archive.org/details/OldSchool_201801"
+    }
+   ],
+   "meta": {
+    "mediatype": "texts",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://archive.org/details/diary-of-a-wimpy-kid-book-14-wrecking-ball-1-1",
+   "title": "Diary Of A Wimpy Kid Book 14 Wrecking Ball( 1)( 1)",
+   "snippet": "Hi guys this is wrecking ball made by Jeff Kinney",
+   "provider": "internetarchive",
+   "provider_name": "Internet Archive",
+   "kind": "document",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "archive.org",
+   "published": null,
+   "deadline": null,
+   "depth": 51,
+   "score": 104.632,
+   "tags": [
+    "internet-archive",
+    "texts",
+    "offers-type"
+   ],
+   "archive": true,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid book",
+    "wrecking ball made",
+    "kid book",
+    "jeff kinney",
+    "wimpy kid",
+    "wrecking ball"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": 5,
+   "age_human": "5 seconds ago",
+   "freshness": 0.999973,
+   "first_seen": "2026-11-25T22:54:25.121262+00:00",
+   "age_source": "first_seen",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    0,
+    20
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "internetarchive",
+     "name": "Internet Archive",
+     "rank": 5,
+     "url": "https://archive.org/details/diary-of-a-wimpy-kid-book-14-wrecking-ball-1-1"
+    }
+   ],
+   "meta": {
+    "mediatype": "texts",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://archive.org/details/LongHaul",
+   "title": "Long Haul Diary Of A Wimpy Kid",
+   "snippet": "Long haul diary of a wimpy kid Jeff kiney",
+   "provider": "internetarchive",
+   "provider_name": "Internet Archive",
+   "kind": "document",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "archive.org",
+   "published": null,
+   "deadline": null,
+   "depth": 51,
+   "score": 96.09,
+   "tags": [
+    "internet-archive",
+    "texts",
+    "offers-type"
+   ],
+   "archive": true,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "long haul diary",
+    "wimpy kid jeff",
+    "kid jeff kiney",
+    "wimpy kid long",
+    "kid long haul",
+    "haul diary"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": 5,
+   "age_human": "5 seconds ago",
+   "freshness": 0.999973,
+   "first_seen": "2026-11-25T22:54:25.129452+00:00",
+   "age_source": "first_seen",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    10,
+    30
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "internetarchive",
+     "name": "Internet Archive",
+     "rank": 9,
+     "url": "https://archive.org/details/LongHaul"
+    }
+   ],
+   "meta": {
+    "mediatype": "texts",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://archive.org/details/diper-overlode",
+   "title": "Diary of a Wimpy Kid Book 17 - Diper Overlode",
+   "snippet": "Book 17 of Diary of a Wimpy Kid",
+   "provider": "internetarchive",
+   "provider_name": "Internet Archive",
+   "kind": "document",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "archive.org",
+   "published": null,
+   "deadline": null,
+   "depth": 51,
+   "score": 94.168,
+   "tags": [
+    "internet-archive",
+    "texts",
+    "offers-type"
+   ],
+   "archive": true,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "diper overlode book",
+    "wimpy kid book",
+    "wimpy kid",
+    "diper overlode",
+    "overlode book",
+    "kid book"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": 5,
+   "age_human": "5 seconds ago",
+   "freshness": 0.999973,
+   "first_seen": "2026-11-25T22:54:25.130582+00:00",
+   "age_source": "first_seen",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    0,
+    20
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "internetarchive",
+     "name": "Internet Archive",
+     "rank": 10,
+     "url": "https://archive.org/details/diper-overlode"
+    }
+   ],
+   "meta": {
+    "mediatype": "texts",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://archive.org/details/DiaryOfAWimpyKidBook1KinneyJeff",
+   "title": "Diary Of A Wimpy Kid Book 1 by Kinney Jeff",
+   "snippet": "nothing",
+   "provider": "internetarchive",
+   "provider_name": "Internet Archive",
+   "kind": "document",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "archive.org",
+   "published": null,
+   "deadline": null,
+   "depth": 51,
+   "score": 83.09,
+   "tags": [
+    "internet-archive",
+    "texts",
+    "offers-type"
+   ],
+   "archive": true,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid book",
+    "kid book",
+    "wimpy kid",
+    "kinney jeff",
+    "book",
+    "wimpy"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": 5,
+   "age_human": "5 seconds ago",
+   "freshness": 0.999973,
+   "first_seen": "2026-11-25T22:54:25.131738+00:00",
+   "age_source": "first_seen",
+   "quality": 0.75,
+   "quality_flags": [
+    "thin"
+   ],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    0,
+    20
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "internetarchive",
+     "name": "Internet Archive",
+     "rank": 11,
+     "url": "https://archive.org/details/DiaryOfAWimpyKidBook1KinneyJeff"
+    }
+   ],
+   "meta": {
+    "mediatype": "texts",
+    "coverage": 1.0,
+    "quality_flags": [
+     "thin"
+    ]
+   }
+  },
+  {
+   "url": "https://archive.org/details/partypooper_202510",
+   "title": "Diary of a Wimpy Kid: Partypooper",
+   "snippet": "Diary",
+   "provider": "internetarchive",
+   "provider_name": "Internet Archive",
+   "kind": "document",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "archive.org",
+   "published": null,
+   "deadline": null,
+   "depth": 51,
+   "score": 65.194,
+   "tags": [
+    "internet-archive",
+    "texts",
+    "offers-type"
+   ],
+   "archive": true,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": 5,
+   "age_human": "5 seconds ago",
+   "freshness": 0.999973,
+   "first_seen": "2026-11-25T22:54:25.173662+00:00",
+   "age_source": "first_seen",
+   "quality": 0.75,
+   "quality_flags": [
+    "thin"
+   ],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    0,
+    20
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "internetarchive",
+     "name": "Internet Archive",
+     "rank": 25,
+     "url": "https://archive.org/details/partypooper_202510"
+    }
+   ],
+   "meta": {
+    "mediatype": "texts",
+    "coverage": 1.0,
+    "quality_flags": [
+     "thin"
+    ]
+   }
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Diary_of_a_Wimpy_Kid_(book)",
+   "title": "Diary of a Wimpy Kid (book) - Wikipedia",
+   "snippet": "Diary of a Wimpy Kid (book) ... Diary of a Wimpy Kid is a children's illustrated novel written and illustrated by Jeff Kinney. It is the first book in the Diary of a Wimpy Kid series. The book is about a boy named Greg Heffley and his attempts to become popular in his first year of middle school.",
+   "provider": "bing-rss",
+   "provider_name": "Bing (public RSS)",
+   "kind": "page",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "en.wikipedia.org",
+   "published": "Wed, 25 Nov 2026 17:32:00 GMT",
+   "deadline": null,
+   "depth": 1,
+   "score": 217.015,
+   "tags": [
+    "web",
+    "bing",
+    "duckduckgo",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid",
+    "wimpy kid series",
+    "wikipedia diary",
+    "wimpy",
+    "kid",
+    "jeff kinney"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-25T17:32:00+00:00",
+   "age_seconds": 19350,
+   "age_human": "5 hours ago",
+   "freshness": 0.901684,
+   "first_seen": "2026-11-25T22:54:24.217721+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    0,
+    20
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "bing-rss",
+     "name": "Bing (public RSS)",
+     "rank": 7,
+     "url": "https://en.wikipedia.org/wiki/Diary_of_a_Wimpy_Kid_(book)"
+    },
+    {
+     "provider": "wikipedia",
+     "name": "Wikipedia",
+     "rank": 3,
+     "url": "https://en.wikipedia.org/wiki/Diary_of_a_Wimpy_Kid_(book)"
+    },
+    {
+     "provider": "ddg-lite",
+     "name": "DuckDuckGo (lite)",
+     "rank": 7,
+     "url": "https://en.wikipedia.org/wiki/Diary_of_a_Wimpy_Kid_(book)"
+    }
+   ],
+   "meta": {
+    "engine": "bing",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://wimpykid.com/books/",
+   "title": "The Wimpy Kid Series \u00b7 Books \u00b7 Wimpy Kid",
+   "snippet": "Filled with laugh-out-loud hilarious text and cartoons, the Diary of a Wimpy Kid series follows Greg Heffley as he records the daily trials and triumphs.",
+   "provider": "bing-rss",
+   "provider_name": "Bing (public RSS)",
+   "kind": "page",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "wimpykid.com",
+   "published": "Wed, 25 Nov 2026 12:25:00 GMT",
+   "deadline": null,
+   "depth": 15,
+   "score": 242.643,
+   "tags": [
+    "web",
+    "bing",
+    "duckduckgo",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid series",
+    "wimpy kid filled",
+    "wimpy kid",
+    "kid series",
+    "kid filled",
+    "greg heffley"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-25T12:25:00+00:00",
+   "age_seconds": 37770,
+   "age_human": "10 hours ago",
+   "freshness": 0.817089,
+   "first_seen": "2026-11-25T22:54:24.204603+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    60,
+    80
+   ],
+   "match_where": "snippet",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "bing-rss",
+     "name": "Bing (public RSS)",
+     "rank": 3,
+     "url": "https://wimpykid.com/books/"
+    },
+    {
+     "provider": "ddg-lite",
+     "name": "DuckDuckGo (lite)",
+     "rank": 3,
+     "url": "https://wimpykid.com/books/"
+    }
+   ],
+   "meta": {
+    "engine": "bing",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Diary_of_a_Wimpy_Kid:_The_Getaway",
+   "title": "Diary of a Wimpy Kid: The Getaway",
+   "snippet": "Diary of a Wimpy Kid : The Getaway is the twelfth book in the Diary of a Wimpy Kid series by Jeff Kinney. The book was unveiled during the 2017 Diary of",
+   "provider": "wikipedia",
+   "provider_name": "Wikipedia",
+   "kind": "reference",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "en.wikipedia.org",
+   "published": "2026-11-23",
+   "deadline": null,
+   "depth": 1,
+   "score": 61.903,
+   "tags": [
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid series",
+    "wimpy kid",
+    "jeff kinney",
+    "getaway diary",
+    "kid series",
+    "series by jeff"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-23T00:00:00+00:00",
+   "age_seconds": 255270,
+   "age_human": "2 days ago",
+   "freshness": 0.25531,
+   "first_seen": "2026-11-25T22:54:24.595649+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    0,
+    20
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "wikipedia",
+     "name": "Wikipedia",
+     "rank": 2,
+     "url": "https://en.wikipedia.org/wiki/Diary_of_a_Wimpy_Kid:_The_Getaway"
+    }
+   ],
+   "meta": {
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://wimpykid.com/",
+   "title": "Wimpy Kid \u00b7 Official Website for Jeff Kinney's Diary of a ...",
+   "snippet": "Famed for laugh-out-loud humor through words and cartoons, the Diary of a Wimpy Kid books follow Greg Heffley as he records the trials and triumphs of middle school. More than 300 million copies have been sold around the globe!",
+   "provider": "bing-rss",
+   "provider_name": "Bing (public RSS)",
+   "kind": "page",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "wimpykid.com",
+   "published": "Wed, 11 Nov 2026 17:49:00 GMT",
+   "deadline": null,
+   "depth": 12,
+   "score": 173.721,
+   "tags": [
+    "web",
+    "bing",
+    "duckduckgo",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "jeff kinney diary",
+    "official website",
+    "website for jeff",
+    "jeff kinney",
+    "kinney diary",
+    "wimpy kid"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-11T17:49:00+00:00",
+   "age_seconds": 1227930,
+   "age_human": "14 days ago",
+   "freshness": 0.001405,
+   "first_seen": "2026-11-25T22:54:23.426319+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    63,
+    83
+   ],
+   "match_where": "snippet",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "bing-rss",
+     "name": "Bing (public RSS)",
+     "rank": 1,
+     "url": "https://wimpykid.com/"
+    },
+    {
+     "provider": "ddg-lite",
+     "name": "DuckDuckGo (lite)",
+     "rank": 1,
+     "url": "https://wimpykid.com/"
+    }
+   ],
+   "meta": {
+    "engine": "bing",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://github.com/shanikashameems/shanikashameems.github.io/pull/11",
+   "title": "Personalise the note, reading shelf and contact pages",
+   "snippet": "## What changed - Rewrote the A note page with a warm, personal introduction and Shasha sign-off. - Replaced the placeholder bookshelf with all 20 supplied reading entries, including the Diary of a Wimpy Kid series and Rodrick Rules favourite. - Made every book clickable, showing its author, a short spoiler-light descr",
+   "provider": "github-issues",
+   "provider_name": "GitHub issues (newest)",
+   "kind": "page",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "github.com",
+   "published": "2026-11-04T06:29:29Z",
+   "deadline": null,
+   "depth": 4,
+   "score": 35.224,
+   "tags": [
+    "issue",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "shasha sign-off",
+    "introduction and shasha",
+    "rodrick rules favourite",
+    "personal introduction",
+    "wimpy kid series",
+    "shelf and contact"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-04T06:29:29+00:00",
+   "age_seconds": 1873501,
+   "age_human": "21 days ago",
+   "freshness": 4.4e-05,
+   "first_seen": "2026-11-25T22:54:26.780555+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    187,
+    207
+   ],
+   "match_where": "snippet",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "github-issues",
+     "name": "GitHub issues (newest)",
+     "rank": 16,
+     "url": "https://github.com/shanikashameems/shanikashameems.github.io/pull/11"
+    }
+   ],
+   "meta": {
+    "repo": [
+     "shanikashameems",
+     "shanikashameems.github.io"
+    ],
+    "state": "closed",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://github.com/Jonak-Adipta-Kalita/JAK-Diary-of-A-Wimpy-Kid-Books-Prog",
+   "title": "Jonak-Adipta-Kalita/JAK-Diary-of-A-Wimpy-Kid-Books-Prog",
+   "snippet": "",
+   "provider": "github",
+   "provider_name": "GitHub",
+   "kind": "repository",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "github.com",
+   "published": "2026-10-21",
+   "deadline": null,
+   "depth": 0,
+   "score": 51.091,
+   "tags": [
+    "github",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "jonak-adipta-kalita jak-diary-of-a-wimpy-kid-books-prog",
+    "jak-diary-of-a-wimpy-kid-books-prog",
+    "jonak-adipta-kalita"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-10-21T00:00:00+00:00",
+   "age_seconds": 3106470,
+   "age_human": "1 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:54:25.084955+00:00",
+   "age_source": "published",
+   "quality": 0.75,
+   "quality_flags": [
+    "thin"
+   ],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    24,
+    44
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "github",
+     "name": "GitHub",
+     "rank": 6,
+     "url": "https://github.com/Jonak-Adipta-Kalita/JAK-Diary-of-A-Wimpy-Kid-Books-Prog"
+    }
+   ],
+   "meta": {
+    "stars": 1,
+    "coverage": 1.0,
+    "quality_flags": [
+     "thin"
+    ]
+   }
+  },
+  {
+   "url": "https://jos.hueuni.edu.vn/index.php/hujos-ssh/article/download/7725/2515",
+   "title": "SEMANTIC PREFERENCE IN \"DIARY OF A WIMPY KID\"",
+   "snippet": "HUE UNIVERSITY JOURNAL OF SCIENCE SOCIAL SCIENCES AND HUMANITIES",
+   "provider": "openalex",
+   "provider_name": "OpenAlex",
+   "kind": "paper",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "jos.hueuni.edu.vn",
+   "published": "2026-07-15",
+   "deadline": null,
+   "depth": 38,
+   "score": 71.251,
+   "tags": [
+    "open-access",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "semantic preference",
+    "wimpy kid",
+    "semantic",
+    "diary",
+    "kid",
+    "abstract"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-07-15T00:00:00+00:00",
+   "age_seconds": 11573670,
+   "age_human": "4 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:54:25.018524+00:00",
+   "age_source": "published",
+   "quality": 0.7,
+   "quality_flags": [
+    "thin",
+    "shouting"
+   ],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    24,
+    44
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "openalex",
+     "name": "OpenAlex",
+     "rank": 2,
+     "url": "https://jos.hueuni.edu.vn/index.php/hujos-ssh/article/download/7725/2515"
+    },
+    {
+     "provider": "openalex-new",
+     "name": "OpenAlex (by date)",
+     "rank": 23,
+     "url": "https://jos.hueuni.edu.vn/index.php/hujos-ssh/article/download/7725/2515"
+    }
+   ],
+   "meta": {
+    "cited_by": 0,
+    "doi": "https://doi.org/10.26459/hueunijssh.v135i6b.7725",
+    "coverage": 1.0,
+    "quality_flags": [
+     "thin",
+     "shouting"
+    ]
+   }
+  },
+  {
+   "url": "https://kgef.journals.ekb.eg/article_311609_75c2f5e4c86198a25cbfb26f00048d8e.pdf",
+   "title": "What Makes Us Laugh? A Study of Traditional Humor Theories in Jeff Kinney's Diary of a Wimpy Kid: Hard Luck",
+   "snippet": "\u0645\u062c\u0644\u0629 \u06a9\u0644\u064a\u0629 \u0627\u0644\u0627\u062f\u0627\u0628 \u062c\u0627\u0645\u0639\u0629 \u062d\u0644\u0648\u0627\u0646",
+   "provider": "doaj-new",
+   "provider_name": "DOAJ (newest)",
+   "kind": "document",
+   "file_ext": "pdf",
+   "mime": "application/pdf",
+   "domain": "kgef.journals.ekb.eg",
+   "published": "2026-05-26T05:36:12Z",
+   "deadline": null,
+   "depth": 42,
+   "score": 71.205,
+   "tags": [
+    "open-access",
+    "doaj"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "makes us laugh",
+    "traditional humor theories",
+    "jeff kinney diary",
+    "hard luck \u0645\u062c\u0644\u0629",
+    "wimpy kid",
+    "hard luck"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-05-26T05:36:12+00:00",
+   "age_seconds": 15873498,
+   "age_human": "6 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:54:26.001872+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "arz",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    76,
+    96
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "doaj-new",
+     "name": "DOAJ (newest)",
+     "rank": 1,
+     "url": "https://kgef.journals.ekb.eg/article_311609_75c2f5e4c86198a25cbfb26f00048d8e.pdf"
+    },
+    {
+     "provider": "doaj",
+     "name": "DOAJ",
+     "rank": 3,
+     "url": "https://kgef.journals.ekb.eg/article_311609_75c2f5e4c86198a25cbfb26f00048d8e.pdf"
+    }
+   ],
+   "meta": {
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://doi.org/10.55277/researchhub.52sb5e58.1",
+   "title": "PDF/EPUB Download Hot Mess (Diary of a Wimpy Kid #19) by Jeff Kinney Full Book",
+   "snippet": "",
+   "provider": "crossref",
+   "provider_name": "Crossref",
+   "kind": "paper",
+   "file_ext": "1",
+   "mime": "text/html",
+   "domain": "doi.org",
+   "published": "2026-4-28",
+   "deadline": null,
+   "depth": 21,
+   "score": 56.408,
+   "tags": [
+    "doi",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "epub download hot",
+    "download hot mess",
+    "kinney full book",
+    "jeff kinney full",
+    "epub download",
+    "hot mess"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-04-28T00:00:00+00:00",
+   "age_seconds": 18312870,
+   "age_human": "7 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:54:24.418868+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    28,
+    48
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "crossref",
+     "name": "Crossref",
+     "rank": 8,
+     "url": "https://doi.org/10.55277/researchhub.52sb5e58.1"
+    }
+   ],
+   "meta": {
+    "doi": "10.55277/researchhub.52sb5e58.1",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://doi.org/10.55277/researchhub.mod5zadc.1",
+   "title": "Online Read Ebook Diary of a Wimpy Kid Box of Books 1-4: Diary of a Wimpy Kid, Rodrick Rules, The Last Straw, and Dog Days by Jeff Kinney",
+   "snippet": "",
+   "provider": "crossref",
+   "provider_name": "Crossref",
+   "kind": "paper",
+   "file_ext": "1",
+   "mime": "text/html",
+   "domain": "doi.org",
+   "published": "2026-4-26",
+   "deadline": null,
+   "depth": 21,
+   "score": 64.466,
+   "tags": [
+    "doi",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid box",
+    "read ebook diary",
+    "online read ebook",
+    "wimpy kid",
+    "rodrick rules",
+    "jeff kinney"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-04-26T00:00:00+00:00",
+   "age_seconds": 18485670,
+   "age_human": "7 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:54:24.408064+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 2,
+   "match_span": [
+    18,
+    38
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "crossref",
+     "name": "Crossref",
+     "rank": 2,
+     "url": "https://doi.org/10.55277/researchhub.mod5zadc.1"
+    }
+   ],
+   "meta": {
+    "doi": "10.55277/researchhub.mod5zadc.1",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://doi.org/10.55277/researchhub.vhugtsq0.1",
+   "title": "[PDF] Diary of a Wimpy Kid Box of Books 1-4: Diary of a Wimpy Kid, Rodrick Rules, The Last Straw, and Dog Days by Jeff Kinney",
+   "snippet": "",
+   "provider": "crossref",
+   "provider_name": "Crossref",
+   "kind": "paper",
+   "file_ext": "1",
+   "mime": "text/html",
+   "domain": "doi.org",
+   "published": "2026-4-25",
+   "deadline": null,
+   "depth": 21,
+   "score": 66.039,
+   "tags": [
+    "doi",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid box",
+    "wimpy kid",
+    "rodrick rules",
+    "jeff kinney",
+    "box of books",
+    "dog days"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-04-25T00:00:00+00:00",
+   "age_seconds": 18572070,
+   "age_human": "7 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:54:24.405538+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 2,
+   "match_span": [
+    6,
+    26
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "crossref",
+     "name": "Crossref",
+     "rank": 1,
+     "url": "https://doi.org/10.55277/researchhub.vhugtsq0.1"
+    }
+   ],
+   "meta": {
+    "doi": "10.55277/researchhub.vhugtsq0.1",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://doi.org/10.55277/researchhub.4js56nzw.1",
+   "title": "PDF [DOWNLOAD] Diary of a Wimpy Kid Book 12 by Jeff Kinney on Iphone",
+   "snippet": "",
+   "provider": "crossref",
+   "provider_name": "Crossref",
+   "kind": "paper",
+   "file_ext": "1",
+   "mime": "text/html",
+   "domain": "doi.org",
+   "published": "2026-4-23",
+   "deadline": null,
+   "depth": 21,
+   "score": 60.169,
+   "tags": [
+    "doi",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid book",
+    "kid book",
+    "kinney on iphone",
+    "wimpy kid",
+    "jeff kinney",
+    "pdf"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-04-23T00:00:00+00:00",
+   "age_seconds": 18744870,
+   "age_human": "7 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:54:24.413251+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    15,
+    35
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "crossref",
+     "name": "Crossref",
+     "rank": 5,
+     "url": "https://doi.org/10.55277/researchhub.4js56nzw.1"
+    }
+   ],
+   "meta": {
+    "doi": "10.55277/researchhub.4js56nzw.1",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://github.com/yahiah2008/Diary-of-a-wimpy-kid-jeff-kinney",
+   "title": "yahiah2008/Diary-of-a-wimpy-kid-jeff-kinney",
+   "snippet": "Simply a website where you can read or download all of the Diary of a Wimpy Kid books, including Diary of an Awesome Friendly Kid.",
+   "provider": "github",
+   "provider_name": "GitHub",
+   "kind": "repository",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "github.com",
+   "published": "2026-02-19",
+   "deadline": null,
+   "depth": 0,
+   "score": 62.174,
+   "tags": [
+    "github",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "awesome friendly kid",
+    "wimpy kid books",
+    "awesome friendly",
+    "wimpy kid",
+    "friendly kid",
+    "including diary"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-02-19T00:00:00+00:00",
+   "age_seconds": 24188070,
+   "age_human": "9 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:54:25.080310+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    11,
+    31
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "github",
+     "name": "GitHub",
+     "rank": 2,
+     "url": "https://github.com/yahiah2008/Diary-of-a-wimpy-kid-jeff-kinney"
+    }
+   ],
+   "meta": {
+    "stars": 2,
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://github.com/Sirath07/wimpy-kid-commercial-page",
+   "title": "Sirath07/wimpy-kid-commercial-page",
+   "snippet": "An interactive marketing-style website inspired by Diary of a Wimpy Kid, built using HTML, CSS, and JavaScript. Features include animated hero sliders, book carousels, character showcases, a fun zone with quizzes and jokes, and responsive UI elements with custom animations and scroll effects.",
+   "provider": "github",
+   "provider_name": "GitHub",
+   "kind": "repository",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "github.com",
+   "published": "2026-01-12",
+   "deadline": null,
+   "depth": 0,
+   "score": 55.56,
+   "tags": [
+    "github",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "interactive marketing-style website",
+    "marketing-style website inspired",
+    "wimpy kid",
+    "built using html",
+    "inspired by diary",
+    "interactive marketing-style"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-01-12T00:00:00+00:00",
+   "age_seconds": 27471270,
+   "age_human": "10 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:54:25.085717+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    51,
+    71
+   ],
+   "match_where": "snippet",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "github",
+     "name": "GitHub",
+     "rank": 7,
+     "url": "https://github.com/Sirath07/wimpy-kid-commercial-page"
+    }
+   ],
+   "meta": {
+    "stars": 1,
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://github.com/gamingmase7/diary-of-a-wimpy-kid",
+   "title": "gamingmase7/diary-of-a-wimpy-kid",
+   "snippet": "the first diary of a wimpy kid book",
+   "provider": "github",
+   "provider_name": "GitHub",
+   "kind": "repository",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "github.com",
+   "published": "2025-12-05",
+   "deadline": null,
+   "depth": 0,
+   "score": 43.522,
+   "tags": [
+    "github",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid book",
+    "kid book",
+    "wimpy kid",
+    "book",
+    "diary",
+    "wimpy"
+   ],
+   "near_dupes": 0,
+   "published_at": "2025-12-05T00:00:00+00:00",
+   "age_seconds": 30754470,
+   "age_human": "11 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:54:25.091118+00:00",
+   "age_source": "published",
+   "quality": 0.75,
+   "quality_flags": [
+    "thin"
+   ],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    12,
+    32
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "github",
+     "name": "GitHub",
+     "rank": 10,
+     "url": "https://github.com/gamingmase7/diary-of-a-wimpy-kid"
+    }
+   ],
+   "meta": {
+    "stars": 0,
+    "coverage": 1.0,
+    "quality_flags": [
+     "thin"
+    ]
+   }
+  },
+  {
+   "url": "https://www.scribd.com/doc/238171104/Diary-of-a-Wimpy-Kid-Book-1",
+   "title": "Free Online Diary of a Wimpy Kid 1 | PDF - Scribd",
+   "snippet": "8. Free Online Diary of a Wimpy Kid 1 | PDF - Scribd",
+   "provider": "ddg-lite",
+   "provider_name": "DuckDuckGo (lite)",
+   "kind": "page",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "scribd.com",
+   "published": null,
+   "deadline": null,
+   "depth": 5,
+   "score": 140.066,
+   "tags": [
+    "web",
+    "duckduckgo",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "free online diary",
+    "wimpy kid",
+    "online diary",
+    "free online",
+    "pdf",
+    "scribd"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": null,
+   "age_human": "undated",
+   "freshness": 0.0,
+   "first_seen": null,
+   "age_source": null,
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    12,
+    32
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "ddg-lite",
+     "name": "DuckDuckGo (lite)",
+     "rank": 8,
+     "url": "https://www.scribd.com/doc/238171104/Diary-of-a-Wimpy-Kid-Book-1"
+    }
+   ],
+   "meta": {
+    "engine": "duckduckgo",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://www.amazon.com/Diary-of-a-Wimpy-Kid/dp/B0F1FBJ8QQ",
+   "title": "Diary of a Wimpy Kid (21 book series) Kindle Edition - amazon.com",
+   "snippet": "9. Diary of a Wimpy Kid (21 book series) Kindle Edition - amazon.com",
+   "provider": "ddg-lite",
+   "provider_name": "DuckDuckGo (lite)",
+   "kind": "page",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "amazon.com",
+   "published": null,
+   "deadline": null,
+   "depth": 0,
+   "score": 134.517,
+   "tags": [
+    "web",
+    "duckduckgo",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "kindle edition",
+    "wimpy kid",
+    "book series",
+    "amazon.com",
+    "kid",
+    "kindle"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": null,
+   "age_human": "undated",
+   "freshness": 0.0,
+   "first_seen": null,
+   "age_source": null,
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    0,
+    20
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "ddg-lite",
+     "name": "DuckDuckGo (lite)",
+     "rank": 9,
+     "url": "https://www.amazon.com/Diary-of-a-Wimpy-Kid/dp/B0F1FBJ8QQ"
+    }
+   ],
+   "meta": {
+    "engine": "duckduckgo",
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://archive.org/details/dogdays00jeff",
+   "title": "Diary of a Wimpy Kid: The Last Straw",
+   "snippet": "found one hop out from en.wikipedia.org",
+   "provider": "hop",
+   "provider_name": "One hop out",
+   "kind": "page",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "archive.org",
+   "published": null,
+   "deadline": null,
+   "depth": 21,
+   "score": 105.617,
+   "tags": [
+    "hidden",
+    "one-hop",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid",
+    "straw found",
+    "kid",
+    "found one hop",
+    "wimpy",
+    "straw"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": null,
+   "age_human": "undated",
+   "freshness": 0.0,
+   "first_seen": null,
+   "age_source": null,
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    0,
+    20
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "hop",
+     "name": "One hop out",
+     "rank": 1,
+     "url": "https://archive.org/details/dogdays00jeff"
+    }
+   ],
+   "meta": {
+    "from": "en.wikipedia.org",
+    "hop": 1,
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://archive.org/details/diaryofwimpykidc00kinn",
+   "title": "Diary of a Wimpy Kid: The Ugly Truth",
+   "snippet": "found one hop out from en.wikipedia.org",
+   "provider": "hop",
+   "provider_name": "One hop out",
+   "kind": "page",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "archive.org",
+   "published": null,
+   "deadline": null,
+   "depth": 21,
+   "score": 103.103,
+   "tags": [
+    "hidden",
+    "one-hop",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "ugly truth found",
+    "wimpy kid",
+    "ugly truth",
+    "truth found",
+    "kid",
+    "found one hop"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": null,
+   "age_human": "undated",
+   "freshness": 0.0,
+   "first_seen": null,
+   "age_source": null,
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    0,
+    20
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "hop",
+     "name": "One hop out",
+     "rank": 2,
+     "url": "https://archive.org/details/diaryofwimpykidc00kinn"
+    }
+   ],
+   "meta": {
+    "from": "en.wikipedia.org",
+    "hop": 1,
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://www.wikidata.org/wiki/Q1339580",
+   "title": "Diary of a Wimpy Kid",
+   "snippet": "comic style book series by Jeff Kinney",
+   "provider": "wikidata",
+   "provider_name": "Wikidata",
+   "kind": "entity",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "wikidata.org",
+   "published": null,
+   "deadline": null,
+   "depth": 17,
+   "score": 39.433,
+   "tags": [
+    "entity",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid comic",
+    "jeff kinney",
+    "kid comic style",
+    "wimpy kid",
+    "comic style book",
+    "style book series"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": null,
+   "age_human": "undated",
+   "freshness": 0.0,
+   "first_seen": null,
+   "age_source": null,
+   "quality": 0.75,
+   "quality_flags": [
+    "thin"
+   ],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    0,
+    20
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "wikidata",
+     "name": "Wikidata",
+     "rank": 1,
+     "url": "https://www.wikidata.org/wiki/Q1339580"
+    }
+   ],
+   "meta": {
+    "coverage": 1.0,
+    "quality_flags": [
+     "thin"
+    ]
+   }
+  },
+  {
+   "url": "https://archive.org/details/dairy-of-a-wimpy-kid",
+   "title": "Dairy Of A Wimpy Kid: All books",
+   "snippet": "Boys don't keep diaries\u2014or do they? The launch of an exciting and innovatively illustrated new series narrated by an unforgettable kid every family can relate to It's a new school year, and Greg Heffley finds himself thrust into middle school, where undersized weaklings share the hallways with kids who are taller, meaner, and already shaving. The hazards of\u2026",
+   "provider": "internetarchive",
+   "provider_name": "Internet Archive",
+   "kind": "document",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "archive.org",
+   "published": null,
+   "deadline": null,
+   "depth": 51,
+   "score": 69.316,
+   "tags": [
+    "internet-archive",
+    "texts",
+    "offers-type"
+   ],
+   "archive": true,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "books boys",
+    "wimpy kid",
+    "greg heffley finds",
+    "greg heffley",
+    "wimpy",
+    "boys"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": 5,
+   "age_human": "5 seconds ago",
+   "freshness": 0.999973,
+   "first_seen": "2026-11-25T22:54:25.112743+00:00",
+   "age_source": "first_seen",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 2,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "internetarchive",
+     "name": "Internet Archive",
+     "rank": 2,
+     "url": "https://archive.org/details/dairy-of-a-wimpy-kid"
+    }
+   ],
+   "meta": {
+    "mediatype": "texts",
+    "coverage": 0.667,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://wimpykid.com/downloadables/",
+   "title": "For Teachers",
+   "snippet": "found one hop out from wimpykid.com",
+   "provider": "hop",
+   "provider_name": "One hop out",
+   "kind": "page",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "wimpykid.com",
+   "published": null,
+   "deadline": null,
+   "depth": 23,
+   "score": 56.454,
+   "tags": [
+    "hidden",
+    "one-hop",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "teachers found",
+    "found one hop",
+    "teachers",
+    "wimpykid.com",
+    "found",
+    "hop"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": null,
+   "age_human": "undated",
+   "freshness": 0.0,
+   "first_seen": null,
+   "age_source": null,
+   "quality": 0.75,
+   "quality_flags": [
+    "thin"
+   ],
+   "language": null,
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "hop",
+     "name": "One hop out",
+     "rank": 3,
+     "url": "https://wimpykid.com/downloadables/"
+    }
+   ],
+   "meta": {
+    "from": "wimpykid.com",
+    "hop": 1,
+    "coverage": 0.667,
+    "quality_flags": [
+     "thin"
+    ]
+   }
+  },
+  {
+   "url": "https://archive.org/details/diary-of-an-awesome-friendly-adventure",
+   "title": "Diary Of An Awesome Friendly Adventure",
+   "snippet": "books",
+   "provider": "internetarchive",
+   "provider_name": "Internet Archive",
+   "kind": "document",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "archive.org",
+   "published": null,
+   "deadline": null,
+   "depth": 51,
+   "score": 36.216,
+   "tags": [
+    "internet-archive",
+    "texts",
+    "offers-type"
+   ],
+   "archive": true,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "awesome friendly adventure",
+    "friendly adventure books",
+    "awesome friendly",
+    "friendly adventure",
+    "adventure books",
+    "awesome"
+   ],
+   "near_dupes": 0,
+   "published_at": null,
+   "age_seconds": 5,
+   "age_human": "5 seconds ago",
+   "freshness": 0.999973,
+   "first_seen": "2026-11-25T22:54:25.172750+00:00",
+   "age_source": "first_seen",
+   "quality": 0.75,
+   "quality_flags": [
+    "thin"
+   ],
+   "language": null,
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 1,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "internetarchive",
+     "name": "Internet Archive",
+     "rank": 24,
+     "url": "https://archive.org/details/diary-of-an-awesome-friendly-adventure"
+    }
+   ],
+   "meta": {
+    "mediatype": "texts",
+    "coverage": 0.333,
+    "quality_flags": [
+     "thin"
+    ]
+   }
+  },
+  {
+   "url": "https://mastodon.art/@Msloftis/117676819133972430",
+   "title": "@Msloftis@mastodon.art: Book 2 of the Madie Beartri series is available to read online at https:// madiebeartri.co",
+   "snippet": "Book 2 of the Madie Beartri series is available to read online at https:// madiebeartri.com/diary/ # fiction # diary # journal # story",
+   "provider": "mastodon",
+   "provider_name": "Mastodon (tag timeline)",
+   "kind": "page",
+   "file_ext": null,
+   "mime": "text/html",
+   "domain": "mastodon.art",
+   "published": "2026-11-25T11:22:40.000Z",
+   "deadline": null,
+   "depth": 18,
+   "score": 34.416,
+   "tags": [
+    "mastodon",
+    "#diary",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "madie beartri series",
+    "madie beartri",
+    "beartri series",
+    "online at https",
+    "madiebeartri.co book",
+    "read online"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-25T11:22:40+00:00",
+   "age_seconds": 41510,
+   "age_human": "11 hours ago",
+   "freshness": 0.800907,
+   "first_seen": "2026-11-25T22:54:26.042647+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 1,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "mastodon",
+     "name": "Mastodon (tag timeline)",
+     "rank": 5,
+     "url": "https://mastodon.art/@Msloftis/117676819133972430"
+    }
+   ],
+   "meta": {
+    "instance": "https://mastodon.social",
+    "boosts": 0,
+    "coverage": 0.333,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://arxiv.org/pdf/2611.33158v1",
+   "title": "OmniAct: One Policy, One Million Embodiments",
+   "snippet": "A single policy that controls diverse robots must not only transfer task knowledge across embodiments, but also adapt its behavior to each robot's capabilities. Existing approaches facilitate transfer through shared action representations, but these representations do not necessarily capture how differences in robot mo",
+   "provider": "arxiv-new",
+   "provider_name": "arXiv (submitted today)",
+   "kind": "paper",
+   "file_ext": "33158v1",
+   "mime": "text/html",
+   "domain": "arxiv.org",
+   "published": "2026-11-24T18:59:58Z",
+   "deadline": null,
+   "depth": 21,
+   "score": 47.654,
+   "tags": [
+    "preprint",
+    "arxiv",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "million embodiments",
+    "transfer task knowledge",
+    "controls diverse robots",
+    "single policy",
+    "controls diverse",
+    "task knowledge"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-24T18:59:58+00:00",
+   "age_seconds": 100472,
+   "age_human": "yesterday",
+   "freshness": 0.584289,
+   "first_seen": "2026-11-25T22:54:26.409803+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "arxiv-new",
+     "name": "arXiv (submitted today)",
+     "rank": 1,
+     "url": "https://arxiv.org/pdf/2611.33158v1"
+    }
+   ],
+   "meta": {
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "https://arxiv.org/pdf/2611.33156v1",
+   "title": "Antiferromagnetic phase of MnTe2: spin-order-induced renormalization of phonon Raman spectrum",
+   "snippet": "Recently, two modes of spin wave excitations (magnons) were detected in Raman scattering spectra of MnTe2. It is an unconventional magnet that features a pyrite-type crystal structure hosting a non-collinear, non-coplanar antiferromagnetic (AFM) spin order below the N\u00e9el temperature. In this brief communication, the fo",
+   "provider": "arxiv-new",
+   "provider_name": "arXiv (submitted today)",
+   "kind": "paper",
+   "file_ext": "33156v1",
+   "mime": "text/html",
+   "domain": "arxiv.org",
+   "published": "2026-11-24T18:59:35Z",
+   "deadline": null,
+   "depth": 21,
+   "score": 40.661,
+   "tags": [
+    "preprint",
+    "arxiv",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "raman spectrum recently",
+    "phonon raman spectrum",
+    "raman scattering spectra",
+    "spin wave excitations",
+    "spectrum recently",
+    "phonon raman"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-24T18:59:35+00:00",
+   "age_seconds": 100495,
+   "age_human": "yesterday",
+   "freshness": 0.584217,
+   "first_seen": "2026-11-25T22:54:26.414281+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "arxiv-new",
+     "name": "arXiv (submitted today)",
+     "rank": 2,
+     "url": "https://arxiv.org/pdf/2611.33156v1"
+    }
+   ],
+   "meta": {
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "https://arxiv.org/pdf/2611.33155v1",
+   "title": "Topological insulators on site-eliminated, projected, and patterned fractal lattices",
+   "snippet": "Identifying fractal lattices of fractional (Hausdorff) dimension as geometric descendants of parent crystals, we showcase the successful realization of canonical topological insulators in one-, two-, and three-dimensional crystals on their self-similar descents using three complementary approaches, starting from lattic",
+   "provider": "arxiv-new",
+   "provider_name": "arXiv (submitted today)",
+   "kind": "paper",
+   "file_ext": "33155v1",
+   "mime": "text/html",
+   "domain": "arxiv.org",
+   "published": "2026-11-24T18:59:34Z",
+   "deadline": null,
+   "depth": 21,
+   "score": 39.716,
+   "tags": [
+    "preprint",
+    "arxiv",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "fractal lattices identifying",
+    "lattices identifying fractal",
+    "identifying fractal lattices",
+    "patterned fractal lattices",
+    "canonical topological insulators",
+    "starting from lattic"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-24T18:59:34+00:00",
+   "age_seconds": 100496,
+   "age_human": "yesterday",
+   "freshness": 0.584214,
+   "first_seen": "2026-11-25T22:54:26.419826+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "arxiv-new",
+     "name": "arXiv (submitted today)",
+     "rank": 3,
+     "url": "https://arxiv.org/pdf/2611.33155v1"
+    }
+   ],
+   "meta": {
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "https://arxiv.org/pdf/2611.33153v1",
+   "title": "DiaCap: Jointly Learning Who Speaks When for Audiovisual Dialogue Captioning",
+   "snippet": "We present DiaCap, an audiovisual LLM for comprehensive dialogue captioning, which produces the transcript, timestamps, and a visual description of the speaker for every utterance in a video. Considering that utterance timing and audiovisual diarization are tightly coupled, DiaCap unifies the tasks in a single model, t",
+   "provider": "arxiv-new",
+   "provider_name": "arXiv (submitted today)",
+   "kind": "paper",
+   "file_ext": "33153v1",
+   "mime": "text/html",
+   "domain": "arxiv.org",
+   "published": "2026-11-24T18:59:08Z",
+   "deadline": null,
+   "depth": 21,
+   "score": 38.812,
+   "tags": [
+    "preprint",
+    "arxiv",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "comprehensive dialogue captioning",
+    "audiovisual dialogue captioning",
+    "jointly learning",
+    "dialogue captioning",
+    "learning who speaks",
+    "llm for comprehensive"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-24T18:59:08+00:00",
+   "age_seconds": 100522,
+   "age_human": "yesterday",
+   "freshness": 0.584132,
+   "first_seen": "2026-11-25T22:54:26.423521+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "arxiv-new",
+     "name": "arXiv (submitted today)",
+     "rank": 4,
+     "url": "https://arxiv.org/pdf/2611.33153v1"
+    }
+   ],
+   "meta": {
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "https://arxiv.org/pdf/2611.33151v1",
+   "title": "BioLoom: Scaling Biomedical Vision-Language Models by Learning from the Structure of Scientific Articles",
+   "snippet": "The development of biomedical vision-language models (VLMs) with contrastive image-text pretraining has been driven by scaling to increasingly large and diverse image-text datasets. Beyond scaling, further progress can come from learning richer representations from existing data. We hypothesize that the structure of sc",
+   "provider": "arxiv-new",
+   "provider_name": "arXiv (submitted today)",
+   "kind": "paper",
+   "file_ext": "33151v1",
+   "mime": "text/html",
+   "domain": "arxiv.org",
+   "published": "2026-11-24T18:59:04Z",
+   "deadline": null,
+   "depth": 21,
+   "score": 37.949,
+   "tags": [
+    "preprint",
+    "arxiv",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "biomedical vision-language models",
+    "scaling biomedical vision-language",
+    "scientific articles",
+    "biomedical vision-language",
+    "vision-language models",
+    "diverse image-text datasets"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-24T18:59:04+00:00",
+   "age_seconds": 100526,
+   "age_human": "yesterday",
+   "freshness": 0.58412,
+   "first_seen": "2026-11-25T22:54:26.427554+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "arxiv-new",
+     "name": "arXiv (submitted today)",
+     "rank": 5,
+     "url": "https://arxiv.org/pdf/2611.33151v1"
+    }
+   ],
+   "meta": {
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "https://arxiv.org/pdf/2611.33149v1",
+   "title": "Envy-Free Cake-Cutting for Five Agents",
+   "snippet": "We study the envy-free cake-cutting problem, in which a divisible resource must be divided among a set of agents with heterogeneous preferences in a way that ensures that no agent envies the piece obtained by another. Remarkably, under some mild continuity assumptions on the agent valuations, it is known that an envy-f",
+   "provider": "arxiv-new",
+   "provider_name": "arXiv (submitted today)",
+   "kind": "paper",
+   "file_ext": "33149v1",
+   "mime": "text/html",
+   "domain": "arxiv.org",
+   "published": "2026-11-24T18:58:57Z",
+   "deadline": null,
+   "depth": 21,
+   "score": 37.124,
+   "tags": [
+    "preprint",
+    "arxiv",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "envy-free cake-cutting problem",
+    "envy-free cake-cutting",
+    "cake-cutting problem",
+    "divisible resource",
+    "heterogeneous preferences",
+    "envies the piece"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-24T18:58:57+00:00",
+   "age_seconds": 100533,
+   "age_human": "yesterday",
+   "freshness": 0.584098,
+   "first_seen": "2026-11-25T22:54:26.431658+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "arxiv-new",
+     "name": "arXiv (submitted today)",
+     "rank": 6,
+     "url": "https://arxiv.org/pdf/2611.33149v1"
+    }
+   ],
+   "meta": {
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "https://arxiv.org/pdf/2611.33147v1",
+   "title": "One Take, Many Cameras: Audio-Grounded Shot Synthesis for Dialogue Re-Cinematography",
+   "snippet": "Creating a dialogue scene typically requires cutting between multiple views (e.g., close-ups, medium shots, and over-the-shoulder shots) of the actors. Yet capturing such coverage is costly and in many settings unavailable. We study dialogue re-cinematography: synthesizing additional shots from a single wide-angle dial",
+   "provider": "arxiv-new",
+   "provider_name": "arXiv (submitted today)",
+   "kind": "paper",
+   "file_ext": "33147v1",
+   "mime": "text/html",
+   "domain": "arxiv.org",
+   "published": "2026-11-24T18:58:32Z",
+   "deadline": null,
+   "depth": 21,
+   "score": 36.333,
+   "tags": [
+    "preprint",
+    "arxiv",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "audio-grounded shot synthesis",
+    "scene typically requires",
+    "typically requires cutting",
+    "dialogue re-cinematography creating",
+    "dialogue scene typically",
+    "multiple views"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-24T18:58:32+00:00",
+   "age_seconds": 100558,
+   "age_human": "yesterday",
+   "freshness": 0.58402,
+   "first_seen": "2026-11-25T22:54:26.435643+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "arxiv-new",
+     "name": "arXiv (submitted today)",
+     "rank": 7,
+     "url": "https://arxiv.org/pdf/2611.33147v1"
+    }
+   ],
+   "meta": {
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "https://arxiv.org/pdf/2611.33145v1",
+   "title": "Lost on Campus: Evaluating Embodied Spatial Reasoning of Vision-Language Models in the Wild",
+   "snippet": "Embodied Spatial Reasoning (ESR) is central to deploying Vision-Language Models (VLMs) in real-world embodied tasks, yet remains inadequately evaluated. Existing benchmarks primarily assess spatial reasoning in static images or synthetic indoor environments, where semantic shortcuts often suffice, making it difficult t",
+   "provider": "arxiv-new",
+   "provider_name": "arXiv (submitted today)",
+   "kind": "paper",
+   "file_ext": "33145v1",
+   "mime": "text/html",
+   "domain": "arxiv.org",
+   "published": "2026-11-24T18:57:48Z",
+   "deadline": null,
+   "depth": 21,
+   "score": 35.574,
+   "tags": [
+    "preprint",
+    "arxiv",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "evaluating embodied spatial",
+    "wild embodied spatial",
+    "embodied spatial reasoning",
+    "deploying vision-language models",
+    "real-world embodied tasks",
+    "remains inadequately evaluated"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-24T18:57:48+00:00",
+   "age_seconds": 100602,
+   "age_human": "yesterday",
+   "freshness": 0.583883,
+   "first_seen": "2026-11-25T22:54:26.439717+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "arxiv-new",
+     "name": "arXiv (submitted today)",
+     "rank": 8,
+     "url": "https://arxiv.org/pdf/2611.33145v1"
+    }
+   ],
+   "meta": {
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "https://arxiv.org/pdf/2611.33142v1",
+   "title": "VENUS: A Census of Strong Lensing in a 60-Cluster JWST Survey",
+   "snippet": "We present strong-lensing models for the 57 galaxy clusters observed in Cycle 4 out of the 60 targeted by the JWST Vast Exploration for Nascent, Unexplored Sources (VENUS) program. Models for the remaining three clusters will be incorporated after their observations. The dataset comprises 5013 individual images, corres",
+   "provider": "arxiv-new",
+   "provider_name": "arXiv (submitted today)",
+   "kind": "paper",
+   "file_ext": "33142v1",
+   "mime": "text/html",
+   "domain": "arxiv.org",
+   "published": "2026-11-24T18:56:18Z",
+   "deadline": null,
+   "depth": 21,
+   "score": 34.844,
+   "tags": [
+    "preprint",
+    "arxiv",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "jwst vast exploration",
+    "unexplored sources",
+    "exploration for nascent",
+    "census of strong",
+    "strong lensing",
+    "vast exploration"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-24T18:56:18+00:00",
+   "age_seconds": 100692,
+   "age_human": "yesterday",
+   "freshness": 0.583602,
+   "first_seen": "2026-11-25T22:54:26.443808+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "arxiv-new",
+     "name": "arXiv (submitted today)",
+     "rank": 9,
+     "url": "https://arxiv.org/pdf/2611.33142v1"
+    }
+   ],
+   "meta": {
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "https://arxiv.org/pdf/2611.33141v1",
+   "title": "iWAM: Efficient Action Prediction from World Models without Explicit Future Prediction",
+   "snippet": "World-action models (WAMs) build policies on pretrained video-generation models, on the premise that predicting how a scene evolves helps determine how to act. However, generating future scenes is expensive for real-time control. This motivates efficient proxies for future imagination, but how to train such proxies wit",
+   "provider": "arxiv-new",
+   "provider_name": "arXiv (submitted today)",
+   "kind": "paper",
+   "file_ext": "33141v1",
+   "mime": "text/html",
+   "domain": "arxiv.org",
+   "published": "2026-11-24T18:56:04Z",
+   "deadline": null,
+   "depth": 21,
+   "score": 34.146,
+   "tags": [
+    "preprint",
+    "arxiv",
+    "offers-type"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "prediction world-action models",
+    "efficient action prediction",
+    "explicit future prediction",
+    "future prediction world-action",
+    "action prediction",
+    "prediction world-action"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-11-24T18:56:04+00:00",
+   "age_seconds": 100706,
+   "age_human": "yesterday",
+   "freshness": 0.583558,
+   "first_seen": "2026-11-25T22:54:26.447845+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "arxiv-new",
+     "name": "arXiv (submitted today)",
+     "rank": 10,
+     "url": "https://arxiv.org/pdf/2611.33141v1"
+    }
+   ],
+   "meta": {
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  }
+ ],
+ "providers": [
+  {
+   "id": "searxng",
+   "name": "SearXNG",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "brave",
+   "name": "Brave Search",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "tavily",
+   "name": "Tavily",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "exa",
+   "name": "Exa",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "serper",
+   "name": "Serper",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "serpapi",
+   "name": "SerpApi",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "searchapi",
+   "name": "SearchApi",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "google_cse",
+   "name": "Google Programmable Search",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "perplexity",
+   "name": "Perplexity",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "you",
+   "name": "You.com",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "bing",
+   "name": "Bing",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "yahoo",
+   "name": "Yahoo",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "ecosia",
+   "name": "Ecosia",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "startpage",
+   "name": "Startpage",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "yandex",
+   "name": "Yandex",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "google_scholar",
+   "name": "Google Scholar",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "google_news",
+   "name": "Google News",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "mojeek",
+   "name": "Mojeek",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "qwant",
+   "name": "Qwant",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "metager",
+   "name": "MetaGer",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "whoogle",
+   "name": "Whoogle",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "librex",
+   "name": "LibreX",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "4get",
+   "name": "4get",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "yacy",
+   "name": "YaCy",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "gigablast",
+   "name": "Gigablast",
+   "status": "empty",
+   "count": 0,
+   "ms": 43,
+   "message": ""
+  },
+  {
+   "id": "wayback",
+   "name": "Wayback CDX",
+   "status": "empty",
+   "count": 0,
+   "ms": 43,
+   "message": ""
+  },
+  {
+   "id": "wiby",
+   "name": "Wiby",
+   "status": "empty",
+   "count": 0,
+   "ms": 294,
+   "message": ""
+  },
+  {
+   "id": "bing-rss",
+   "name": "Bing (public RSS)",
+   "status": "ok",
+   "count": 7,
+   "ms": 301,
+   "message": ""
+  },
+  {
+   "id": "ddg-lite",
+   "name": "DuckDuckGo (lite)",
+   "status": "ok",
+   "count": 10,
+   "ms": 1374,
+   "message": ""
+  },
+  {
+   "id": "commoncrawl",
+   "name": "Common Crawl Index",
+   "status": "empty",
+   "count": 0,
+   "ms": 1424,
+   "message": ""
+  },
+  {
+   "id": "reliefweb_reports",
+   "name": "ReliefWeb Reports",
+   "status": "error",
+   "count": 0,
+   "ms": 1430,
+   "message": "Client error '410 Gone' for url 'https://api.reliefweb.int/v1/reports?appname=nighthawk&profile=list&limit=20&query%5Bvalue%5D=diary+of+a+wimpy+kid&sort%5B%5D=d"
+  },
+  {
+   "id": "reliefweb",
+   "name": "ReliefWeb Jobs",
+   "status": "error",
+   "count": 0,
+   "ms": 1442,
+   "message": "Client error '410 Gone' for url 'https://api.reliefweb.int/v1/jobs?appname=nighthawk&profile=list&limit=20&query%5Bvalue%5D=diary+of+a+wimpy+kid&sort%5B%5D=date"
+  },
+  {
+   "id": "mojeek-html",
+   "name": "Mojeek (public page)",
+   "status": "empty",
+   "count": 0,
+   "ms": 1452,
+   "message": ""
+  },
+  {
+   "id": "wikidata",
+   "name": "Wikidata",
+   "status": "ok",
+   "count": 10,
+   "ms": 1500,
+   "message": ""
+  },
+  {
+   "id": "ckan",
+   "name": "CKAN Portal",
+   "status": "error",
+   "count": 0,
+   "ms": 1514,
+   "message": "Client error '404 Not Found' for url 'https://catalog.data.gov/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://d"
+  },
+  {
+   "id": "pubmed",
+   "name": "PubMed",
+   "status": "empty",
+   "count": 0,
+   "ms": 1514,
+   "message": ""
+  },
+  {
+   "id": "datagov",
+   "name": "Data.gov",
+   "status": "error",
+   "count": 0,
+   "ms": 1514,
+   "message": "Client error '404 Not Found' for url 'https://catalog.data.gov/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://d"
+  },
+  {
+   "id": "semanticscholar",
+   "name": "Semantic Scholar",
+   "status": "error",
+   "count": 0,
+   "ms": 1517,
+   "message": "Client error '429 ' for url 'https://api.semanticscholar.org/graph/v1/paper/search?query=diary+of+a+wimpy+kid&limit=20&fields=title%2Cabstract%2Curl%2CopenAcces"
+  },
+  {
+   "id": "crossref",
+   "name": "Crossref",
+   "status": "ok",
+   "count": 20,
+   "ms": 1531,
+   "message": ""
+  },
+  {
+   "id": "grantsgov",
+   "name": "Grants.gov",
+   "status": "ok",
+   "count": 25,
+   "ms": 1674,
+   "message": ""
+  },
+  {
+   "id": "gitlab",
+   "name": "GitLab",
+   "status": "empty",
+   "count": 0,
+   "ms": 1631,
+   "message": ""
+  },
+  {
+   "id": "wikipedia",
+   "name": "Wikipedia",
+   "status": "ok",
+   "count": 8,
+   "ms": 1674,
+   "message": ""
+  },
+  {
+   "id": "stackexchange",
+   "name": "Stack Exchange",
+   "status": "ok",
+   "count": 15,
+   "ms": 1380,
+   "message": ""
+  },
+  {
+   "id": "doaj",
+   "name": "DOAJ",
+   "status": "ok",
+   "count": 10,
+   "ms": 1674,
+   "message": ""
+  },
+  {
+   "id": "opencanada",
+   "name": "Open Canada",
+   "status": "error",
+   "count": 0,
+   "ms": 1674,
+   "message": "Client error '404 Not Found' for url 'https://open.canada.ca/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://dev"
+  },
+  {
+   "id": "nih_reporter",
+   "name": "NIH RePORTER",
+   "status": "ok",
+   "count": 20,
+   "ms": 1674,
+   "message": ""
+  },
+  {
+   "id": "hackernews",
+   "name": "Hacker News",
+   "status": "empty",
+   "count": 0,
+   "ms": 1631,
+   "message": ""
+  },
+  {
+   "id": "dataeuropa",
+   "name": "EU Open Data",
+   "status": "error",
+   "count": 0,
+   "ms": 1674,
+   "message": "Client error '404 Not Found' for url 'https://data.europa.eu/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://dev"
+  },
+  {
+   "id": "crates",
+   "name": "crates.io",
+   "status": "empty",
+   "count": 0,
+   "ms": 416,
+   "message": ""
+  },
+  {
+   "id": "eu_sedia",
+   "name": "EU Funding & Tenders",
+   "status": "error",
+   "count": 0,
+   "ms": 1794,
+   "message": "Client error '404 Not Found' for url 'https://api.tech.ec.europa.eu/search-api/search?apiKey=SEDIA&text=diary+of+a+wimpy+kid&pageSize=20&pageNumber=1'\nFor more "
+  },
+  {
+   "id": "marginalia",
+   "name": "Marginalia",
+   "status": "empty",
+   "count": 0,
+   "ms": 1794,
+   "message": ""
+  },
+  {
+   "id": "npm",
+   "name": "npm Registry",
+   "status": "ok",
+   "count": 12,
+   "ms": 1511,
+   "message": ""
+  },
+  {
+   "id": "openalex",
+   "name": "OpenAlex",
+   "status": "ok",
+   "count": 25,
+   "ms": 1956,
+   "message": ""
+  },
+  {
+   "id": "datagovau",
+   "name": "Data.gov.au",
+   "status": "error",
+   "count": 0,
+   "ms": 2200,
+   "message": "Client error '404 Not Found' for url 'https://data.gov.au/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://develo"
+  },
+  {
+   "id": "github",
+   "name": "GitHub",
+   "status": "ok",
+   "count": 15,
+   "ms": 2200,
+   "message": ""
+  },
+  {
+   "id": "internetarchive",
+   "name": "Internet Archive",
+   "status": "ok",
+   "count": 25,
+   "ms": 2234,
+   "message": ""
+  },
+  {
+   "id": "reddit-new",
+   "name": "Reddit (new)",
+   "status": "error",
+   "count": 0,
+   "ms": 1013,
+   "message": "Client error '403 Blocked' for url 'https://www.reddit.com/search.json?q=diary+of+a+wimpy+kid&sort=new&t=week&limit=25&raw_json=1'\nFor more information check: h"
+  },
+  {
+   "id": "reddit-subs",
+   "name": "Reddit (curated subs)",
+   "status": "empty",
+   "count": 0,
+   "ms": 1006,
+   "message": ""
+  },
+  {
+   "id": "arxiv",
+   "name": "arXiv",
+   "status": "ok",
+   "count": 20,
+   "ms": 2739,
+   "message": ""
+  },
+  {
+   "id": "hn-new",
+   "name": "Hacker News (by date)",
+   "status": "empty",
+   "count": 0,
+   "ms": 1326,
+   "message": ""
+  },
+  {
+   "id": "lobsters",
+   "name": "Lobsters",
+   "status": "error",
+   "count": 0,
+   "ms": 1368,
+   "message": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "id": "crates-new",
+   "name": "crates.io (newest)",
+   "status": "empty",
+   "count": 0,
+   "ms": 1208,
+   "message": ""
+  },
+  {
+   "id": "bluesky",
+   "name": "Bluesky (latest)",
+   "status": "error",
+   "count": 0,
+   "ms": 1376,
+   "message": "Client error '403 Forbidden' for url 'https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=diary+of+a+wimpy+kid&limit=25&sort=latest'\nFor more informati"
+  },
+  {
+   "id": "s2-new",
+   "name": "Semantic Scholar (bulk)",
+   "status": "error",
+   "count": 0,
+   "ms": 1159,
+   "message": "Client error '429 ' for url 'https://api.semanticscholar.org/graph/v1/paper/search/bulk?query=diary+of+a+wimpy+kid&sort=publicationDate%3Adesc&fields=title%2Cab"
+  },
+  {
+   "id": "crossref-new",
+   "name": "Crossref (published today)",
+   "status": "ok",
+   "count": 25,
+   "ms": 1228,
+   "message": ""
+  },
+  {
+   "id": "pubmed-new",
+   "name": "PubMed (in press)",
+   "status": "empty",
+   "count": 0,
+   "ms": 1100,
+   "message": ""
+  },
+  {
+   "id": "openalex-new",
+   "name": "OpenAlex (by date)",
+   "status": "ok",
+   "count": 25,
+   "ms": 1285,
+   "message": ""
+  },
+  {
+   "id": "doaj-new",
+   "name": "DOAJ (newest)",
+   "status": "ok",
+   "count": 10,
+   "ms": 878,
+   "message": ""
+  },
+  {
+   "id": "gitlab-projects",
+   "name": "GitLab (last activity)",
+   "status": "empty",
+   "count": 0,
+   "ms": 1404,
+   "message": ""
+  },
+  {
+   "id": "wikipedia-rev",
+   "name": "Wikipedia (last revision)",
+   "status": "empty",
+   "count": 0,
+   "ms": 1474,
+   "message": ""
+  },
+  {
+   "id": "mastodon",
+   "name": "Mastodon (tag timeline)",
+   "status": "ok",
+   "count": 40,
+   "ms": 1639,
+   "message": ""
+  },
+  {
+   "id": "ghsa",
+   "name": "GitHub advisories (newest)",
+   "status": "error",
+   "count": 0,
+   "ms": 1627,
+   "message": "sequence item 0: expected str instance, dict found"
+  },
+  {
+   "id": "medrxiv-new",
+   "name": "medRxiv (last 10 days)",
+   "status": "empty",
+   "count": 0,
+   "ms": 1549,
+   "message": ""
+  },
+  {
+   "id": "biorxiv-new",
+   "name": "bioRxiv (last 10 days)",
+   "status": "empty",
+   "count": 0,
+   "ms": 1740,
+   "message": ""
+  },
+  {
+   "id": "npm-new",
+   "name": "npm registry (newest)",
+   "status": "ok",
+   "count": 25,
+   "ms": 1762,
+   "message": ""
+  },
+  {
+   "id": "arxiv-new",
+   "name": "arXiv (submitted today)",
+   "status": "ok",
+   "count": 25,
+   "ms": 1860,
+   "message": ""
+  },
+  {
+   "id": "federal-register",
+   "name": "Federal Register",
+   "status": "empty",
+   "count": 0,
+   "ms": 764,
+   "message": ""
+  },
+  {
+   "id": "datagovuk",
+   "name": "Data.gov.uk",
+   "status": "empty",
+   "count": 0,
+   "ms": 3647,
+   "message": ""
+  },
+  {
+   "id": "dryad",
+   "name": "Dryad",
+   "status": "empty",
+   "count": 0,
+   "ms": 1412,
+   "message": ""
+  },
+  {
+   "id": "github-issues",
+   "name": "GitHub issues (newest)",
+   "status": "ok",
+   "count": 22,
+   "ms": 2315,
+   "message": ""
+  },
+  {
+   "id": "socrata",
+   "name": "Socrata catalog",
+   "status": "empty",
+   "count": 0,
+   "ms": 1019,
+   "message": ""
+  },
+  {
+   "id": "datacite",
+   "name": "DataCite (newest DOIs)",
+   "status": "ok",
+   "count": 25,
+   "ms": 1740,
+   "message": ""
+  },
+  {
+   "id": "hop",
+   "name": "One hop out",
+   "status": "ok",
+   "count": 3,
+   "ms": 3021,
+   "message": "3 page(s) skipped (slow, refused or not a page)"
+  },
+  {
+   "id": "archivefiles",
+   "name": "Internet Archive (files)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "rss-firehose",
+   "name": "Institutional RSS (20 feeds)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "data-gouv-fr",
+   "name": "data.gouv.fr",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "ukri",
+   "name": "UKRI Gateway to Research",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "sourceforge",
+   "name": "SourceForge",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "data-europa",
+   "name": "data.europa.eu",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "se-new",
+   "name": "Stack Exchange (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "find-a-tender",
+   "name": "Find a Tender (UK OCDS)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "vault",
+   "name": "Nighthawk Vault",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "ckan-recent",
+   "name": "CKAN portals (latest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "wb-procurement",
+   "name": "World Bank procurement",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "vault_docs",
+   "name": "Vault Deep Text",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "arcgis-hub",
+   "name": "ArcGIS Hub",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "europepmc",
+   "name": "Europe PMC (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "cordis-live",
+   "name": "CORDIS projects (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "portals",
+   "name": "Portal Universe",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "clinicaltrials",
+   "name": "ClinicalTrials.gov (updated)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "hal",
+   "name": "HAL (French archive)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "fundsforngos",
+   "name": "FundsforNGOs search",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "dorklaunch",
+   "name": "Dork Hand-off",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "sec-edgar",
+   "name": "SEC EDGAR (latest filings)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "undp-procurement",
+   "name": "UNDP procurement",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "openaire",
+   "name": "OpenAIRE Graph",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "zenodo-new",
+   "name": "Zenodo (most recent)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "openlibrary",
+   "name": "Open Library",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "mediafire",
+   "name": "MediaFire",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "osf-preprints",
+   "name": "OSF Preprints",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "github-commits",
+   "name": "GitHub commits (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "arquivo",
+   "name": "Arquivo.pt",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "hf-models",
+   "name": "Hugging Face (last modified)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "apkpure",
+   "name": "APKPure",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "wikidata-recent",
+   "name": "Wikidata (last modified)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "zenodo",
+   "name": "Zenodo",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "apkmirror",
+   "name": "APKMirror",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "grantsgov-live",
+   "name": "Grants.gov (posted today)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "gdelt",
+   "name": "GDELT 2.0",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "fdroid",
+   "name": "F-Droid",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "usaspending-new",
+   "name": "USAspending (new awards)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "ted",
+   "name": "TED (EU tenders)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  }
+ ],
+ "facets": {
+  "domain": [
+   {
+    "value": "archive.org",
+    "count": 10
+   },
+   {
+    "value": "arxiv.org",
+    "count": 10
+   },
+   {
+    "value": "github.com",
+    "count": 5
+   },
+   {
+    "value": "doi.org",
+    "count": 4
+   },
+   {
+    "value": "wimpykid.com",
+    "count": 3
+   },
+   {
+    "value": "en.wikipedia.org",
+    "count": 2
+   },
+   {
+    "value": "jos.hueuni.edu.vn",
+    "count": 1
+   },
+   {
+    "value": "kgef.journals.ekb.eg",
+    "count": 1
+   },
+   {
+    "value": "scribd.com",
+    "count": 1
+   },
+   {
+    "value": "amazon.com",
+    "count": 1
+   },
+   {
+    "value": "wikidata.org",
+    "count": 1
+   },
+   {
+    "value": "mastodon.art",
+    "count": 1
+   }
+  ],
+  "provider": [
+   {
+    "value": "arXiv (submitted today)",
+    "count": 10
+   },
+   {
+    "value": "Internet Archive",
+    "count": 8
+   },
+   {
+    "value": "GitHub",
+    "count": 4
+   },
+   {
+    "value": "Crossref",
+    "count": 4
+   },
+   {
+    "value": "Bing (public RSS)",
+    "count": 3
+   },
+   {
+    "value": "One hop out",
+    "count": 3
+   },
+   {
+    "value": "DuckDuckGo (lite)",
+    "count": 2
+   },
+   {
+    "value": "Wikipedia",
+    "count": 1
+   },
+   {
+    "value": "GitHub issues (newest)",
+    "count": 1
+   },
+   {
+    "value": "OpenAlex",
+    "count": 1
+   },
+   {
+    "value": "DOAJ (newest)",
+    "count": 1
+   },
+   {
+    "value": "Wikidata",
+    "count": 1
+   },
+   {
+    "value": "Mastodon (tag timeline)",
+    "count": 1
+   }
+  ],
+  "file_ext": [
+   {
+    "value": "page",
+    "count": 25
+   },
+   {
+    "value": "1",
+    "count": 4
+   },
+   {
+    "value": "pdf",
+    "count": 1
+   },
+   {
+    "value": "33158v1",
+    "count": 1
+   },
+   {
+    "value": "33156v1",
+    "count": 1
+   },
+   {
+    "value": "33155v1",
+    "count": 1
+   },
+   {
+    "value": "33153v1",
+    "count": 1
+   },
+   {
+    "value": "33151v1",
+    "count": 1
+   },
+   {
+    "value": "33149v1",
+    "count": 1
+   },
+   {
+    "value": "33147v1",
+    "count": 1
+   },
+   {
+    "value": "33145v1",
+    "count": 1
+   },
+   {
+    "value": "33142v1",
+    "count": 1
+   },
+   {
+    "value": "33141v1",
+    "count": 1
+   }
+  ],
+  "kind": [
+   {
+    "value": "paper",
+    "count": 15
+   },
+   {
+    "value": "page",
+    "count": 10
+   },
+   {
+    "value": "document",
+    "count": 9
+   },
+   {
+    "value": "repository",
+    "count": 4
+   },
+   {
+    "value": "reference",
+    "count": 1
+   },
+   {
+    "value": "entity",
+    "count": 1
+   }
+  ],
+  "deadline": []
+ },
+ "stats": {
+  "hits": 422,
+  "unique": 40,
+  "providers_ok": 23,
+  "providers_failed": 14,
+  "files": 15,
+  "opportunities": 0,
+  "closing_soon": 0,
+  "duplicates_collapsed": 17,
+  "dropped_noise": 0,
+  "verbatim": 26,
+  "near_verbatim": 0,
+  "not_verbatim": 14,
+  "copies_reported": 17,
+  "junk_retained": 0,
+  "noise_retained": 0,
+  "truncated": true,
+  "dropped_spam": 0,
+  "hop_pages": 3,
+  "hop_found": 3,
+  "hop_skipped": 3,
+  "cut_older_files": 1,
+  "fresh_seconds": 8,
+  "fresh_minutes": 0,
+  "fresh_hours": 3,
+  "fresh_days": 11,
+  "dated": 26,
+  "undated": 14,
+  "newest_age_seconds": 5,
+  "newest_age_human": "5 seconds ago",
+  "took_ms": 7738,
+  "cached": false,
+  "budget_ms": 4000,
+  "slow_providers": 39,
+  "post_ms": 574,
+  "copies_scanned": 256,
+  "window_days": 730,
+  "local_excluded": 0,
+  "off_topic": 12,
+  "cut_older": 102,
+  "cut_future": 0,
+  "undated_kept": 32
+ },
+ "plays": [
+  "diary of a wimpy kid (filetype:pdf)",
+  "diary of a wimpy kid (filetype:pdf) (inurl:upload OR inurl:files OR inurl:documents OR inurl:download OR inurl:archive)",
+  "diary of a wimpy kid (\"call for proposals\" OR \"call for applications\" OR \"request for proposals\" OR grant OR tender OR fellowship OR scholarship OR accelerator OR \"open call\" OR RFP OR \"expression of interest\" OR procurement OR bounty OR \"applications open\")",
+  "diary of a wimpy kid (\"deadline\" OR \"closes\" OR \"apply by\" OR \"applications close\") (filetype:pdf OR filetype:docx)",
+  "diary of a wimpy kid (\"application form\" OR \"apply now\" OR \"applications close\" OR \"application deadline\" OR \"call for applications\" OR \"admissions\" OR \"apply by\" OR \"online application\")",
+  "diary of a wimpy kid (\"guidelines\" OR \"eligibility\" OR \"terms of reference\") (filetype:pdf OR filetype:docx)"
+ ],
+ "sort": "newest",
+ "match": "exact",
+ "only_exact": false,
+ "unrestricted": true,
+ "understanding": {
+  "query": "diary of a wimpy kid pdf",
+  "subject": "diary of a wimpy kid",
+  "phrases": [
+   "diary of a wimpy kid",
+   "wimpy kid",
+   "diary"
+  ],
+  "keywords": [
+   "diary",
+   "wimpy",
+   "kid"
+  ],
+  "kind": "document",
+  "kind_label": "a document or report",
+  "kind_score": 0.61,
+  "kind_cue": "pdf",
+  "suggested_lens": "files",
+  "file_types": [
+   "pdf",
+   "docx"
+  ],
+  "places": [],
+  "orgs": [],
+  "quoted": [],
+  "negatives": [],
+  "years": [],
+  "asked_days": null,
+  "window_days": 730,
+  "future_days": 120,
+  "warnings": [],
+  "summary": "A document or report, about \u201cdiary of a wimpy kid\u201d \u2014 as pdf / docx",
+  "engine": "rules + RAKE (vendored)",
+  "note": "what the search was read as, before any source was asked; the words matched against a result are still the words that were typed"
+ },
+ "as_of": "2026-11-25T22:54:30.508199+00:00",
+ "expanded": [],
+ "intent": {
+  "text": "diary of a wimpy kid pdf",
+  "query": "diary of a wimpy kid",
+  "types": [
+   "pdf"
+  ],
+  "hosts": [],
+  "matched": [
+   "pdf"
+  ],
+  "search_text": "diary of a wimpy kid",
+  "removed_by_type": 156,
+  "host_matches": 0,
+  "file_host_engines": [
+   "mediafire",
+   "apkpure",
+   "apkmirror",
+   "fdroid",
+   "archivefiles",
+   "sourceforge"
+  ]
+ }
+}
