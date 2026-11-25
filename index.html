@@ -2749,6 +2749,10 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (hit.match_where) {
       top.appendChild(pill("in " + hit.match_where, "pill muted", "where the match was found"));
     }
+    if ((hit.tags || []).indexOf("one-hop") !== -1) {
+      top.appendChild(pill("found inside a page", "pill muted",
+        "not handed over by an index \u2014 the engine opened a result and took this out of it"));
+    }
     if ((hit.tags || []).indexOf("offers-type") !== -1) {
       top.appendChild(pill("page offering the file", "pill muted",
         "not a file itself — a page that hands it over (an archive item, a document viewer, a download page)"));
@@ -2889,10 +2893,21 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (stats.slow_providers) note.push(stats.slow_providers + " still answering");
     if (stats.local_excluded) note.push(stats.local_excluded + " practice-site results left out");
     if (stats.off_topic) note.push(stats.off_topic + " contain none of your words, sorted last");
+    if (stats.hop_pages) {
+      note.push("opened " + stats.hop_pages + " page" + (stats.hop_pages === 1 ? "" : "s") +
+        " and took " + (stats.hop_found || 0) + " file" + ((stats.hop_found || 0) === 1 ? "" : "s") +
+        " out of them");
+    }
+    if (stats.hop_skipped) note.push(stats.hop_skipped + " page" + (stats.hop_skipped === 1 ? "" : "s") +
+      " could not be read");
     if (stats.window_days >= 36500) {
       note.push("the two-year window is off for this answer \u2014 you asked for older results");
     } else if (stats.cut_older) {
       note.push(stats.cut_older + " older than " + (stats.window_days || 730) + " days left out");
+      if (stats.cut_older_files) {
+        note.push(stats.cut_older_files + " of them the " +
+          (typed.length ? typed[0] : "file") + " you asked for \u2014 \u201cinclude older results\u201d brings them back");
+      }
     }
     var noteEl = document.getElementById("live-note");
     noteEl.textContent = note.join(" · ");

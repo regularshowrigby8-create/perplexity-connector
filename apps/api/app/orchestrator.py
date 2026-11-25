@@ -12,8 +12,8 @@ from urllib.parse import urlsplit
 
 import httpx
 
-from . import (exact, freshness, intent as query_intent, local_index, near_dup, quality,
-               recency, registry, understand)
+from . import (discover, exact, freshness, intent as query_intent, local_index, near_dup,
+               quality, recency, registry, understand)
 from .config import settings
 from .extract import (canonical_url, depth_score, fingerprint, find_deadline, opportunity_tags,
                       truncate)
@@ -702,6 +702,45 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                         "total": len(collected),
                         "hits": [h.model_dump() for h in ordered[:80]]})
 
+        # One hop out: the indexes named the pages that matter, so open the best
+        # few and read what is inside them — the chapter PDFs, the download
+        # links, the page's own publication date. Seed, fetch, extract, one hop,
+        # bounded, and reported whether it finishes or not.
+        hop_stats: dict[str, Any] = {}
+        if settings.discover_ms > 0 and collected:
+            try:
+                hop_raws, hop_stats = await discover.hop(
+                    rank(collected, req.sort, verbatim=False), client, terms=terms,
+                    types=file_types, budget_s=settings.discover_ms / 1000.0,
+                    seed_cap=settings.discover_seeds)
+            except Exception as exc:                 # a hop that breaks is not an answer
+                hop_raws, hop_stats = [], {"error": f"{type(exc).__name__}: {exc}"[:160],
+                                           "seeds": 0, "pages_read": 0, "found": 0,
+                                           "skipped": 0}
+            hop_hits: list[Hit] = []
+            for index, raw in enumerate(hop_raws):
+                hit = build_hit(raw, discover.HOP, index + 1, plan.lens, terms, phrase,
+                                req.unrestricted)
+                if hit:
+                    hit.score += understanding.relevance_bonus(hit)
+                    hop_hits.append(hit)
+            collected.extend(hop_hits)
+            hop_stats["ms"] = hop_stats.get("ms", settings.discover_ms)
+            statuses.append({"id": discover.HOP.id, "name": discover.HOP.name,
+                             "status": "ok" if hop_hits else "empty",
+                             "count": len(hop_hits), "ms": int(hop_stats.get("ms") or 0),
+                             "message": hop_stats.get("note", "")})
+            if emit:
+                ordered = stream_view()
+                await emit({"type": "provider", **statuses[-1]})
+                await emit({"type": "results", "final": False,
+                            "provider": discover.HOP.id, "provider_name": discover.HOP.name,
+                            "arrived": len(hop_hits),
+                            "answered": sum(1 for row in statuses
+                                            if row["status"] in ("ok", "empty", "error")),
+                            "total": len(collected),
+                            "hits": [h.model_dump() for h in ordered[:80]]})
+
         after_sources = time.perf_counter()
         slow = 0
         if pending:
@@ -730,6 +769,16 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     # the same list. Nothing downstream can put a 2019 page back.
     window = (recency.Window(days=int(req.window_days), future_days=settings.future_days)
               if req.window_days else recency.Window.current())
+    # The cut most likely to hurt is the one that removes the very thing that was
+    # asked for: a 2007 PDF is still the PDF the person wanted. It is still cut by
+    # default (the window is the window), but it is counted and named, so the page
+    # can offer to include it for this one search instead of pretending it is gone.
+    cut_older_files = 0
+    if file_types:
+        asked_exts = {t.lower() for t in file_types}
+        cut_older_files = sum(1 for h in fused
+                              if (h.file_ext or "").lower() in asked_exts
+                              and window.classify(h) == recency.OLD)
     fused, window_stats = recency.apply(fused, window)
     before = len(fused)
     collapsed = 0
@@ -813,6 +862,10 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         closing_soon=sum(1 for h in fused if h.deadline and 0 <= h.deadline.days_left <= 30),
         duplicates_collapsed=int(collapsed),
         dropped_spam=dropped_spam,
+        hop_pages=int(hop_stats.get("pages_read") or 0),
+        hop_found=int(hop_stats.get("found") or 0),
+        hop_skipped=int(hop_stats.get("skipped") or 0),
+        cut_older_files=int(cut_older_files),
         fresh_seconds=sum(1 for h in fused if h.age_seconds is not None and h.age_seconds < 60),
         fresh_minutes=sum(1 for h in fused if h.age_seconds is not None and 60 <= h.age_seconds < 3600),
         fresh_hours=sum(1 for h in fused if h.age_seconds is not None and 3600 <= h.age_seconds < 86400),

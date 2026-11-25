@@ -907,6 +907,36 @@ async def main() -> int:
                 len(_kept) == 2 and all("offers-type" in (h.tags or []) for h in _kept)
                 and _dropped == 1, f"{len(_kept)} kept, {_dropped} set aside")
 
+    print("\n▸ 15d. one hop out: the page is opened, and the files inside it count")
+    from app import discover as _discover
+
+    _html = """<html><head>
+      <meta property="article:published_time" content="2026-11-01T09:00:00Z"></head><body>
+      <a href="/details/diaryofawimpykidbookseriesbyjeffkinney_202004">Diary of a Wimpy Kid — download</a>
+      <a href="/download/x/Diary of a wimpy kid book01.pdf">Diary of a Wimpy Kid book 1 (PDF)</a>
+      <a href="/recipes/pasta.pdf">Best pasta recipes</a>
+      <a href="javascript:void(0)">share</a></body></html>"""
+    _links = _discover.file_links(_html, "https://archive.org/details/x",
+                                  ["diary", "wimpy", "kid"], ["pdf"])
+    ok &= check("a page is read for the files it offers, not just its snippet", len(_links) == 2,
+                str([l["url"] for l in _links])[:120])
+    ok &= check("and the page's own date comes with them",
+                bool(_links) and all(str(l.get("published", "")).startswith("2026-11-01")
+                                     for l in _links),
+                str([l.get("published") for l in _links]))
+    ok &= check("relevance is not given up for crawling",
+                all("pasta" not in l["url"] for l in _links))
+    ok &= check("an apk search is not answered with pdfs",
+                _discover._wanted_exts(["apk"]) == {"apk"},
+                str(sorted(_discover._wanted_exts(["apk"]))))
+    ok &= check("the hop asks for pages, not files, as seeds",
+                [h.url for h in _discover.seeds_from([
+                    Hit(url="https://archive.org/details/x", title="item page",
+                        provider="x", provider_name="X", kind="page"),
+                    Hit(url="https://archive.org/download/x/a.pdf", title="a pdf",
+                        provider="x", provider_name="X", kind="document", file_ext="pdf")])]
+                == ["https://archive.org/details/x"])
+
     print("\n▸ 16. the engine reads the question before it fetches anything")
     from app import understand
 

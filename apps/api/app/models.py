@@ -137,6 +137,14 @@ class HuntStats(BaseModel):
     noise_retained: int = 0
     truncated: bool = False
     dropped_spam: int = 0
+    # one hop out: the pages opened, the files and dates taken out of them,
+    # and the pages that could not be read (slow, refused, not a page)
+    hop_pages: int = 0
+    hop_found: int = 0
+    hop_skipped: int = 0
+    # files of the type that was asked for, cut only because they are older
+    # than the window — reported, because that is the cut most likely to hurt
+    cut_older_files: int = 0
     # freshness ledger — second granularity for the first minute
     fresh_seconds: int = 0      # < 60s
     fresh_minutes: int = 0      # < 60m

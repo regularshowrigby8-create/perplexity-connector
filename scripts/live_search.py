@@ -61,6 +61,10 @@ def render(report: dict, query: str) -> str:
         f"- set aside: {stats.get('off_topic', 0)} not about the words · "
         f"{(report.get('intent') or {}).get('removed_by_type', 0)} of another type · "
         f"{stats.get('local_excluded', 0)} practice-site",
+        f"- one hop out: opened {stats.get('hop_pages', 0)} page(s), took "
+        f"{stats.get('hop_found', 0)} file(s) out of them, "
+        f"{stats.get('hop_skipped', 0)} page(s) unreadable",
+        f"- files of the asked type cut by the window: {stats.get('cut_older_files', 0)}",
         f"- read as: {understanding.get('summary', '—')}",
         "",
     ]

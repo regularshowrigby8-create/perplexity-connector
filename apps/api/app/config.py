@@ -71,6 +71,11 @@ class Settings(BaseSettings):
     # search budget: answer with what has arrived after this long instead of
     # waiting on the slowest of 119 engines (which was the whole lag)
     hunt_budget_ms: int = 2500
+    # One hop out: after the indexes answer, open the best few pages and take
+    # the files and dates inside them. This is the crawler's own share of the
+    # budget, and it is bounded so it can never own the answer's latency.
+    discover_ms: int = 1600
+    discover_seeds: int = 6
 
     # the recency window every search answer lives inside
     window_days: int = 730        # two years: older is cut, not sorted last
