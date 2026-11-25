@@ -463,9 +463,12 @@ def rank(hits: list[Hit], sort: str, verbatim: bool = True) -> list[Hit]:
             else:
                 date_tier, date_value = 0, float(age)
             # "not about your words" is the strongest demotion there is; junk
-            # (parked, login wall) is the next one down
-            return (hit.off_topic, hit.junk, band, proximity, date_tier, date_value,
-                    -hit.score, -hit.depth)
+            # (parked, login wall) is the next one down. Then how many of the
+            # words the result actually carries: a page with all three words beats
+            # a dated commit that happens to share one, and the date only decides
+            # between results that are equally about the question.
+            return (hit.off_topic, hit.junk, band, proximity, -int(hit.words_hit or 0),
+                    date_tier, date_value, -hit.score, -hit.depth)
 
         hits.sort(key=accuracy_key)
         hits, _ = spread(hits)
