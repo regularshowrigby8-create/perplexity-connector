@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ResultCard } from "@/components/bits";
+import { ResultCard, ThemeBanner } from "@/components/bits";
 import { SearchPanel } from "@/components/search-panel";
 import { api, streamSSE, type Hit, type HuntResponse, type Lens, type ProviderStatus } from "@/lib/api";
 import { LENSES, fmtMs, hostOf } from "@/lib/format";
@@ -268,6 +268,7 @@ function HuntView() {
         </aside>
 
         <section>
+          <ThemeBanner variant="compact" />
           <div className="result-toolbar">
             <div>
               <h1>{q || "No query"}</h1>

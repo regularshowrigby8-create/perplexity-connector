@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { ThemeBanner } from "@/components/bits";
 import { streamSSE, type Hit } from "@/lib/api";
 import { fmtMs } from "@/lib/format";
 
@@ -157,6 +158,7 @@ function CrawlView() {
         <span className="rule" />
         <span className="tiny">primary engine · no ceilings</span>
       </div>
+      <ThemeBanner variant="compact" />
       <p className="lede" style={{ maxWidth: 820 }}>
         Give it seeds or a query. It harvests candidates from SERPs, sitemaps and archive indexes,
         then walks the frontier with whatever fetchers, parsers and extractors are installed —

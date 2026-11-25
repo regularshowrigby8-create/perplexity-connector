@@ -3,6 +3,36 @@
 import { type Hit, type Deadline } from "@/lib/api";
 import { fileIcon, fmtDays, fmtMoney, fmtSize, hostOf } from "@/lib/format";
 
+export function ThemeBanner({ variant = "full" }: { variant?: "full" | "compact" }) {
+  if (variant === "compact") {
+    return (
+      <div className="theme-banner compact" role="note">
+        <span className="theme-mark">!</span>
+        <span>
+          <b>Not a news feed.</b> Newest-first is an ordering, never a filter — the buried PDFs,
+          listings and open calls that typical engines drop stay in these results.
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className="theme-banner" role="note">
+      <span className="theme-mark">!</span>
+      <div>
+        <strong>This engine does not rank by popularity, and it does not filter like one.</strong>
+        <p>
+          Nighthawk exists for the material a mainstream results page demotes or drops entirely:
+          the PDF in <span className="mono">/uploads/2019/03/</span>, the tender notice behind a
+          portal search, the directory listing nobody linked, the spreadsheet in a data dump, the
+          page deleted from the site. No freshness gate, no “helpful content” scorer, no
+          domain-authority penalty — old, ugly, unlinked and machine-generated is the point.
+          Sort order can change; that filtering policy does not.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function Depth({ value }: { value: number }) {
   const filled = Math.max(1, Math.round((value / 100) * 5));
   return (

@@ -453,3 +453,36 @@ h1.title .grad {
   border: 1px solid rgba(255,182,72,0.22); background: rgba(255,182,72,0.05);
 }
 .change-delta { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 6px; }
+
+/* ---------------------------------------------------------------- theme banner
+   The product promise stays visible on every surface: this engine exists for
+   what typical engines filter out. Ordering never becomes a filter. */
+.theme-banner {
+  display: flex; gap: 12px; align-items: flex-start;
+  margin: 16px 0 4px; padding: 13px 15px; border-radius: 10px;
+  border: 1px solid rgba(255,182,72,0.32);
+  background: linear-gradient(180deg, rgba(255,182,72,0.09), rgba(255,182,72,0.035));
+}
+.theme-banner strong { color: var(--amber); font-size: 13.5px; letter-spacing: -0.01em; }
+.theme-banner p {
+  margin: 5px 0 0; font-size: 12.6px; line-height: 1.6; color: var(--ink-2); max-width: 78ch;
+}
+.theme-banner .theme-mark {
+  flex: none; width: 20px; height: 20px; border-radius: 6px;
+  display: grid; place-items: center; margin-top: 1px;
+  background: rgba(255,182,72,0.16); color: var(--amber);
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+}
+.theme-banner.compact {
+  margin: 0 0 12px; padding: 9px 12px; align-items: center; gap: 9px;
+  font-size: 12.2px; line-height: 1.5; color: var(--ink-2);
+}
+.theme-banner.compact b { color: var(--amber); font-weight: 600; }
+.theme-banner.compact .theme-mark { width: 16px; height: 16px; border-radius: 5px; font-size: 10px; }
+
+.chip-warn {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 8px; border-radius: 6px; white-space: nowrap;
+  color: var(--amber); border: 1px solid rgba(255,182,72,0.34);
+  background: rgba(255,182,72,0.08);
+}

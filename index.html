@@ -80,6 +80,14 @@
   .field .glyph{color:var(--dim);font-family:var(--mono)}
   .field input{flex:1;background:transparent;border:0;outline:0;padding:15px 0;font-size:16px;min-width:0}
   .field input::placeholder{color:#56606e}
+  .warn-strip{display:flex;gap:12px;align-items:flex-start;margin:18px 0 4px;padding:13px 15px;border-radius:10px;
+    border:1px solid rgba(255,182,72,.32);background:linear-gradient(180deg,rgba(255,182,72,.09),rgba(255,182,72,.035))}
+  .warn-strip strong{color:var(--amber);font-size:13.5px}
+  .warn-strip p{margin:5px 0 0;font-size:12.6px;line-height:1.6;color:#a9b4c4;max-width:78ch}
+  .warn-strip .warn-mark{flex:none;width:20px;height:20px;border-radius:6px;display:grid;place-items:center;
+    background:rgba(255,182,72,.16);color:var(--amber);font-family:var(--mono);font-size:12px;font-weight:700}
+  .chip-warn{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;
+    border-radius:6px;white-space:nowrap;color:var(--amber);border:1px solid rgba(255,182,72,.34);background:rgba(255,182,72,.08)}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;padding:12px 18px;font-weight:600;font-size:14px;border:1px solid var(--line2);background:var(--panel2);cursor:pointer;white-space:nowrap;transition:transform .12s,background .15s,border-color .15s}
   .btn:hover{background:#171d26}
   .btn:active{transform:translateY(1px)}
@@ -173,6 +181,7 @@
       <a href="#deploy">Deploy</a>
     </nav>
     <div class="nav-right">
+      <span class="chip-warn" title="No popularity ranking, no freshness gate, no authority penalty — buried-first by design.">buried-first</span>
       <span class="chip" id="status"><span class="dot"></span><span id="status-text">checking engine</span></span>
       <a class="btn btn-sm" id="open-app" href="#" target="_blank" rel="noreferrer">Open app ↗</a>
     </div>
@@ -189,6 +198,20 @@
         queries every structured engine it can reach — then extracts, indexes and ranks the
         <b>hosted files, open calls and portals</b> that a normal results page never shows you.
       </p>
+
+      <div class="warn-strip" role="note">
+        <span class="warn-mark">!</span>
+        <div>
+          <strong>This engine does not rank by popularity, and it does not filter like one.</strong>
+          <p>
+            The point of Nighthawk is the material a normal results page demotes or drops: the PDF in
+            <span class="mono">/uploads/2019/03/</span>, the tender notice behind a portal search, the
+            “Index of /” listing nobody linked, the spreadsheet in a data dump, the page the site deleted.
+            No freshness gate, no “helpful content” scorer, no domain-authority penalty. Sort order can
+            change — this filtering policy does not.
+          </p>
+        </div>
+      </div>
 
       <div class="panel" id="hunt">
         <form class="row" id="hunt-form" autocomplete="off">

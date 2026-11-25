@@ -88,6 +88,15 @@ async def health() -> dict[str, Any]:
         "portals": len(PORTALS),
         "vault": local_index.vault_stats(),
         "cache_ttl": settings.cache_ttl,
+        "policy": {
+            "purpose": "surface what typical engines filter out",
+            "popularity_ranking": False,
+            "freshness_gate": False,
+            "authority_penalty": False,
+            "buried_boost": True,
+            "note": "sort order is an ordering, not a filter: old, unlinked, ugly and "
+                    "machine-generated material stays in the result set",
+        },
     }
 
 

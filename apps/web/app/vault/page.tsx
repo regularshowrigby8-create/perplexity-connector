@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { ThemeBanner } from "@/components/bits";
 import { api } from "@/lib/api";
 import { fileIcon } from "@/lib/format";
 
@@ -40,6 +41,7 @@ export default function VaultPage() {
         <span className="rule" />
         <span className="tiny">sqlite fts5 · whoosh · tantivy</span>
       </div>
+      <ThemeBanner variant="compact" />
       <p className="lede" style={{ maxWidth: 820 }}>
         Everything the crawler and the engines have ever touched is mirrored here — URLs, metadata
         and the extracted full text of every PDF, spreadsheet and archive. It works with the network

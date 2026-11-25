@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ThemeBanner } from "@/components/bits";
 import { SearchPanel } from "@/components/search-panel";
 import { api } from "@/lib/api";
 
@@ -52,7 +53,10 @@ export default function HomePage() {
             Nighthawk is a <b>fusion crawler</b> that walks the web itself, reads raw crawl archives,
             and queries every structured engine it can reach — then extracts, indexes and ranks the
             <b> hosted files, open calls and portals</b> that a normal results page never shows you.
+            Nothing is demoted here for being old, unlinked or ugly.
           </p>
+
+          <ThemeBanner />
 
           <SearchPanel />
 

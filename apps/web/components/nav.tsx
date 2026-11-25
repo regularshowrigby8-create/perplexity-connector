@@ -35,7 +35,7 @@ export function Nav() {
           <span className="brand-mark">N</span>
           <span>
             Nighthawk
-            <small>buried web engine</small>
+            <small>buried web engine · no popularity filter</small>
           </span>
         </Link>
         <nav className="nav-links">
@@ -52,6 +52,9 @@ export function Nav() {
         <div className="nav-right">
           <span className="count-chip">
             <b>{counts.remote}</b> remote · <b>{counts.arsenal}</b> arsenal
+          </span>
+          <span className="chip-warn" title="Nighthawk does not demote results for being old, ugly, unlinked or machine-generated.">
+            buried-first
           </span>
         </div>
       </div>

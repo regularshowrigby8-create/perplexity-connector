@@ -135,7 +135,19 @@ Recall is the easy half. Before ranking, every result passes through:
 
 `docs/REPOS.md` maps each of these to the project whose algorithm or parameter set it came from.
 
-## 8. Security posture
+## 8. Ranking policy (the part that does not change)
+
+The engine surfaces what typical engines filter out. Concretely, that means these are **never**
+applied as filters: publication recency, domain authority, inbound-link count, "helpful content"
+scoring, content-type snobbery (HTML over PDF/XLS/SQL), or "ugliness" (directory listings, plain
+Apache indexes, machine-generated pages).
+
+What exists instead is ordering: `relevance` (default), `newest`, `deadline`, `depth`. Every sort
+keeps the full candidate set — a hit with no timestamp sorts last under `newest`, it is never
+dropped. `/api/v1/health` publishes this as a machine-readable `policy` block so downstream tools
+can assert it, and the UI carries a persistent banner saying the same thing.
+
+## 9. Security posture
 
 - Keys, when supplied, live in the request body only; they are never persisted or logged.
 - No arbitrary URL proxying — the browser talks to one origin and the server only fetches targets

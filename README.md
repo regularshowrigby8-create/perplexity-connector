@@ -25,6 +25,33 @@ python3 -m http.server 8080      # serve the page alone
 
 ---
 
+## The theme (unchanged)
+
+> **Nighthawk does not rank by popularity, and it does not filter like one.**
+
+It exists for the material a mainstream results page demotes or drops entirely: the PDF in
+`/uploads/2019/03/`, the tender notice behind a portal search, the "Index of /" listing nobody
+linked, the spreadsheet in a data dump, the page the site deleted. No freshness gate, no
+"helpful content" scorer, no domain-authority penalty — old, ugly, unlinked and
+machine-generated is the point.
+
+Sort order is an **ordering, not a filter**. Switching to newest-first (or deadline, or depth)
+changes what you see first; it never removes the buried, undated or archived results. The engine
+states this in `/api/v1/health` under `policy`, so an integration can verify it rather than trust
+the copy:
+
+```json
+"policy": {
+  "purpose": "surface what typical engines filter out",
+  "popularity_ranking": false,
+  "freshness_gate": false,
+  "authority_penalty": false,
+  "buried_boost": true
+}
+```
+
+---
+
 ## Why this exists
 
 A normal SERP shows you ten pages that were built to rank. It hides the things that actually
