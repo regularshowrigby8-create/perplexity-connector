@@ -1,0 +1,1627 @@
+{
+ "query": "diary of a wimpy kid",
+ "lens": "all",
+ "site": null,
+ "hits": [
+  {
+   "url": "https://storage.prod.researchhub.com/uploads/papers/users/195721/8acb0ed5-3465-4d3f-953e-8101fa09d3da/Online-Read-Ebook-Diary-of-a.pdf",
+   "title": "Online Read Ebook Diary of a Wimpy Kid Box of Books 1-4: Diary of a Wimpy Kid, Rodrick Rules, The Last Straw, and Dog Days by Jeff Kinney",
+   "snippet": "",
+   "provider": "s2-new",
+   "provider_name": "Semantic Scholar (bulk)",
+   "kind": "document",
+   "file_ext": "pdf",
+   "mime": "application/pdf",
+   "domain": "storage.prod.researchhub.com",
+   "published": "2026-04-26T00:00:00Z",
+   "deadline": null,
+   "depth": 62,
+   "score": 73.811,
+   "tags": [
+    "scholarly"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid box",
+    "read ebook diary",
+    "online read ebook",
+    "wimpy kid",
+    "rodrick rules",
+    "jeff kinney"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-04-26T00:00:00+00:00",
+   "age_seconds": 18484857,
+   "age_human": "7 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:40:55.855134+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 2,
+   "match_span": [
+    18,
+    38
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "s2-new",
+     "name": "Semantic Scholar (bulk)",
+     "rank": 3,
+     "url": "https://storage.prod.researchhub.com/uploads/papers/users/195721/8acb0ed5-3465-4d3f-953e-8101fa09d3da/Online-Read-Ebook-Diary-of-a.pdf"
+    }
+   ],
+   "meta": {
+    "ids": {
+     "DOI": "10.55277/researchhub.mod5zadc.1",
+     "CorpusId": 287816777
+    },
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://storage.prod.researchhub.com/uploads/papers/users/195777/68b7df03-a23a-43cf-aa20-1081a9f55812/PDF-Diary-of-a-Wimpy-Kid.pdf",
+   "title": "[PDF] Diary of a Wimpy Kid Box of Books 1-4: Diary of a Wimpy Kid, Rodrick Rules, The Last Straw, and Dog Days by Jeff Kinney",
+   "snippet": "",
+   "provider": "s2-new",
+   "provider_name": "Semantic Scholar (bulk)",
+   "kind": "document",
+   "file_ext": "pdf",
+   "mime": "application/pdf",
+   "domain": "storage.prod.researchhub.com",
+   "published": "2026-04-25T00:00:00Z",
+   "deadline": null,
+   "depth": 62,
+   "score": 72.134,
+   "tags": [
+    "scholarly"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid box",
+    "wimpy kid",
+    "rodrick rules",
+    "jeff kinney",
+    "box of books",
+    "dog days"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-04-25T00:00:00+00:00",
+   "age_seconds": 18571257,
+   "age_human": "7 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:40:55.856965+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": "en",
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 2,
+   "match_span": [
+    6,
+    26
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "s2-new",
+     "name": "Semantic Scholar (bulk)",
+     "rank": 4,
+     "url": "https://storage.prod.researchhub.com/uploads/papers/users/195777/68b7df03-a23a-43cf-aa20-1081a9f55812/PDF-Diary-of-a-Wimpy-Kid.pdf"
+    }
+   ],
+   "meta": {
+    "ids": {
+     "DOI": "10.55277/researchhub.vhugtsq0.1",
+     "CorpusId": 287823799
+    },
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://storage.prod.researchhub.com/uploads/papers/users/196104/3fac9c2b-08a3-4873-a821-86aaf24b122f/PDF-DOWNLOAD-Diary-of-a.pdf",
+   "title": "PDF [DOWNLOAD] Diary of a Wimpy Kid Book 12 by Jeff Kinney on Iphone",
+   "snippet": "",
+   "provider": "s2-new",
+   "provider_name": "Semantic Scholar (bulk)",
+   "kind": "document",
+   "file_ext": "pdf",
+   "mime": "application/pdf",
+   "domain": "storage.prod.researchhub.com",
+   "published": "2026-04-23T00:00:00Z",
+   "deadline": null,
+   "depth": 62,
+   "score": 70.531,
+   "tags": [
+    "scholarly"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "wimpy kid book",
+    "kid book",
+    "kinney on iphone",
+    "wimpy kid",
+    "jeff kinney",
+    "pdf"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-04-23T00:00:00+00:00",
+   "age_seconds": 18744057,
+   "age_human": "7 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:40:55.858644+00:00",
+   "age_source": "published",
+   "quality": 1.0,
+   "quality_flags": [],
+   "language": null,
+   "exact": true,
+   "proximity": 0,
+   "occurrences": 1,
+   "match_span": [
+    15,
+    35
+   ],
+   "match_where": "title",
+   "copies": 0,
+   "words_hit": 3,
+   "off_topic": false,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "s2-new",
+     "name": "Semantic Scholar (bulk)",
+     "rank": 5,
+     "url": "https://storage.prod.researchhub.com/uploads/papers/users/196104/3fac9c2b-08a3-4873-a821-86aaf24b122f/PDF-DOWNLOAD-Diary-of-a.pdf"
+    }
+   ],
+   "meta": {
+    "ids": {
+     "DOI": "10.55277/researchhub.4js56nzw.1",
+     "CorpusId": 287738126
+    },
+    "coverage": 1.0,
+    "quality_flags": []
+   }
+  },
+  {
+   "url": "https://strathprints.strath.ac.uk/97862/1/Tenedios-Moshfeghi-NeurIPS-2026-On-length-bias-in-EEG-to-text-decoding.pdf",
+   "title": "On length bias in EEG-to-text decoding",
+   "snippet": "Strathprints: The University of Strathclyde institutional repository (University of Strathclyde)",
+   "provider": "openalex-new",
+   "provider_name": "OpenAlex (by date)",
+   "kind": "document",
+   "file_ext": "pdf",
+   "mime": "application/pdf",
+   "domain": "strathprints.strath.ac.uk",
+   "published": "2026-09-24T00:00:00Z",
+   "deadline": null,
+   "depth": 48,
+   "score": 31.721,
+   "tags": [
+    "open-access"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "strathclyde institutional repository",
+    "university of strathclyde",
+    "decoding strathprints",
+    "strathclyde institutional",
+    "institutional repository",
+    "length bias"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-09-24T00:00:00+00:00",
+   "age_seconds": 5438457,
+   "age_human": "2 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:40:56.290677+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "openalex-new",
+     "name": "OpenAlex (by date)",
+     "rank": 8,
+     "url": "https://strathprints.strath.ac.uk/97862/1/Tenedios-Moshfeghi-NeurIPS-2026-On-length-bias-in-EEG-to-text-decoding.pdf"
+    }
+   ],
+   "meta": {
+    "doi": null,
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "https://www.biorxiv.org/content/biorxiv/early/2026/09/14/2026.09.07.749616.full.pdf",
+   "title": "Sex differences in pediatric EEG inter-subject correlation during naturalistic movie watching: a large-scale characterization of the Healthy Brain Network EEG dataset",
+   "snippet": "bioRxiv (Cold Spring Harbor Laboratory)",
+   "provider": "openalex-new",
+   "provider_name": "OpenAlex (by date)",
+   "kind": "document",
+   "file_ext": "pdf",
+   "mime": "application/pdf",
+   "domain": "biorxiv.org",
+   "published": "2026-09-14T00:00:00Z",
+   "deadline": null,
+   "depth": 53,
+   "score": 31.595,
+   "tags": [
+    "open-access"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "cold spring harbor",
+    "spring harbor laboratory",
+    "healthy brain network",
+    "brain network eeg",
+    "network eeg dataset",
+    "eeg dataset biorxiv"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-09-14T00:00:00+00:00",
+   "age_seconds": 6302457,
+   "age_human": "2 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:40:56.292173+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "openalex-new",
+     "name": "OpenAlex (by date)",
+     "rank": 9,
+     "url": "https://www.biorxiv.org/content/biorxiv/early/2026/09/14/2026.09.07.749616.full.pdf"
+    }
+   ],
+   "meta": {
+    "doi": "https://doi.org/10.64898/2026.09.07.749616",
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "http://wrap.warwick.ac.uk/3110/1/WRAP_THESIS_Allett_2010.pdf",
+   "title": "'Love's labours': extreme metal music and its feeling community",
+   "snippet": "Warwick Research Archive Portal (University of Warwick)",
+   "provider": "openalex-new",
+   "provider_name": "OpenAlex (by date)",
+   "kind": "document",
+   "file_ext": "pdf",
+   "mime": "application/pdf",
+   "domain": "wrap.warwick.ac.uk",
+   "published": "2026-09-09T00:00:00Z",
+   "deadline": null,
+   "depth": 48,
+   "score": 30.452,
+   "tags": [
+    "open-access"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "research archive portal",
+    "warwick research archive",
+    "community warwick research",
+    "extreme metal music",
+    "feeling community warwick",
+    "archive portal"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-09-09T00:00:00+00:00",
+   "age_seconds": 6734457,
+   "age_human": "2 months ago",
+   "freshness": 0.0,
+   "first_seen": "2026-11-25T22:40:56.294442+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "en",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "openalex-new",
+     "name": "OpenAlex (by date)",
+     "rank": 10,
+     "url": "http://wrap.warwick.ac.uk/3110/1/WRAP_THESIS_Allett_2010.pdf"
+    }
+   ],
+   "meta": {
+    "doi": "https://doi.org/10.82444/warw.33489607",
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  },
+  {
+   "url": "https://centerprode.com/ojls/ojls0902/coas.ojls.0902.02063e.pdf",
+   "title": "Sexual Minorities' Rights in Kenya, Malawi and Tanzania: Reality or Rhetoric?",
+   "snippet": "Open Journal for Legal Studies",
+   "provider": "openalex-new",
+   "provider_name": "OpenAlex (by date)",
+   "kind": "document",
+   "file_ext": "pdf",
+   "mime": "application/pdf",
+   "domain": "centerprode.com",
+   "published": "2026-12-01T00:00:00Z",
+   "deadline": null,
+   "depth": 48,
+   "score": 57.561,
+   "tags": [
+    "open-access"
+   ],
+   "archive": false,
+   "portal": false,
+   "funder": null,
+   "amount": null,
+   "currency": null,
+   "location": null,
+   "structured": null,
+   "schema_type": null,
+   "size": null,
+   "sniffed": null,
+   "keyphrases": [
+    "malawi and tanzania",
+    "reality or rhetoric",
+    "sexual minorities'",
+    "kenya",
+    "malawi",
+    "tanzania"
+   ],
+   "near_dupes": 0,
+   "published_at": "2026-12-01T00:00:00+00:00",
+   "age_seconds": -436742,
+   "age_human": "in 5 days",
+   "freshness": 1.0,
+   "first_seen": "2026-11-25T22:40:56.278866+00:00",
+   "age_source": "published",
+   "quality": 0.9,
+   "quality_flags": [
+    "off-topic"
+   ],
+   "language": "pcm",
+   "exact": false,
+   "proximity": null,
+   "occurrences": 0,
+   "match_span": null,
+   "match_where": null,
+   "copies": 0,
+   "words_hit": 0,
+   "off_topic": true,
+   "junk": false,
+   "noise": false,
+   "sources": [
+    {
+     "provider": "openalex-new",
+     "name": "OpenAlex (by date)",
+     "rank": 1,
+     "url": "https://centerprode.com/ojls/ojls0902/coas.ojls.0902.02063e.pdf"
+    }
+   ],
+   "meta": {
+    "doi": "https://doi.org/10.32591/coas.ojls.0902.02053e",
+    "coverage": 0.0,
+    "quality_flags": [
+     "off-topic"
+    ]
+   }
+  }
+ ],
+ "providers": [
+  {
+   "id": "searxng",
+   "name": "SearXNG",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "brave",
+   "name": "Brave Search",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "tavily",
+   "name": "Tavily",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "exa",
+   "name": "Exa",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "serper",
+   "name": "Serper",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "serpapi",
+   "name": "SerpApi",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "searchapi",
+   "name": "SearchApi",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "google_cse",
+   "name": "Google Programmable Search",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "perplexity",
+   "name": "Perplexity",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "you",
+   "name": "You.com",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "bing",
+   "name": "Bing",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "yahoo",
+   "name": "Yahoo",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "ecosia",
+   "name": "Ecosia",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "startpage",
+   "name": "Startpage",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "yandex",
+   "name": "Yandex",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "google_scholar",
+   "name": "Google Scholar",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "google_news",
+   "name": "Google News",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "mojeek",
+   "name": "Mojeek",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "qwant",
+   "name": "Qwant",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "metager",
+   "name": "MetaGer",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "whoogle",
+   "name": "Whoogle",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "librex",
+   "name": "LibreX",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "4get",
+   "name": "4get",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "yacy",
+   "name": "YaCy",
+   "status": "needs_key",
+   "count": 0,
+   "ms": 0,
+   "message": "credentials not set"
+  },
+  {
+   "id": "gigablast",
+   "name": "Gigablast",
+   "status": "empty",
+   "count": 0,
+   "ms": 17,
+   "message": ""
+  },
+  {
+   "id": "wayback",
+   "name": "Wayback CDX",
+   "status": "empty",
+   "count": 0,
+   "ms": 17,
+   "message": ""
+  },
+  {
+   "id": "commoncrawl",
+   "name": "Common Crawl Index",
+   "status": "empty",
+   "count": 0,
+   "ms": 323,
+   "message": ""
+  },
+  {
+   "id": "internetarchive",
+   "name": "Internet Archive",
+   "status": "ok",
+   "count": 25,
+   "ms": 332,
+   "message": ""
+  },
+  {
+   "id": "wiby",
+   "name": "Wiby",
+   "status": "empty",
+   "count": 0,
+   "ms": 1845,
+   "message": ""
+  },
+  {
+   "id": "reliefweb",
+   "name": "ReliefWeb Jobs",
+   "status": "error",
+   "count": 0,
+   "ms": 1843,
+   "message": "Client error '410 Gone' for url 'https://api.reliefweb.int/v1/jobs?appname=nighthawk&profile=list&limit=20&query%5Bvalue%5D=diary+of+a+wimpy+kid&sort%5B%5D=date"
+  },
+  {
+   "id": "reliefweb_reports",
+   "name": "ReliefWeb Reports",
+   "status": "error",
+   "count": 0,
+   "ms": 1843,
+   "message": "Client error '410 Gone' for url 'https://api.reliefweb.int/v1/reports?appname=nighthawk&profile=list&limit=20&query%5Bvalue%5D=diary+of+a+wimpy+kid&sort%5B%5D=d"
+  },
+  {
+   "id": "openalex",
+   "name": "OpenAlex",
+   "status": "ok",
+   "count": 25,
+   "ms": 1845,
+   "message": ""
+  },
+  {
+   "id": "grantsgov",
+   "name": "Grants.gov",
+   "status": "ok",
+   "count": 25,
+   "ms": 1843,
+   "message": ""
+  },
+  {
+   "id": "semanticscholar",
+   "name": "Semantic Scholar",
+   "status": "error",
+   "count": 0,
+   "ms": 2017,
+   "message": "Client error '429 ' for url 'https://api.semanticscholar.org/graph/v1/paper/search?query=diary+of+a+wimpy+kid&limit=20&fields=title%2Cabstract%2Curl%2CopenAcces"
+  },
+  {
+   "id": "ckan",
+   "name": "CKAN Portal",
+   "status": "error",
+   "count": 0,
+   "ms": 2022,
+   "message": "Client error '404 Not Found' for url 'https://catalog.data.gov/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://d"
+  },
+  {
+   "id": "datagov",
+   "name": "Data.gov",
+   "status": "error",
+   "count": 0,
+   "ms": 2022,
+   "message": "Client error '404 Not Found' for url 'https://catalog.data.gov/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://d"
+  },
+  {
+   "id": "marginalia",
+   "name": "Marginalia",
+   "status": "empty",
+   "count": 0,
+   "ms": 2027,
+   "message": ""
+  },
+  {
+   "id": "stackexchange",
+   "name": "Stack Exchange",
+   "status": "ok",
+   "count": 15,
+   "ms": 2183,
+   "message": ""
+  },
+  {
+   "id": "pubmed",
+   "name": "PubMed",
+   "status": "empty",
+   "count": 0,
+   "ms": 2183,
+   "message": ""
+  },
+  {
+   "id": "wikipedia",
+   "name": "Wikipedia",
+   "status": "ok",
+   "count": 8,
+   "ms": 2183,
+   "message": ""
+  },
+  {
+   "id": "dataeuropa",
+   "name": "EU Open Data",
+   "status": "error",
+   "count": 0,
+   "ms": 2183,
+   "message": "Client error '404 Not Found' for url 'https://data.europa.eu/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://dev"
+  },
+  {
+   "id": "wikidata",
+   "name": "Wikidata",
+   "status": "ok",
+   "count": 10,
+   "ms": 2183,
+   "message": ""
+  },
+  {
+   "id": "doaj",
+   "name": "DOAJ",
+   "status": "ok",
+   "count": 10,
+   "ms": 2183,
+   "message": ""
+  },
+  {
+   "id": "hackernews",
+   "name": "Hacker News",
+   "status": "empty",
+   "count": 0,
+   "ms": 2262,
+   "message": ""
+  },
+  {
+   "id": "gitlab",
+   "name": "GitLab",
+   "status": "empty",
+   "count": 0,
+   "ms": 2270,
+   "message": ""
+  },
+  {
+   "id": "eu_sedia",
+   "name": "EU Funding & Tenders",
+   "status": "error",
+   "count": 0,
+   "ms": 2270,
+   "message": "Client error '404 Not Found' for url 'https://api.tech.ec.europa.eu/search-api/search?apiKey=SEDIA&text=diary+of+a+wimpy+kid&pageSize=20&pageNumber=1'\nFor more "
+  },
+  {
+   "id": "crates",
+   "name": "crates.io",
+   "status": "empty",
+   "count": 0,
+   "ms": 2252,
+   "message": ""
+  },
+  {
+   "id": "reddit-new",
+   "name": "Reddit (new)",
+   "status": "error",
+   "count": 0,
+   "ms": 563,
+   "message": "Client error '403 Blocked' for url 'https://www.reddit.com/search.json?q=diary+of+a+wimpy+kid&sort=new&t=week&limit=25&raw_json=1'\nFor more information check: h"
+  },
+  {
+   "id": "opencanada",
+   "name": "Open Canada",
+   "status": "error",
+   "count": 0,
+   "ms": 2407,
+   "message": "Client error '404 Not Found' for url 'https://open.canada.ca/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://dev"
+  },
+  {
+   "id": "nih_reporter",
+   "name": "NIH RePORTER",
+   "status": "ok",
+   "count": 20,
+   "ms": 2407,
+   "message": ""
+  },
+  {
+   "id": "reddit-subs",
+   "name": "Reddit (curated subs)",
+   "status": "empty",
+   "count": 0,
+   "ms": 589,
+   "message": ""
+  },
+  {
+   "id": "bluesky",
+   "name": "Bluesky (latest)",
+   "status": "error",
+   "count": 0,
+   "ms": 417,
+   "message": "Client error '403 Forbidden' for url 'https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=diary+of+a+wimpy+kid&limit=25&sort=latest'\nFor more informati"
+  },
+  {
+   "id": "lobsters",
+   "name": "Lobsters",
+   "status": "error",
+   "count": 0,
+   "ms": 606,
+   "message": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "id": "github",
+   "name": "GitHub",
+   "status": "ok",
+   "count": 15,
+   "ms": 2488,
+   "message": ""
+  },
+  {
+   "id": "dryad",
+   "name": "Dryad",
+   "status": "empty",
+   "count": 0,
+   "ms": 88,
+   "message": ""
+  },
+  {
+   "id": "datagovau",
+   "name": "Data.gov.au",
+   "status": "error",
+   "count": 0,
+   "ms": 2558,
+   "message": "Client error '404 Not Found' for url 'https://data.gov.au/api/3/action/package_search?q=diary+of+a+wimpy+kid&rows=15'\nFor more information check: https://develo"
+  },
+  {
+   "id": "arxiv-new",
+   "name": "arXiv (submitted today)",
+   "status": "ok",
+   "count": 25,
+   "ms": 410,
+   "message": ""
+  },
+  {
+   "id": "s2-new",
+   "name": "Semantic Scholar (bulk)",
+   "status": "ok",
+   "count": 40,
+   "ms": 287,
+   "message": ""
+  },
+  {
+   "id": "hn-new",
+   "name": "Hacker News (by date)",
+   "status": "empty",
+   "count": 0,
+   "ms": 850,
+   "message": ""
+  },
+  {
+   "id": "doaj-new",
+   "name": "DOAJ (newest)",
+   "status": "ok",
+   "count": 10,
+   "ms": 391,
+   "message": ""
+  },
+  {
+   "id": "crossref-new",
+   "name": "Crossref (published today)",
+   "status": "ok",
+   "count": 25,
+   "ms": 556,
+   "message": ""
+  },
+  {
+   "id": "npm",
+   "name": "npm Registry",
+   "status": "ok",
+   "count": 12,
+   "ms": 2810,
+   "message": ""
+  },
+  {
+   "id": "pubmed-new",
+   "name": "PubMed (in press)",
+   "status": "empty",
+   "count": 0,
+   "ms": 414,
+   "message": ""
+  },
+  {
+   "id": "gitlab-projects",
+   "name": "GitLab (last activity)",
+   "status": "empty",
+   "count": 0,
+   "ms": 800,
+   "message": ""
+  },
+  {
+   "id": "wikipedia-rev",
+   "name": "Wikipedia (last revision)",
+   "status": "empty",
+   "count": 0,
+   "ms": 716,
+   "message": ""
+  },
+  {
+   "id": "crates-new",
+   "name": "crates.io (newest)",
+   "status": "empty",
+   "count": 0,
+   "ms": 716,
+   "message": ""
+  },
+  {
+   "id": "mastodon",
+   "name": "Mastodon (tag timeline)",
+   "status": "ok",
+   "count": 40,
+   "ms": 1061,
+   "message": ""
+  },
+  {
+   "id": "npm-new",
+   "name": "npm registry (newest)",
+   "status": "ok",
+   "count": 25,
+   "ms": 857,
+   "message": ""
+  },
+  {
+   "id": "ghsa",
+   "name": "GitHub advisories (newest)",
+   "status": "error",
+   "count": 0,
+   "ms": 901,
+   "message": "sequence item 0: expected str instance, dict found"
+  },
+  {
+   "id": "crossref",
+   "name": "Crossref",
+   "status": "ok",
+   "count": 20,
+   "ms": 3090,
+   "message": ""
+  },
+  {
+   "id": "openalex-new",
+   "name": "OpenAlex (by date)",
+   "status": "ok",
+   "count": 25,
+   "ms": 858,
+   "message": ""
+  },
+  {
+   "id": "federal-register",
+   "name": "Federal Register",
+   "status": "empty",
+   "count": 0,
+   "ms": 486,
+   "message": ""
+  },
+  {
+   "id": "arxiv",
+   "name": "arXiv",
+   "status": "ok",
+   "count": 20,
+   "ms": 3401,
+   "message": ""
+  },
+  {
+   "id": "clinicaltrials",
+   "name": "ClinicalTrials.gov (updated)",
+   "status": "empty",
+   "count": 0,
+   "ms": 655,
+   "message": ""
+  },
+  {
+   "id": "github-commits",
+   "name": "GitHub commits (newest)",
+   "status": "ok",
+   "count": 21,
+   "ms": 1461,
+   "message": ""
+  },
+  {
+   "id": "openlibrary",
+   "name": "Open Library",
+   "status": "ok",
+   "count": 10,
+   "ms": 3484,
+   "message": ""
+  },
+  {
+   "id": "usaspending-new",
+   "name": "USAspending (new awards)",
+   "status": "empty",
+   "count": 0,
+   "ms": 783,
+   "message": ""
+  },
+  {
+   "id": "socrata",
+   "name": "Socrata catalog",
+   "status": "empty",
+   "count": 0,
+   "ms": 885,
+   "message": ""
+  },
+  {
+   "id": "arcgis-hub",
+   "name": "ArcGIS Hub",
+   "status": "ok",
+   "count": 11,
+   "ms": 655,
+   "message": ""
+  },
+  {
+   "id": "datacite",
+   "name": "DataCite (newest DOIs)",
+   "status": "ok",
+   "count": 25,
+   "ms": 1104,
+   "message": ""
+  },
+  {
+   "id": "medrxiv-new",
+   "name": "medRxiv (last 10 days)",
+   "status": "empty",
+   "count": 0,
+   "ms": 1269,
+   "message": ""
+  },
+  {
+   "id": "github-issues",
+   "name": "GitHub issues (newest)",
+   "status": "ok",
+   "count": 22,
+   "ms": 1519,
+   "message": ""
+  },
+  {
+   "id": "hal",
+   "name": "HAL (French archive)",
+   "status": "empty",
+   "count": 0,
+   "ms": 1181,
+   "message": ""
+  },
+  {
+   "id": "sec-edgar",
+   "name": "SEC EDGAR (latest filings)",
+   "status": "ok",
+   "count": 31,
+   "ms": 762,
+   "message": ""
+  },
+  {
+   "id": "vault_docs",
+   "name": "Vault Deep Text",
+   "status": "empty",
+   "count": 0,
+   "ms": 33,
+   "message": ""
+  },
+  {
+   "id": "vault",
+   "name": "Nighthawk Vault",
+   "status": "empty",
+   "count": 0,
+   "ms": 33,
+   "message": ""
+  },
+  {
+   "id": "dorklaunch",
+   "name": "Dork Hand-off",
+   "status": "ok",
+   "count": 6,
+   "ms": 1,
+   "message": ""
+  },
+  {
+   "id": "portals",
+   "name": "Portal Universe",
+   "status": "empty",
+   "count": 0,
+   "ms": 1,
+   "message": ""
+  },
+  {
+   "id": "hf-models",
+   "name": "Hugging Face (last modified)",
+   "status": "empty",
+   "count": 0,
+   "ms": 876,
+   "message": ""
+  },
+  {
+   "id": "zenodo",
+   "name": "Zenodo",
+   "status": "ok",
+   "count": 20,
+   "ms": 3818,
+   "message": ""
+  },
+  {
+   "id": "wb-procurement",
+   "name": "World Bank procurement",
+   "status": "empty",
+   "count": 0,
+   "ms": 415,
+   "message": ""
+  },
+  {
+   "id": "se-new",
+   "name": "Stack Exchange (newest)",
+   "status": "ok",
+   "count": 10,
+   "ms": 1767,
+   "message": ""
+  },
+  {
+   "id": "datagovuk",
+   "name": "Data.gov.uk",
+   "status": "empty",
+   "count": 0,
+   "ms": 3955,
+   "message": ""
+  },
+  {
+   "id": "data-gouv-fr",
+   "name": "data.gouv.fr",
+   "status": "empty",
+   "count": 0,
+   "ms": 1127,
+   "message": ""
+  },
+  {
+   "id": "apkmirror",
+   "name": "APKMirror",
+   "status": "ok",
+   "count": 38,
+   "ms": 470,
+   "message": ""
+  },
+  {
+   "id": "openaire",
+   "name": "OpenAIRE Graph",
+   "status": "error",
+   "count": 0,
+   "ms": 1413,
+   "message": "Client error '405 Method Not Allowed' for url 'https://api.openaire.eu/graph/v1/researchProducts?search=diary+of+a+wimpy+kid&type=publication&sortBy=publication"
+  },
+  {
+   "id": "sourceforge",
+   "name": "SourceForge",
+   "status": "empty",
+   "count": 0,
+   "ms": 300,
+   "message": ""
+  },
+  {
+   "id": "grantsgov-live",
+   "name": "Grants.gov (posted today)",
+   "status": "ok",
+   "count": 25,
+   "ms": 865,
+   "message": ""
+  },
+  {
+   "id": "find-a-tender",
+   "name": "Find a Tender (UK OCDS)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "ckan-recent",
+   "name": "CKAN portals (latest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "arquivo",
+   "name": "Arquivo.pt",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "cordis-live",
+   "name": "CORDIS projects (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "fundsforngos",
+   "name": "FundsforNGOs search",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "biorxiv-new",
+   "name": "bioRxiv (last 10 days)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "undp-procurement",
+   "name": "UNDP procurement",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "zenodo-new",
+   "name": "Zenodo (most recent)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "mediafire",
+   "name": "MediaFire",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "osf-preprints",
+   "name": "OSF Preprints",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "apkpure",
+   "name": "APKPure",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "wikidata-recent",
+   "name": "Wikidata (last modified)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "fdroid",
+   "name": "F-Droid",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "gdelt",
+   "name": "GDELT 2.0",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "ted",
+   "name": "TED (EU tenders)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "europepmc",
+   "name": "Europe PMC (newest)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "archivefiles",
+   "name": "Internet Archive (files)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "rss-firehose",
+   "name": "Institutional RSS (20 feeds)",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "ukri",
+   "name": "UKRI Gateway to Research",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  },
+  {
+   "id": "data-europa",
+   "name": "data.europa.eu",
+   "status": "slow",
+   "count": 0,
+   "ms": 4000,
+   "message": "still working when the 4000 ms budget ran out"
+  }
+ ],
+ "facets": {
+  "domain": [
+   {
+    "value": "storage.prod.researchhub.com",
+    "count": 3
+   },
+   {
+    "value": "strathprints.strath.ac.uk",
+    "count": 1
+   },
+   {
+    "value": "biorxiv.org",
+    "count": 1
+   },
+   {
+    "value": "wrap.warwick.ac.uk",
+    "count": 1
+   },
+   {
+    "value": "centerprode.com",
+    "count": 1
+   }
+  ],
+  "provider": [
+   {
+    "value": "OpenAlex (by date)",
+    "count": 4
+   },
+   {
+    "value": "Semantic Scholar (bulk)",
+    "count": 3
+   }
+  ],
+  "file_ext": [
+   {
+    "value": "pdf",
+    "count": 7
+   }
+  ],
+  "kind": [
+   {
+    "value": "document",
+    "count": 7
+   }
+  ],
+  "deadline": []
+ },
+ "stats": {
+  "hits": 614,
+  "unique": 7,
+  "providers_ok": 30,
+  "providers_failed": 14,
+  "files": 7,
+  "opportunities": 0,
+  "closing_soon": 0,
+  "duplicates_collapsed": 26,
+  "dropped_noise": 0,
+  "verbatim": 3,
+  "near_verbatim": 0,
+  "not_verbatim": 4,
+  "copies_reported": 26,
+  "junk_retained": 0,
+  "noise_retained": 0,
+  "truncated": false,
+  "dropped_spam": 0,
+  "fresh_seconds": 1,
+  "fresh_minutes": 0,
+  "fresh_hours": 0,
+  "fresh_days": 0,
+  "dated": 7,
+  "undated": 0,
+  "newest_age_seconds": 18484857,
+  "newest_age_human": "7 months ago",
+  "took_ms": 4716,
+  "cached": false,
+  "budget_ms": 4000,
+  "slow_providers": 20,
+  "post_ms": 657,
+  "copies_scanned": 369,
+  "window_days": 730,
+  "local_excluded": 0,
+  "off_topic": 4,
+  "cut_older": 155,
+  "cut_future": 0,
+  "undated_kept": 32
+ },
+ "plays": [
+  "diary of a wimpy kid (filetype:pdf)",
+  "diary of a wimpy kid (filetype:pdf) (inurl:upload OR inurl:files OR inurl:documents OR inurl:download OR inurl:archive)",
+  "diary of a wimpy kid (\"call for proposals\" OR \"call for applications\" OR \"request for proposals\" OR grant OR tender OR fellowship OR scholarship OR accelerator OR \"open call\" OR RFP OR \"expression of interest\" OR procurement OR bounty OR \"applications open\")",
+  "diary of a wimpy kid (\"deadline\" OR \"closes\" OR \"apply by\" OR \"applications close\") (filetype:pdf OR filetype:docx)",
+  "diary of a wimpy kid (\"application form\" OR \"apply now\" OR \"applications close\" OR \"application deadline\" OR \"call for applications\" OR \"admissions\" OR \"apply by\" OR \"online application\")",
+  "diary of a wimpy kid (\"guidelines\" OR \"eligibility\" OR \"terms of reference\") (filetype:pdf OR filetype:docx)"
+ ],
+ "sort": "newest",
+ "match": "exact",
+ "only_exact": false,
+ "unrestricted": true,
+ "understanding": {
+  "query": "diary of a wimpy kid pdf",
+  "subject": "diary of a wimpy kid",
+  "phrases": [
+   "diary of a wimpy kid",
+   "wimpy kid",
+   "diary"
+  ],
+  "keywords": [
+   "diary",
+   "wimpy",
+   "kid"
+  ],
+  "kind": "document",
+  "kind_label": "a document or report",
+  "kind_score": 0.61,
+  "kind_cue": "pdf",
+  "suggested_lens": "files",
+  "file_types": [
+   "pdf",
+   "docx"
+  ],
+  "places": [],
+  "orgs": [],
+  "quoted": [],
+  "negatives": [],
+  "years": [],
+  "asked_days": null,
+  "window_days": 730,
+  "future_days": 120,
+  "warnings": [],
+  "summary": "A document or report, about \u201cdiary of a wimpy kid\u201d \u2014 as pdf / docx",
+  "engine": "rules + RAKE (vendored)",
+  "note": "what the search was read as, before any source was asked; the words matched against a result are still the words that were typed"
+ },
+ "as_of": "2026-11-25T22:40:57.837024+00:00",
+ "expanded": [],
+ "intent": {
+  "text": "diary of a wimpy kid pdf",
+  "query": "diary of a wimpy kid",
+  "types": [
+   "pdf"
+  ],
+  "hosts": [],
+  "matched": [
+   "pdf"
+  ],
+  "search_text": "diary of a wimpy kid",
+  "removed_by_type": 362,
+  "host_matches": 0,
+  "file_host_engines": [
+   "mediafire",
+   "apkpure",
+   "apkmirror",
+   "fdroid",
+   "archivefiles",
+   "sourceforge"
+  ]
+ }
+}
