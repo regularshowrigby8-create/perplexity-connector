@@ -80,7 +80,9 @@ class HuntRequest(BaseModel):
     providers: list[str] = Field(default_factory=list)
     # 0 means "everything found". The caller's own display cap is their business.
     limit: int = Field(default=40, ge=0, le=1000)
-    sort: Literal["relevance", "depth", "deadline", "newest"] = "newest"
+    # "accuracy": how well it matches first (literal, then word distance), and
+    # newest upload inside each band. "newest": upload date alone.
+    sort: Literal["relevance", "depth", "deadline", "newest", "accuracy"] = "newest"
     # word-for-word by default: the literal phrase, in order, nothing added
     match: Literal["exact", "loose"] = "exact"
     # opt-in filter, off by default: results are never narrowed without being asked

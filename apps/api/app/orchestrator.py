@@ -328,6 +328,23 @@ def rank(hits: list[Hit], sort: str, verbatim: bool = True) -> list[Hit]:
     elif sort == "deadline":
         hits.sort(key=lambda h: (h.junk, h.deadline is None,
                                  abs(h.deadline.days_left) if h.deadline else 10**6, -h.score))
+    elif sort == "accuracy":
+        # Accuracy first, upload date second — the order results arrive in when
+        # they are streamed as each source answers: the ones that really contain
+        # the phrase lead, and within that band the newest upload leads.
+        def accuracy_key(hit: Hit):
+            band, proximity = verbatim_key(hit)
+            stamp = stamp_of(hit)
+            age = freshness.age_seconds(stamp, now)
+            if age is None:
+                date_tier, date_value = 2, 0.0
+            elif age < 0:
+                date_tier, date_value = 1, float(-age)
+            else:
+                date_tier, date_value = 0, float(age)
+            return (hit.junk, band, proximity, date_tier, date_value, -hit.score, -hit.depth)
+
+        hits.sort(key=accuracy_key)
     elif sort == "newest":
         # undated results are sorted last, never removed — ordering, not a filter
         def newest_key(hit: Hit):
@@ -493,7 +510,23 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
             {"id": p.id, "name": p.name, "status": "needs_key", "count": 0, "ms": 0,
              "message": "credentials not set"} for p in waiting
         ]
+        def stream_view() -> list[Hit]:
+            """What the answer would be right now, with the caller's own filters applied.
+
+            The typed-file filter and only_exact are applied here too: a live
+            frame must never show a result the final answer is about to drop
+            because the query asked for a type.
+            """
+            rows = list(collected)
+            if req.only_exact:
+                rows = [h for h in rows if h.exact]
+            if asked.types:
+                rows, _ = query_intent.filter_by_type(rows, asked.types)
+            return rank(rows, req.sort, verbatim=bool(phrase))
+
         dropped = 0
+        last_frame = 0.0
+        last_total = -1
         pending: set[asyncio.Task] = set(tasks)
         while pending:
             left = deadline - time.perf_counter()
@@ -527,13 +560,39 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                                  "status": "error" if error else ("empty" if not raws else "ok"),
                                  "count": len(batch), "ms": int(ms),
                                  "message": error or ""})
-                if emit and batch:
-                    preview = rank(batch, req.sort)[:12]
-                    await emit({"type": "results", "final": False,
-                                "provider": provider.id, "provider_name": provider.name,
-                                "hits": [h.model_dump() for h in preview]})
-                elif emit:
+                if emit:
+                    # Streaming: every source that answers re-sends the whole
+                    # ordered list (accuracy first, upload date second), so a
+                    # late source slots into place instead of being appended to
+                    # the end. Throttled to ~8 frames a second; the `done` event
+                    # still carries the authoritative report.
                     await emit({"type": "provider", **statuses[-1]})
+                    # A frame whenever the answer actually changed (a new source
+                    # brought results), and a heartbeat every half second so a
+                    # client can tell "nothing new" from "nothing happening".
+                    now_perf = time.perf_counter()
+                    changed = len(collected) != last_total
+                    if (changed and (now_perf - last_frame) >= 0.08) \
+                            or (now_perf - last_frame) >= 0.5:
+                        last_frame = now_perf
+                        last_total = len(collected)
+                        ordered = stream_view()
+                        await emit({"type": "results", "final": False,
+                                    "provider": provider.id, "provider_name": provider.name,
+                                    "arrived": len(batch),
+                                    "answered": sum(1 for row in statuses
+                                                    if row["status"] in ("ok", "empty", "error")),
+                                    "total": len(collected),
+                                    "hits": [h.model_dump() for h in ordered[:80]]})
+
+        if emit:
+            ordered = stream_view()
+            await emit({"type": "results", "final": True, "provider": "", "provider_name": "",
+                        "arrived": 0,
+                        "answered": sum(1 for row in statuses
+                                        if row["status"] in ("ok", "empty", "error")),
+                        "total": len(collected),
+                        "hits": [h.model_dump() for h in ordered[:80]]})
 
         slow = 0
         if pending:

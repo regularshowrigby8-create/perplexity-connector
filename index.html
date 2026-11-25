@@ -2007,7 +2007,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
 <footer>
   <div class="wrap foot">
-    <span class="mono">NIGHTHAWK v1.5</span>
+    <span class="mono">NIGHTHAWK v1.6</span>
     <span class="dim">·</span>
     <a data-route="api/docs">API</a>
     <a data-route="arsenal">Crawlers</a>
@@ -2472,6 +2472,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       }
     }
     if (hosts.length) note.push("aimed at " + hosts.slice(0, 3).join(", "));
+    if (report.sort === "accuracy") note.push("best match first");
     if (policy.verbatim_only) note.push("verbatim only");
     if (stats.took_ms !== undefined && stats.took_ms !== null) note.push(stats.took_ms + " ms");
     if (stats.cached) note.push("cached");
@@ -2541,10 +2542,88 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     return value;
   }
 
-  // The engine answers within its own budget (2.5 s by default) with whatever
-  // arrived, and the browser says what it is doing the moment you press Search
-  // instead of looking frozen. Repeat searches inside a minute come back from
-  // the engine's cache in milliseconds; "again" asks for a real fresh hunt.
+  // Results arrive while the search is still running. The engine streams a fresh
+  // ordered list every time a source answers, so the page fills in instead of
+  // waiting for the slowest one. Each frame is already ordered server-side:
+  // accuracy first (the literal phrase, then how far apart the words are), and
+  // the newest upload inside each accuracy band.
+  function streamHunt(body, onFrame) {
+    return fetch(url("/api/v1/hunt/stream"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store"
+    }).then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      if (!res.body || typeof res.body.getReader !== "function") {
+        throw new Error("this engine has no live stream");
+      }
+      var reader = res.body.getReader();
+      var decoder = new TextDecoder();
+      var buffer = "";
+      var frames = 0;
+      var report = null;
+
+      function handle(raw) {
+        raw.split("\n").forEach(function (line) {
+          if (line.indexOf("data:") !== 0) return;
+          var payload;
+          try {
+            payload = JSON.parse(line.slice(5).trim());
+          } catch (e) {
+            return;
+          }
+          if (payload.type === "results") {
+            frames += 1;
+            if (onFrame) onFrame(payload);
+          } else if (payload.type === "done") {
+            report = payload;
+          }
+        });
+      }
+
+      function pump() {
+        return reader.read().then(function (chunk) {
+          if (chunk.done) {
+            if (buffer.trim()) handle(buffer);
+            if (!report) throw new Error("the stream ended without an answer");
+            return { report: report, frames: frames };
+          }
+          buffer += decoder.decode(chunk.value, { stream: true });
+          var parts = buffer.split("\n\n");
+          buffer = parts.pop();
+          for (var i = 0; i < parts.length; i++) handle(parts[i]);
+          return pump();
+        });
+      }
+
+      return pump();
+    });
+  }
+
+  // One frame = the whole list as it stands, already ordered. Replacing the rows
+  // (rather than appending) is what keeps a late source in its right place
+  // instead of pinned to the bottom.
+  function renderFrame(frame) {
+    var hits = frame.hits || [];
+    var bar = document.getElementById("live-counts");
+    if (bar) {
+      bar.innerHTML =
+        '<span class="tick"><b>' + hits.length + "</b> shown</span>" +
+        '<span class="tick"><b>' + (frame.total || hits.length) + "</b> found</span>" +
+        '<span class="tick"><b>' + (frame.answered || 0) + "</b> sources answered</span>" +
+        '<span class="tick"><b>…</b> still arriving</span>';
+    }
+    var note = document.getElementById("live-note");
+    if (note) {
+      note.textContent = "arriving as each source answers · best match first, newest upload inside each band";
+    }
+    var box = document.getElementById("live-hits");
+    if (!box) return;
+    box.innerHTML = "";
+    hits.slice(0, 120).forEach(function (hit) { box.appendChild(hitRow(hit)); });
+  }
+
   function searchingState(label, detail) {
     var bar = document.getElementById("live-counts");
     if (bar) {
@@ -2562,22 +2641,35 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     var headline = "Hunt · " + q;
     document.getElementById("live-title").textContent = headline;
     searchingState("searching every working source",
-      "the fast ones answer first; slow ones are cut off at the budget");
+      "results arrive as each source answers — best match first, newest upload inside each band");
+    document.getElementById("live-hits").innerHTML = "";
+    var body = {
+      q: q, lens: lens, limit: 0, sort: "accuracy", match: "exact",
+      only_exact: false, unrestricted: true, fresh: !!forceFresh
+    };
     var nudge = setTimeout(function () {
       var note = document.getElementById("live-note");
       if (note) note.textContent = "still gathering — a slow source does not hold the whole page";
-    }, 900);
-    post("/api/v1/hunt", {
-      q: q, lens: lens, limit: 0, sort: "newest", match: "exact",
-      only_exact: false, unrestricted: true, fresh: !!forceFresh
-    }).then(function (report) {
+    }, 5000);
+
+    function finish(report) {
       clearTimeout(nudge);
       renderReport(report, headline);
       var slow = (report.stats || {}).slow_providers || 0;
       toast((report.hits || []).length + " results" + (slow ? " · " + slow + " still answering" : ""));
-    }).catch(function (err) {
+    }
+
+    streamHunt(body, function (frame) {
       clearTimeout(nudge);
-      toast("hunt failed · " + err.message);
+      renderFrame(frame);
+    }).then(function (out) {
+      finish(out.report);
+    }).catch(function () {
+      // A proxy that buffers SSE, or an older engine: fall back to one POST.
+      clearTimeout(nudge);
+      post("/api/v1/hunt", body).then(finish).catch(function (err) {
+        toast("hunt failed · " + err.message);
+      });
     });
   }
 

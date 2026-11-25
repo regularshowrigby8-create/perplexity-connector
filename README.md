@@ -205,7 +205,47 @@ Measured here against the full engine list:
 |---|---|---|
 | first search, 6 engines hanging 30 s | never returns (30 s+) | **2.6 s**, six reported `slow` |
 | repeat of the same search | 1.4–3.5 s every time | **13 ms** (`cached`) |
-| the page on click | nothing until the last engine answered | a line saying it is searching |
+| the page on click | nothing until the last engine answered | a line at once, **first results at ~0.9 s**, complete at 1.6 s |
+
+## Results arrive while the search is still running
+
+Waiting for the budget and *then* painting the page still means a blank screen for two seconds. The
+launcher no longer does that: it reads `/api/v1/hunt/stream` and paints each frame as it lands.
+
+```
+POST /api/v1/hunt/stream   {"q": "…", "sort": "accuracy", "limit": 0}
+
+data: {"type":"results","final":false,"provider":"mojeek","answered":40,
+       "total":12,"hits":[…]}          ← every source that answers updates the list
+…
+data: {"type":"results","final":true,"answered":94,"total":65,"hits":[…]}   ← the clock ran out
+data: {"type":"done","hits":[…],"stats":{…}}                                 ← the settled answer
+```
+
+Each frame carries **the whole list as it stands**, already ordered, so a late source slots into its
+right place instead of being appended to the bottom. Frames are emitted whenever the answer actually
+changes (throttled to ~12 a second) plus a heartbeat every half second, so a client can tell "nothing
+new yet" from "nothing happening". The same filters the finished answer applies — the typed file type,
+`only_exact` — are applied to the frames too: a live result is never something the final answer is
+about to drop.
+
+### Accuracy first, upload date second
+
+`sort: "accuracy"` is what the page asks for:
+
+| band | meaning |
+|---|---|
+| 1 | the phrase, word for word, in the title, snippet or URL |
+| 2 | the words are there but not adjacent — ordered by how many extra words sit between them |
+| 3 | no verbatim match reported |
+
+Inside a band the **newest upload wins**, banded the same way the newest-first order always was: dated
+in the past (newest first), then future-dated (a broken clock, never allowed to jump the queue), then
+undated. Junk-labelled results stay last. An exact match from 2019 therefore outranks a fresh page that
+does not contain the phrase — which is the point of ordering by accuracy before date.
+
+The page falls back to a plain `POST /api/v1/hunt` if a proxy buffers SSE, so nothing depends on
+streaming being available.
 
 ## Typing a file type means that file type
 

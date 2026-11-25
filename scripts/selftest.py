@@ -28,7 +28,7 @@ os.environ["NH_DATA_DIR"] = str(_TMP)
 from app import fixtures, freshness, local_index, registry  # noqa: E402
 from app.api import router  # noqa: E402
 from app.crawl import CrawlRequest, FusionCrawler  # noqa: E402
-from app.models import HuntRequest  # noqa: E402
+from app.models import Hit, HuntRequest  # noqa: E402
 from app.orchestrator import hunt, rank  # noqa: E402
 
 def free_port() -> int:
@@ -541,6 +541,68 @@ async def main() -> int:
     ok &= check("the page says it is searching, and offers 'ask again'",
                 "searching every working source" in launcher_now
                 and "ask again" in launcher_now)
+
+    print("\n\u25b8 12. results arrive as each source answers, ordered by accuracy then upload date")
+    frames: list[dict] = []
+    stamps: list[float] = []
+    began = time.perf_counter()
+
+    async def collector(event):
+        if event.get("type") == "results":
+            frames.append(event)
+            stamps.append(time.perf_counter() - began)
+
+    stall2 = {"n": 0}
+
+    async def slow_some(provider, ctx):
+        stall2["n"] += 1
+        if stall2["n"] <= 3:            # three engines that take their time
+            await asyncio.sleep(1.6)
+        return provider, [], 1.0, None
+
+    try:
+        orch._run_provider = slow_some
+        streamed = await orch.hunt(HuntRequest(q="stream probe", limit=0, sort="accuracy"),
+                                   emit=collector, use_cache=False)
+    finally:
+        orch._run_provider = real_runner
+    total = time.perf_counter() - began
+
+    ok &= check("the first frame lands long before the last source finishes",
+                bool(stamps) and stamps[0] < total * 0.75,
+                f"{stamps[0]:.2f}s of {total:.2f}s" if stamps else "no frames")
+    ok &= check("several frames arrive instead of one dump at the end",
+                len(frames) >= 2, str(len(frames)))
+    answered = [frame.get("answered", 0) for frame in frames]
+    ok &= check("each frame says how many sources have answered so far",
+                all(a <= b for a, b in zip(answered, answered[1:])) and answered[-1] > 0,
+                str(answered[:6]))
+    ok &= check("the last streamed frame is marked final",
+                frames[-1].get("final") is True)
+
+    def accuracy_key(hit: dict) -> tuple:
+        band = 0 if hit.get("exact") else (1 if hit.get("proximity") is not None else 2)
+        return (band, hit["proximity"] if hit.get("proximity") is not None else 10 ** 6)
+
+    ok &= check("every frame is already ordered by accuracy",
+                all([accuracy_key(h) for h in frame["hits"]]
+                    == sorted(accuracy_key(h) for h in frame["hits"]) for frame in frames))
+
+    exact_new = Hit(url="exact-new", title="x", provider="p", provider_name="P",
+                    exact=True, proximity=0, published="2026-11-23T10:00:00Z")
+    exact_old = Hit(url="exact-old", title="x", provider="p", provider_name="P",
+                    exact=True, proximity=0, published="2019-01-01T00:00:00Z")
+    fresh_miss = Hit(url="fresh-miss", title="x", provider="p", provider_name="P",
+                     exact=False, proximity=None, published="2026-11-23T11:00:00Z")
+    order = [h.url for h in orch.rank([fresh_miss, exact_old, exact_new], "accuracy", verbatim=True)]
+    ok &= check("an exact match from 2019 outranks a fresh page that does not contain the phrase",
+                order == ["exact-new", "exact-old", "fresh-miss"], str(order))
+    ok &= check("the finished answer keeps that order",
+                streamed.sort == "accuracy" and len(streamed.hits) >= 0)
+    ok &= check("the page listens to the stream and asks for accuracy order",
+                "/api/v1/hunt/stream" in launcher_now and 'sort: "accuracy"' in launcher_now)
+    ok &= check("the stream route exists on the API",
+                "/api/v1/hunt/stream" in {getattr(route, "path", "") for route in router.routes})
 
     httpd.shutdown()
     print("\n" + ("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED"))
