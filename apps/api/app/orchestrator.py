@@ -9,7 +9,8 @@ from typing import Any, Awaitable, Callable
 
 import httpx
 
-from . import exact, freshness, intent as query_intent, local_index, near_dup, quality, registry
+from . import (exact, freshness, intent as query_intent, local_index, near_dup, quality,
+               recency, registry, understand)
 from .config import settings
 from .extract import (canonical_url, depth_score, fingerprint, find_deadline, opportunity_tags,
                       truncate)
@@ -460,6 +461,9 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     # What is being asked for, before anything is crawled: a file type ("apk",
     # "pdf report") and/or a host ("mediafire"). A type word becomes the one
     # filter the engine has; a host word becomes an aim, not a filter.
+    # Read the question first: what kind of thing is wanted, what the subject
+    # phrase is, which place or organisation was named, which year was mentioned.
+    understanding = understand.read(req.q)
     asked = query_intent.parse(req.q)
     search_text = asked.query if asked.wants_files else req.q
     if not search_text.strip():
@@ -490,6 +494,7 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                              "file_types": plan.file_types,
                              "plays": [{"id": p.id, "label": p.label, "dork": p.dork} for p in plan.plays]},
                     "domains": domains,
+                    "understanding": understanding.as_meta(),
                     "providers": [p.id for p in providers],
                     "waiting": [p.id for p in waiting],
                     "expanded": expanded})
@@ -524,6 +529,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
             {"id": p.id, "name": p.name, "status": "needs_key", "count": 0, "ms": 0,
              "message": "credentials not set"} for p in waiting
         ]
+        window = recency.Window.current()
+
         def stream_view() -> list[Hit]:
             """What the answer would be right now, with the caller's own filters applied.
 
@@ -531,7 +538,7 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
             frame must never show a result the final answer is about to drop
             because the query asked for a type.
             """
-            rows = list(collected)
+            rows, _ = recency.apply(list(collected), window)
             if req.only_exact:
                 rows = [h for h in rows if h.exact]
             if asked.types:
@@ -569,6 +576,12 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                         batch.append(hit)
                     else:
                         dropped += 1
+                for hit in batch:
+                    # a small nudge towards the kind of artefact that was described;
+                    # accuracy still decides the order, this only breaks ties
+                    bonus = understanding.relevance_bonus(hit)
+                    if bonus:
+                        hit.score += bonus
                 collected.extend(batch)
                 statuses.append({"id": provider.id, "name": provider.name,
                                  "status": "error" if error else ("empty" if not raws else "ok"),
@@ -631,6 +644,11 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                         lambda t: t.cancelled() or t.exception())
 
     fused = merge_hits(collected)
+    # The window is applied before anything else reads the set: older than two
+    # years is cut here, once, so ranking, dedup, limits and the stream all see
+    # the same list. Nothing downstream can put a 2019 page back.
+    window = recency.Window.current()
+    fused, window_stats = recency.apply(fused, window)
     before = len(fused)
     collapsed = 0
     scanned = 0
@@ -727,6 +745,10 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         slow_providers=int(slow),
         post_ms=int((time.perf_counter() - after_sources) * 1000),
         copies_scanned=int(scanned),
+        window_days=int(window_stats["window_days"]),
+        cut_older=int(window_stats["cut_older"]),
+        cut_future=int(window_stats["cut_future"]),
+        undated_kept=int(window_stats["undated_kept"]),
     )
     intent_meta = asked.as_meta()
     intent_meta.update({
@@ -741,7 +763,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                             plays=[p.dork for p in plan.plays], expanded=expanded,
                             sort=req.sort, as_of=freshness.utcnow().isoformat(),
                             match=req.match, only_exact=req.only_exact,
-                            unrestricted=req.unrestricted, intent=intent_meta)
+                            unrestricted=req.unrestricted, intent=intent_meta,
+                            understanding=understanding.as_meta())
     _cache[key] = (time.time(), response)
     if len(_cache) > settings.cache_max:
         for stale in sorted(_cache, key=lambda k: _cache[k][0])[:50]:

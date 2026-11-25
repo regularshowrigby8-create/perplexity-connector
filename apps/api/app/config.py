@@ -72,6 +72,10 @@ class Settings(BaseSettings):
     # waiting on the slowest of 119 engines (which was the whole lag)
     hunt_budget_ms: int = 2500
 
+    # the recency window every search answer lives inside
+    window_days: int = 730        # two years: older is cut, not sorted last
+    future_days: int = 120        # a date further ahead than this is a broken clock
+
     # how many of the top results the duplicate report looks at — clustering
     # every row was seconds of CPU on a small instance, for a number nobody
     # reads past the first screen

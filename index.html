@@ -2062,6 +2062,25 @@
     border-top: 1px solid var(--line);
   }
 
+  /* what the engine understood, in one quiet line */
+  .understood {
+    margin: 10px 0 0;
+    padding: 0 0 0 12px;
+    border-left: 2px solid var(--accent);
+    color: var(--ink2);
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+
+  .understood b {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .understood .warn {
+    color: #c79f6a;
+  }
+
 </style>
 </head>
 <body>
@@ -2107,7 +2126,7 @@
   <section class="hero" id="search">
     <div class="wrap hero-in">
       <h1 class="title">Find the files search engines bury.</h1>
-      <p class="lede">Documents, forms, notices and data that ordinary search skips. Exact words, best match first, newest upload inside each band, nothing removed.</p>
+      <p class="lede">Documents, forms, notices and data that ordinary search skips — from the last two years only, best match first, nothing older than that.</p>
 
       <div class="panel" id="hunt">
         <form class="row" id="hunt-form" autocomplete="off">
@@ -2164,6 +2183,7 @@
       <span class="rule"></span>
       <span class="tiny" id="live-note"></span>
     </div>
+    <p class="understood" id="live-understood" hidden></p>
     <div class="deep-counts" id="live-counts"></div>
     <div class="deep-results" id="live-hits"></div>
   </section>
@@ -2345,7 +2365,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
 <footer>
   <div class="wrap foot">
-    <span class="mono">NIGHTHAWK v1.7</span>
+    <span class="mono">NIGHTHAWK v1.8</span>
     <span class="dim">·</span>
     <a data-route="api/docs">API</a>
     <a data-route="arsenal">Crawlers</a>
@@ -2787,6 +2807,32 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     return row;
   }
 
+  function renderUnderstanding(meta) {
+    var box = document.getElementById("live-understood");
+    if (!box) return;
+    var u = meta || {};
+    var text = u.summary || "";
+    if (!text) {
+      box.hidden = true;
+      return;
+    }
+    box.innerHTML = "";
+    var label = document.createElement("b");
+    label.textContent = "Understood · ";
+    box.appendChild(label);
+    box.appendChild(document.createTextNode(text));
+    if (u.window_days && text.indexOf("nothing older than") === -1) {
+      box.appendChild(document.createTextNode(" · nothing older than " + u.window_days + " days"));
+    }
+    (u.warnings || []).forEach(function (line) {
+      var warn = document.createElement("div");
+      warn.className = "warn";
+      warn.textContent = line;
+      box.appendChild(warn);
+    });
+    box.hidden = false;
+  }
+
   function renderReport(report, headline) {
     var hits = report.hits || [];
     var stats = report.stats || {};
@@ -2795,6 +2841,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     document.getElementById("live").hidden = false;
     hidePanels();
     document.getElementById("live-title").textContent = headline;
+    renderUnderstanding(report.understanding);
     var intent = report.intent || {};
     var typed = intent.types || [];
     var hosts = intent.hosts || [];
@@ -2815,6 +2862,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (stats.took_ms !== undefined && stats.took_ms !== null) note.push(stats.took_ms + " ms");
     if (stats.cached) note.push("cached");
     if (stats.slow_providers) note.push(stats.slow_providers + " still answering");
+    if (stats.cut_older) note.push(stats.cut_older + " older than " + (stats.window_days || 730) + " days cut");
     var noteEl = document.getElementById("live-note");
     noteEl.textContent = note.join(" · ");
     if (stats.cached) {
@@ -2854,6 +2902,17 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (stats.noise_retained) tick("noise kept", stats.noise_retained, "kept, not dropped");
     if (stats.undated) tick("undated", stats.undated, "no date anywhere — kept, last");
     if (stats.newest_age_human) tick("newest", stats.newest_age_human, "age of the newest result");
+    if (stats.cut_older) {
+      tick("cut as too old", stats.cut_older,
+        "results the site dates older than " + (stats.window_days || 730) + " days — the window cuts them, it does not sort them last");
+    }
+    if (stats.cut_future) {
+      tick("cut as future-dated", stats.cut_future,
+        "dates further ahead than " + (stats.future_days || 120) + " days — a broken clock, not a document from the future");
+    }
+    if (stats.undated_kept) {
+      tick("undated kept", stats.undated_kept, "no date anywhere on the page — kept, because a missing date is not evidence of age");
+    }
     if (stats.slow_providers) {
       tick("still answering", stats.slow_providers,
         "engines that had not answered when the " + (stats.budget_ms || 2500) +
@@ -2938,9 +2997,10 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
   // The hunt stream sends a whole ordered list per frame; the crawl stream sends
   // one event per page read. Same reader, two consumers.
-  function streamHunt(body, onFrame) {
+  function streamHunt(body, onFrame, onMeta) {
     return streamPost("/api/v1/hunt/stream", body, function (payload) {
       if (payload.type === "results") onFrame(payload);
+      else if (payload.type === "meta" && onMeta) onMeta(payload);
     });
   }
 
@@ -3005,6 +3065,8 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     streamHunt(body, function (frame) {
       clearTimeout(nudge);
       renderFrame(frame);
+    }, function (meta) {
+      if (meta.understanding) renderUnderstanding(meta.understanding);
     }).then(function (out) {
       finish(out.report);
     }).catch(function () {
@@ -3044,6 +3106,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (!bar) return;
     var bits = [[state.hits, "found"], [state.pages, "pages read"]];
     if (state.blocked) bits.push([state.blocked, "blocked by robots"]);
+    if (state.cut) bits.push([state.cut, "older than the window, cut"]);
     if (state.errors) bits.push([state.errors, "errors"]);
     bits.push(["…", "still crawling"]);
     bar.innerHTML = bits.map(function (bit) {
@@ -3060,7 +3123,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       return;
     }
     var headline = "Crawl · " + q;
-    var state = { hits: 0, pages: 0, files: 0, blocked: 0, errors: 0 };
+    var state = { hits: 0, pages: 0, files: 0, blocked: 0, errors: 0, cut: 0 };
     crawlRows = [];
     crawlErrors = [];
     document.getElementById("live-title").textContent = headline;
@@ -3092,6 +3155,8 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
         crawlErrors.push((event.url ? event.url + " — " : "") + (event.message || "error"));
       } else if (event.type === "progress") {
         state.pages = Math.max(state.pages, event.pages || 0);
+      } else if (event.type === "done" && event.stats) {
+        state.cut = event.stats.cut_older || 0;
       }
       crawlCounts(state);
     }
@@ -3123,6 +3188,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (stats.files) note.push(stats.files + " files");
     if (blocked) note.push(blocked + " blocked by robots");
     if (errors) note.push(errors + " errors");
+    if (stats.cut_older) note.push(stats.cut_older + " older than " + (stats.window_days || 730) + " days left out");
     if (stats.took_ms) note.push(stats.took_ms + " ms");
     document.getElementById("live-note").textContent = note.join(" · ");
 
@@ -3132,6 +3198,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       '<span class="tick"><b>' + pages + "</b> pages read</span>" +
       (blocked ? '<span class="tick"><b>' + blocked + "</b> blocked by robots</span>" : "") +
       (errors ? '<span class="tick"><b>' + errors + "</b> errors</span>" : "") +
+      (stats.cut_older ? '<span class="tick"><b>' + stats.cut_older + "</b> older than the window</span>" : "") +
       (stats.docs_indexed ? '<span class="tick"><b>' + stats.docs_indexed + "</b> documents read</span>" : "");
 
     crawlRows = hits;

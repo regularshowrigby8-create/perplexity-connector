@@ -111,11 +111,14 @@ into `Ford Foundation · USD 90,000 · Nairobi, Kenya · 2026-02-28`.
 
 | Repo | Taken | Lands in | Effect |
 |---|---|---|---|
+| [u-prashant/RAKE](https://github.com/u-prashant/RAKE) | the whole package — `rake.py`, `SmartStoplist.txt`, LICENSE — vendored unmodified under `apps/api/app/vendor/rake_keyword/` | `understand.py::read` | every search is read before a source is asked: the subject phrase is the highest-RAKE-scoring run of words in the query, and the answer says what it understood — **wired (vendored source, py3, stdlib only)** |
 | [LIAAD/yake](https://github.com/LIAAD/yake) | YAKE parameters (`n=3`, `dedupLim=0.85`, `top=12`) | `keyterms.py::keyphrases` | every hit carries 4–6 extracted keyphrases — **wired** |
 | [boudinfl/pke](https://github.com/boudinfl/pke) | TF-IDF/TextRank family as the fallback | `keyterms.py` | phrases still appear when YAKE is absent — **ported** |
 | [swisscom/ai-research-keyphrase-extraction](https://github.com/swisscom/ai-research-keyphrase-extraction) | embedded-keyphrase elimination idea | `keyterms.py::_dedupe_subphrases` | `climate grant` is not listed next to `grant` — **ported** |
 | [searxng/searxng](https://github.com/searxng/searxng) | synonym expansion per category | `keyterms.py::THESAURUS`, `expand_terms` | a hunt for "grant" also queries "call for proposals", "tender", "fellowship" — **ported** |
 | [explosion/spaCy](https://github.com/explosion/spaCy) | (rejected) heavy NLP dependency | — | we kept YAKE + regex: no model download, works offline — **decision** |
+| [aneesha/RAKE](https://github.com/aneesha/RAKE) | (rejected) Python 2 source; only its `SmartStoplist.txt` lineage is reused | `vendor/rake_keyword/resources` | the same stop list, through the Python 3 fork above — **decision** |
+| [MaartenGr/KeyBERT](https://github.com/MaartenGr/KeyBERT) · [csurfer/rake-nltk](https://github.com/csurfer/rake-nltk) | (rejected) torch + sentence-transformers, NLTK corpora | — | a free 512 MB instance cannot download a model at boot; RAKE needs nothing — **decision** |
 
 ## 8. Change detection
 
@@ -169,11 +172,11 @@ Selected repos represented there, by role:
 | 4. Text extraction | 12 |
 | 5. Files | 10 |
 | 6. Structured fields | 5 |
-| 7. Query understanding | 5 |
+| 7. Query understanding | 8 |
 | 8. Change detection | 2 |
 | 9. Opportunity & archive data | 9 |
 | 10. Registered arsenal engines | 50 (of 86 entries) |
-| **Distinct projects** | **120** (52 wired or ported into the request path) |
+| **Distinct projects** | **123** (53 wired or ported into the request path, 1 of them vendored source) |
 
 ## What this bought, in numbers
 

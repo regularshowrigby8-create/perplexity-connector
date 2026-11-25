@@ -28,8 +28,9 @@ from urllib.parse import parse_qsl, urlsplit
 
 from pydantic import BaseModel, Field
 
-from . import exact, freshness
+from . import exact, freshness, recency
 from .crawl import CrawlRequest, FusionCrawler
+from .models import Hit
 
 QUERY_SURFACE = re.compile(
     r"(id|notice|doc|document|file|download|attachment|view|page|pg|item|record|"
@@ -142,7 +143,6 @@ async def deep_crawl(req: DeepRequest,
     result = await crawler.run()
 
     phrase = exact.Phrase.parse(req.query) if req.query.strip() else None
-    from .models import Hit
 
     hits: list[Hit] = []
     for payload in result.get("files", []):
@@ -183,6 +183,15 @@ async def deep_crawl(req: DeepRequest,
         "as_of": datetime.now(timezone.utc).isoformat(),
         "unrestricted": True,
     })
+    # the same window as every other answer: a page you pasted is not an excuse
+    # for a 2013 annex to come back — undated pages are still kept
+    hits, window_stats = recency.apply(hits)
+    stats = dict(stats or {})
+    stats["window_days"] = window_stats["window_days"]
+    stats["cut_older"] = window_stats["cut_older"]
+    stats["cut_future"] = window_stats["cut_future"]
+    stats["undated_kept"] = window_stats["undated_kept"]
+
     return {
         "query": req.query,
         "seeds": [{"url": url, "host": _host(url)} for url in seeds],

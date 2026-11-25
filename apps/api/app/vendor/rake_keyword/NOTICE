@@ -1,0 +1,24 @@
+rake_keyword — Rapid Automatic Keyword Extraction
+=================================================
+
+Source:   https://github.com/u-prashant/RAKE  (package `rake`, MIT)
+Author:   Prashant Upadhyay
+License:  MIT (see LICENSE in this directory)
+
+Why it is here
+--------------
+Nighthawk reads a query before it fetches anything: which phrase is the
+subject, which words are filler, what kind of thing the person wants. RAKE is
+the keyword/phrase half of that — it scores candidate phrases from word degree
+and frequency without a model file, a download, or a network call, which is the
+only kind of thing that can run on a free instance with no data directory.
+
+What was changed
+----------------
+Nothing in rake.py. The file is vendored verbatim so it can be read against
+upstream. The default stop-word path (`resources/SmartStoplist.txt`, relative to
+the process working directory) is supplied explicitly by
+`apps/api/app/understand.py`, which points at the copy shipped here.
+
+SmartStoplist.txt is the Fox/Smart stop list that ships with RAKE upstream
+(originally from https://github.com/aneesha/RAKE, MIT).

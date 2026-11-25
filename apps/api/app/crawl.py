@@ -19,7 +19,7 @@ from urllib.parse import urljoin, urlsplit
 import httpx
 from pydantic import BaseModel, Field
 
-from . import local_index
+from . import local_index, recency
 from .arsenal import available_ids
 from .config import settings
 from .extract import (FILE_MAP, canonical_url, depth_score, fingerprint, find_deadline,
@@ -99,6 +99,7 @@ class CrawlStats:
     bytes: int = 0
     docs_indexed: int = 0
     opportunities: int = 0
+    cut_older: int = 0
     started: float = field(default_factory=time.time)
     engines: dict[str, int] = field(default_factory=dict)
 
@@ -111,6 +112,8 @@ class CrawlStats:
             "blocked_by_robots": self.blocked, "errors": self.errors,
             "opportunities": self.opportunities,
             "bytes": self.bytes, "docs_indexed": self.docs_indexed,
+            "cut_older": self.cut_older,
+            "window_days": recency.Window.current().days,
             "engines": self.engines,
             "took_ms": int((time.time() - self.started) * 1000),
         }
@@ -475,6 +478,17 @@ class FusionCrawler:
         return seeds
 
     # --------------------------------------------------------------------- files
+    def _in_window(self, hit: Hit) -> bool:
+        """The same recency window a search uses, applied to what a crawl keeps.
+
+        An undated page is kept (the site may simply not publish a clock); a page
+        that says it is from 2014 is not, however it was reached.
+        """
+        if recency.Window.current().keeps(hit):
+            return True
+        self.stats.cut_older += 1
+        return False
+
     async def _register_file(self, url: str, referrer: str | None, depth: int,
                              headers: dict[str, str] | None = None) -> Hit | None:
         canon = canonical_url(url)
@@ -566,6 +580,8 @@ class FusionCrawler:
                 hit.keyphrases = []
         hit.depth = depth_score(url, ext, False, text[:2000])
         hit.score = 40 + hit.depth * 0.5
+        if not self._in_window(hit):
+            return None
         self.files[canon] = hit
         self.stats.files += 1
         if sniffed:
@@ -690,8 +706,9 @@ class FusionCrawler:
             page_hit.meta["published_source"] = clock_source
             page_hit.depth = depth_score(url, None, False, text[:2000])
             page_hit.score = 35 + page_hit.depth * 0.5 + (12 if structured else 0)
-            self.page_hits[canon] = page_hit
-            await self._send("pagehit", hit=page_hit.model_dump())
+            if self._in_window(page_hit):
+                self.page_hits[canon] = page_hit
+                await self._send("pagehit", hit=page_hit.model_dump())
 
         if records:
             await self._send("structured", url=url, count=len(records),

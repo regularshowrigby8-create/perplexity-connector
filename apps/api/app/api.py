@@ -9,7 +9,7 @@ from typing import Any, AsyncIterator
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
-from . import arsenal, local_index, registry
+from . import arsenal, local_index, recency, registry
 from .config import public_port, settings
 from .crawl import CrawlRequest, FusionCrawler
 from .deep import DeepRequest, deep_crawl
@@ -200,7 +200,11 @@ async def get_vault(q: str = Query(default="", max_length=300),
                     limit: int = Query(default=40, ge=1, le=200)) -> dict[str, Any]:
     meta = local_index.search_vault(q, limit=limit) if mode in ("both", "meta") else []
     docs = local_index.search_docs(q, limit=limit) if mode in ("both", "fulltext") else []
-    return {"query": q, "meta": meta, "fulltext": docs, "stats": local_index.vault_stats()}
+    window = recency.Window.current()
+    meta, meta_window = recency.apply(meta, window)
+    return {"query": q, "meta": meta, "fulltext": docs,
+            "window": window.as_meta(), "cut_older": meta_window["cut_older"],
+            "stats": local_index.vault_stats()}
 
 
 # ------------------------------------------------------------------ crawl routes

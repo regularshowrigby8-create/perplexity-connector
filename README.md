@@ -59,6 +59,53 @@ the copy:
 
 ---
 
+## The engine reads the question first
+
+Before a single source is asked, `understand.py` turns the query into a structure: what kind of thing
+is wanted, what the subject phrase is, which place or organisation was named, which file type was
+asked for, which years were mentioned, what was excluded, and whether the request can be honoured
+inside the window at all.
+
+"A machine part that understands the search" is not a prompt: it is a taxonomy (`KINDS`), a gazetteer
+of places, a rule for names ("World Bank" is one name, not "Bank"), a reader for quoted phrases and
+`-exclusions`, and **RAKE** for the phrase extraction. RAKE is a real codebase, vendored unmodified in
+`apps/api/app/vendor/rake_keyword/` — MIT, from [`u-prashant/RAKE`](https://github.com/u-prashant/RAKE),
+with the upstream `rake.py`, its `SmartStoplist.txt` and its LICENSE kept intact next to a NOTICE that
+records the URL and the reason it is here. It needs no model file, no download and no network: it
+scores phrases from word degree and frequency, which is the only kind of keyword engine that belongs
+on a free instance.
+
+What it does with the reading:
+
+| reading | effect |
+|---|---|
+| kind (`form`, `tender`, `dataset`, `document`, `legal`, `code`, `media`, `job`, `place`) | a **+6** ordering nudge towards that artefact, and a suggested lens — never a filter |
+| subject phrases | shown back to you ("about 'water points maintenance tender'") |
+| places and names | shown back, and used by the existing intent layer |
+| file words (`pdf`, `csv`, `apk`…) | become the one type filter the engine has |
+| quoted phrases, `-exclusions` | separated out and honoured by the verbatim matcher |
+| a year outside the window | a warning in the answer and on the page, before you read any results |
+
+The words matched against a result are still the words you typed — the reading steers *where to look*
+and *how to phrase the answer*, never *what counts as a match*.
+
+```bash
+curl -s localhost:8000/api/v1/hunt -H 'content-type: application/json' \
+  -d '{"q":"climate resilience grant application form for coastal towns in Kenya","limit":5}' \
+  | python -m json.tool | head -30
+# "understanding": {
+#   "kind": "form", "kind_label": "a form or application",
+#   "phrases": ["climate resilience grant application", "coastal towns", "kenya"],
+#   "places": ["kenya"], "suggested_lens": "applications",
+#   "summary": "A form or application, about \u201cclimate resilience grant application\u201d \u2014 in Kenya",
+#   "engine": "rules + RAKE (vendored)"
+# }
+```
+
+On the page it is one quiet line under the search: **Understood · A form or application, about
+"climate resilience grant application" — in Kenya · nothing older than 730 days**, with any conflict
+underneath it in amber.
+
 ## Verbatim results, and no restrictions on them
 
 The query is matched **word for word**. No stemming, no synonyms, no query expansion, no fuzzy
@@ -286,14 +333,52 @@ A host word (`mediafire`, `mega`, `drive`, `dropbox`, `apkmirror`, `archive.org`
 `fdroid`, `archivefiles`, `sourceforge`) and lifts those results to the front. A host we cannot reach
 returns nothing and says so — it never turns into "no results".
 
+## Nothing older than two years — the window is the search
+
+Every answer is bounded to the **last 730 days**. A result whose own clock says it is older than
+that is not returned: not sorted last, not greyed out, not "see more" — cut, before ranking, dedupe
+and limits ever see it. `recency.py` holds the rule and `Window.current()` is the only place the
+number lives.
+
+| what the page says | what happens |
+|---|---|
+| published seconds, minutes, days or months ago | **kept**, and it is where the answer starts |
+| published up to two years ago | **kept** — the far end of the window |
+| published 2014 | **cut**, and counted in `cut_older` |
+| dated 18 months in the future | **cut** as a broken clock, counted in `cut_future` |
+| dated 3 weeks ahead (a tender opening, a scheduled notice) | **kept**, sorted after real dates |
+| no date anywhere on the page or in its headers | **kept**, counted in `undated_kept` |
+
+The last row is the deliberate one. A page with no clock — an `/uploads/2019/03/annex.pdf` whose only
+date is in its path, a portal entry behind a form, an old-style `.doc` with no metadata — is not
+evidence of age. We saw it today. It is kept, and counted separately so you can see how much of the
+answer is undated rather than dated.
+
+The window applies to **every way in**, not just the front page:
+
+- **a search** — applied once to the merged set, so the live streamed frames and the final answer
+  both obey it (live: `stats.window_days 730 · cut_older 4 · undated_kept 18`)
+- **the vault** — `search_vault` now carries a real `published` column (added by an in-place
+  migration, with a one-off full-text rebuild for vaults written by older releases), so a 2011 annex
+  found last month is judged on its date, not on when we found it
+- **a pasted link** — the crawl and deep layers use the same gate; an undated page on a site you named
+  is still kept, a page the site dates 2014 is not
+
+Nothing about the cut is silent: the answer carries `cut_older`, `cut_future` and `undated_kept`, the
+page shows them as ticks ("12 cut as too old"), and a query that names a year outside the window says
+so out loud — "2016 is outside the 730-day window the engine enforces, so this search can only return
+2024 onwards" — instead of quietly returning nothing.
+
 ## Newest first, to the second
 
 ### A clock that lies
 
 Future-dated records used to sort *above* everything, because their age is negative — which is how a
 document stamped "in 10 months" ended up over results that were 16 seconds old. Newest-first now has
-three bands: dated in the past (newest first, to the second), dated in the future (a wrong clock,
-sorted after every real date), then undated. Nothing is removed; only the order changed.
+three bands: dated in the past (newest first, to the second), dated up to a few months ahead (a
+scheduled notice, sorted after every real date), then undated. Anything dated further ahead than 120
+days is a broken clock and is cut by the window above — a date that cannot be true is not a reason to
+show a page.
 
 `sort=newest` is the **default**. It is not a guess at what is fresh — every engine in the
 freshness layer hands back the source's own publication timestamp, and the API normalises it to
@@ -665,6 +750,9 @@ apps/api/app/
   textkit.py       parser/extractor dispatch
   registry.py      the 119 remote engines
   orchestrator.py  fan-out, fusion, ranking, streaming
+  understand.py    reads the query first: kind, phrases, places, names, file words, years
+  recency.py       the 730-day window every answer lives inside (and what it cut)
+  vendor/          imported code, unmodified, with its LICENSE and a NOTICE
   local_index.py   SQLite FTS5 / Whoosh / Tantivy / BM25 vault
   portals.py       54 portals + archive targeting
   plays.py         natural language → dorks

@@ -147,6 +147,11 @@ class HuntStats(BaseModel):
     # time spent after the last source answered (dedupe report, ranking, index)
     post_ms: int = 0
     copies_scanned: int = 0
+    # the recency window: what it was, and how much it cut
+    window_days: int = 0
+    cut_older: int = 0
+    cut_future: int = 0
+    undated_kept: int = 0
 
 
 class HuntResponse(BaseModel):
@@ -162,6 +167,8 @@ class HuntResponse(BaseModel):
     match: str = "exact"
     only_exact: bool = False
     unrestricted: bool = True
+    # what the query was read as before anything was fetched
+    understanding: dict[str, Any] | None = None
     as_of: str | None = None
     expanded: list[str] = Field(default_factory=list)
     # what the query asked for, read before crawling: file types, hosts, and what

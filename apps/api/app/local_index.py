@@ -58,7 +58,8 @@ _SCHEMA = """
                 first_seen TEXT,
                 last_seen TEXT,
                 times_seen INTEGER DEFAULT 1,
-                payload TEXT
+                payload TEXT,
+                published TEXT
             );
             CREATE UNIQUE INDEX IF NOT EXISTS vault_canonical ON vault(canonical);
             CREATE INDEX IF NOT EXISTS vault_ext ON vault(file_ext);
@@ -181,14 +182,32 @@ def init() -> None:
 
 def _ensure_columns(conn: sqlite3.Connection | None = None) -> None:
     """Small in-place migrations; the vault must survive upgrades."""
-    wanted = {"docs": {"hash": "TEXT"}, "vault": {"rich": "INTEGER NOT NULL DEFAULT 0"}}
+    wanted = {"docs": {"hash": "TEXT"},
+              "vault": {"rich": "INTEGER NOT NULL DEFAULT 0",
+                        # the date the vault needs to answer "is this inside the window?"
+                        "published": "TEXT"}}
 
     def migrate(target: sqlite3.Connection) -> None:
+        upgraded = False
         for table, columns in wanted.items():
             existing = {row[1] for row in target.execute(f"PRAGMA table_info({table})")}
             for column, kind in columns.items():
                 if column not in existing:
                     target.execute(f"ALTER TABLE {table} ADD COLUMN {column} {kind}")
+                    upgraded = True
+        # indexes on migrated columns come after the columns exist
+        try:
+            target.execute("CREATE INDEX IF NOT EXISTS vault_published ON vault(published)")
+        except sqlite3.Error:
+            pass
+        # a vault written by an older release can be missing from its own
+        # full-text index (rows inserted before the index existed); an upgrade
+        # rebuilds it once, from the rows themselves
+        if upgraded:
+            try:
+                target.execute("INSERT INTO vault_fts(vault_fts) VALUES('rebuild')")
+            except sqlite3.Error:
+                pass
 
     if conn is not None:
         migrate(conn)
@@ -255,8 +274,8 @@ def upsert_hits(hits: Iterable) -> int:
                 cur = conn.execute(
                     """INSERT INTO vault (url, canonical, title, snippet, provider, kind, file_ext,
                                           domain, deadline, depth, first_seen, last_seen, times_seen,
-                                          payload, rich)
-                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1,?,?)
+                                          payload, rich, published)
+                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1,?,?,?)
                        ON CONFLICT(canonical) DO UPDATE SET
                          last_seen=excluded.last_seen,
                          times_seen=vault.times_seen+1,
@@ -273,10 +292,13 @@ def upsert_hits(hits: Iterable) -> int:
                          payload=CASE WHEN excluded.rich >= vault.rich THEN excluded.payload
                                       ELSE vault.payload END,
                          rich=MAX(vault.rich, excluded.rich),
-                         depth=MAX(vault.depth, excluded.depth)""",
+                         depth=MAX(vault.depth, excluded.depth),
+                         published=COALESCE(NULLIF(vault.published, ''), excluded.published)""",
                     (h.url, canon, h.title, h.snippet, h.provider, h.kind, h.file_ext,
                      h.domain, h.deadline.date if getattr(h, "deadline", None) else None,
-                     int(getattr(h, "depth", 0)), stamp, stamp, payload, richness),
+                     int(getattr(h, "depth", 0)), stamp, stamp, payload, richness,
+                     (getattr(h, "published_at", None) or getattr(h, "published", None)
+                      or getattr(h, "first_seen", None) or stamp)),
                 )
                 added += cur.rowcount
             except sqlite3.Error:
@@ -421,7 +443,8 @@ def search_vault(query: str, limit: int = 40, file_ext: str | None = None) -> li
                     "kind": row["kind"] or "page", "file_ext": row["file_ext"],
                     "domain": row["domain"] or "", "depth": row["depth"] or 0,
                     "deadline": row["deadline"], "score": round(-row["rank"] * 10, 2),
-                    "first_seen": row["first_seen"], "times_seen": row["times_seen"],
+                    "first_seen": row["first_seen"], "published": row["published"],
+                    "times_seen": row["times_seen"],
                     "meta": _payload_meta(row["payload"]),
                 })
     except sqlite3.Error:

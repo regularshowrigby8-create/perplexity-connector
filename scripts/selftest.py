@@ -679,6 +679,114 @@ async def main() -> int:
                 timed_report.stats.budget_ms == 1500
                 and timed_report.stats.slow_providers >= 0)
 
+    print("\n▸ 15. nothing older than two years comes back")
+    from app import recency
+    from app.models import Hit as WindowHit
+
+    import datetime as _dt
+    _now = _dt.datetime.now(_dt.timezone.utc)
+
+    def _old(days: int) -> str:
+        return (_now - _dt.timedelta(days=days)).isoformat().replace("+00:00", "Z")
+
+    def _row(url: str, published=None, first_seen=None) -> WindowHit:
+        return WindowHit(url=url, title=url, provider="p", provider_name="P",
+                         published=published, first_seen=first_seen)
+
+    probe = [_row("seconds", _old(0)), _row("one-year", _old(365)), _row("just-under", _old(729)),
+             _row("five-years", _old(5 * 365)), _row("ahead-60", _old(-60)),
+             _row("ahead-500", _old(-500)), _row("no-date"),
+             _row("seen-today", None, _old(0))]
+    kept_rows, win_stats = recency.apply(probe)
+    kept_urls = [row.url for row in kept_rows]
+    ok &= check("results from seconds ago to just under two years are kept",
+                {"seconds", "one-year", "just-under"} <= set(kept_urls), str(kept_urls))
+    ok &= check("a five-year-old page is cut, not sorted last",
+                "five-years" not in kept_urls and win_stats["cut_older"] == 1, str(win_stats))
+    ok &= check("a page dated two years into the future is cut too",
+                "ahead-500" not in kept_urls and "ahead-60" in kept_urls, str(kept_urls))
+    ok &= check("undated pages survive (a missing date is not evidence of age)",
+                "no-date" in kept_urls, str(kept_urls))
+    ok &= check("first_seen is the last resort clock, and today counts as inside",
+                "seen-today" in kept_urls)
+    ok &= check("the window is two years by default",
+                cfg.window_days == 730 and cfg.future_days == 120,
+                f"{cfg.window_days}/{cfg.future_days}")
+
+    ages = [hit.age_seconds for hit in timed_report.hits if hit.age_seconds is not None]
+    ok &= check("every hit a real hunt returns is inside the window",
+                all(age <= cfg.window_days * 86400 and age >= -cfg.future_days * 86400 for age in ages),
+                f"{len(ages)} dated hits")
+    ok &= check("the answer says what the window cut",
+                timed_report.stats.window_days == cfg.window_days
+                and timed_report.stats.cut_older >= 0
+                and timed_report.stats.undated_kept >= 0,
+                f"cut {timed_report.stats.cut_older} · undated {timed_report.stats.undated_kept}")
+
+    # the vault obeys it too
+    old_hit = WindowHit(url="https://example.org/2011/annex.pdf", title="Annex from 2011",
+                        provider="selftest", provider_name="Selftest", file_ext="pdf",
+                        published="2011-05-01T00:00:00Z")
+    local_index.upsert_hits([old_hit])
+    vault_rows = local_index.search_vault("annex", limit=10)
+    vault_kept, vault_window = recency.apply(vault_rows)
+    ok &= check("the vault search cuts it as well",
+                any(row["url"].endswith("annex.pdf") for row in vault_rows)
+                and all(not row["url"].endswith("annex.pdf") for row in vault_kept)
+                and vault_window["cut_older"] >= 1,
+                str(vault_window))
+
+    with local_index.db() as _conn:
+        vault_cols = {row[1] for row in _conn.execute("PRAGMA table_info(vault)")}
+    ok &= check("the vault stores a publication date, so old rows are judged, not guessed",
+                "published" in vault_cols, str(sorted(vault_cols)))
+
+    launcher_window = (ROOT / "index.html").read_text(encoding="utf-8")
+    ok &= check("the page says the window out loud, and what it cut",
+                "cut as too old" in launcher_window and "nothing older than" in launcher_window)
+
+    print("\n▸ 16. the engine reads the question before it fetches anything")
+    from app import understand
+
+    form_read = understand.read("climate resilience grant application form for coastal towns in Kenya")
+    ok &= check("it knows a form when it sees one",
+                form_read.kind == "form" and form_read.suggested_lens == "applications",
+                form_read.kind)
+    ok &= check("it pulls the subject phrase out of the sentence",
+                "climate resilience" in form_read.phrases[0], str(form_read.phrases[:2]))
+    ok &= check("it notices the country", form_read.places[:1] == ["kenya"], str(form_read.places))
+    ok &= check("it says what it understood, in words",
+                "form or application" in form_read.summary(), form_read.summary())
+
+    code_read = understand.read("github repository for solar mini-grid survey dataset")
+    ok &= check("a repository request is read as code", code_read.kind == "code", code_read.kind)
+    money_read = understand.read("water points maintenance tender pdf 2025")
+    ok &= check("a tender is read as a funding call, and the pdf is noticed",
+                money_read.kind == "tender" and "pdf" in money_read.file_types,
+                f"{money_read.kind}/{money_read.file_types}")
+
+    stale_read = understand.read("World Bank policy report from 2016 on education")
+    ok &= check("a name is taken whole, not word by word",
+                "World Bank" in stale_read.orgs, str(stale_read.orgs))
+    ok &= check("a year outside the window is flagged, not silently ignored",
+                stale_read.warnings and "outside" in stale_read.warnings[0],
+                str(stale_read.warnings))
+
+    neg_read = understand.read('ministry of health "infection control" guidelines -vaccine')
+    ok &= check("quoted phrases and exclusions are separated out",
+                neg_read.quoted == ["infection control"] and neg_read.negatives == ["vaccine"],
+                f"{neg_read.quoted}/{neg_read.negatives}")
+
+    rake_dir = ROOT / "apps" / "api" / "app" / "vendor" / "rake_keyword"
+    ok &= check("the keyword engine is a real imported codebase, kept intact",
+                (rake_dir / "rake.py").is_file() and (rake_dir / "LICENSE").is_file()
+                and (rake_dir / "resources" / "SmartStoplist.txt").is_file())
+    ok &= check("it records where that code came from",
+                "github.com/u-prashant/RAKE" in (rake_dir / "NOTICE").read_text(encoding="utf-8"))
+    ok &= check("the hunt carries the reading, not just the results",
+                (timed_report.understanding or {}).get("summary") != "",
+                (timed_report.understanding or {}).get("summary", "none"))
+
     httpd.shutdown()
     print("\n" + ("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED"))
     return 0 if ok else 1
