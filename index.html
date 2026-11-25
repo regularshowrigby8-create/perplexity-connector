@@ -2365,7 +2365,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
 <footer>
   <div class="wrap foot">
-    <span class="mono">NIGHTHAWK v1.8</span>
+    <span class="mono">NIGHTHAWK v1.9</span>
     <span class="dim">·</span>
     <a data-route="api/docs">API</a>
     <a data-route="arsenal">Crawlers</a>
@@ -2749,6 +2749,14 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (hit.match_where) {
       top.appendChild(pill("in " + hit.match_where, "pill muted", "where the match was found"));
     }
+    if (hit.off_topic) {
+      top.appendChild(pill("none of your words", "pill muted",
+        "kept, but it contains less than a third of the words you typed — sorted below everything that does"));
+    }
+    if ((hit.meta && hit.meta.launcher) || (hit.tags || []).indexOf("launcher") !== -1) {
+      top.appendChild(pill("opens that site's own search", "pill muted",
+        "not a document — a link into that site's search box for these words; kept, at the end"));
+    }
     row.appendChild(top);
 
     var where = document.createElement("div");
@@ -2833,8 +2841,19 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     box.hidden = false;
   }
 
-  function renderReport(report, headline) {
+  function plainMs(ms) {
+    if (ms === undefined || ms === null) return "";
+    return ms >= 1000 ? (ms / 1000).toFixed(1).replace(/\.0$/, "") + " s" : ms + " ms";
+  }
+
+  function renderReport(report, headline, opts) {
     var hits = report.hits || [];
+    function isLauncherRow(h) {
+      return (h.meta && h.meta.launcher) || (h.tags || []).indexOf("launcher") !== -1;
+    }
+    var onTopic = hits.filter(function (h) { return !isLauncherRow(h) && !h.off_topic; });
+    var onlyLaunchers = hits.length > 0 && hits.every(isLauncherRow);
+    var nothingOnTopic = hits.length > 0 && onTopic.length === 0;
     var stats = report.stats || {};
     var policy = report.policy || {};
 
@@ -2849,20 +2868,20 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (typed.length) {
       // the one filter, and it exists because it was typed
       note.push("only " + typed.slice(0, 4).join(" / "));
-      note.push((intent.removed_by_type || 0) + " not that type, set aside");
-    } else {
-      note.push("verbatim match");
-      if (policy.result_removal === false || policy.result_removal === undefined) {
-        note.push("nothing removed");
-      }
+      note.push((intent.removed_by_type || 0) + " of another type, set aside");
     }
     if (hosts.length) note.push("aimed at " + hosts.slice(0, 3).join(", "));
     if (report.sort === "accuracy") note.push("best match first");
+    if (report.match === "loose") note.push("gaps between your words allowed \u2014 exact matches still lead");
     if (policy.verbatim_only) note.push("verbatim only");
-    if (stats.took_ms !== undefined && stats.took_ms !== null) note.push(stats.took_ms + " ms");
-    if (stats.cached) note.push("cached");
+    if (stats.cached && !(opts && opts.noCacheClaim)) {
+      note.push("instant \u2014 answered from what we already had");
+    }
+    else note.push(plainMs(stats.took_ms) + " to answer");
     if (stats.slow_providers) note.push(stats.slow_providers + " still answering");
-    if (stats.cut_older) note.push(stats.cut_older + " older than " + (stats.window_days || 730) + " days cut");
+    if (stats.local_excluded) note.push(stats.local_excluded + " practice-site results left out");
+    if (stats.off_topic) note.push(stats.off_topic + " contain none of your words, sorted last");
+    if (stats.cut_older) note.push(stats.cut_older + " older than " + (stats.window_days || 730) + " days left out");
     var noteEl = document.getElementById("live-note");
     noteEl.textContent = note.join(" · ");
     if (stats.cached) {
@@ -2895,8 +2914,17 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       }
     }
     if (intent.host_matches) tick("named host", intent.host_matches, "results on a host you named");
-    tick("verbatim", stats.verbatim !== undefined ? stats.verbatim
-      : hits.filter(function (h) { return h.exact; }).length, "the phrase, word for word");
+    var verbatimCount = stats.verbatim !== undefined ? stats.verbatim
+      : hits.filter(function (h) { return h.exact; }).length;
+    if (verbatimCount) tick("word for word", verbatimCount, "results containing the phrase exactly as typed");
+    if (stats.local_excluded) {
+      tick("practice site left out", stats.local_excluded,
+        "the demo site that ships with the engine is served from this machine — it belongs in practice, not in an answer about the web");
+    }
+    if (stats.off_topic) {
+      tick("not about your words", stats.off_topic,
+        "kept, but they contain none of the words you typed — sorted below everything that does");
+    }
     if (stats.copies_reported) tick("copies reported", stats.copies_reported, "duplicates kept and labelled");
     if (stats.junk_retained) tick("junk kept", stats.junk_retained, "kept, sorted last");
     if (stats.noise_retained) tick("noise kept", stats.noise_retained, "kept, not dropped");
@@ -2921,12 +2949,15 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
 
     var box = document.getElementById("live-hits");
     box.innerHTML = "";
-    if (!hits.length) {
-      var empty = document.createElement("div");
-      empty.className = "note";
-      empty.textContent = "No results — and nothing was filtered to get here. " +
-        "That is everything every reachable engine had for that phrase.";
-      box.appendChild(empty);
+    if (!hits.length || onlyLaunchers || nothingOnTopic) showHuntEmpty(report);
+    if (hits.length && (onlyLaunchers || nothingOnTopic)) {
+      var said = document.createElement("p");
+      said.className = "dim";
+      said.style.margin = "18px 0 4px";
+      said.textContent = nothingOnTopic
+        ? "What the sources did send, kept and labelled \u2014 none of it contains your words:"
+        : "Where else to look for these words:";
+      box.appendChild(said);
     }
     hits.slice(0, 300).forEach(function (hit) { box.appendChild(hitRow(hit)); });
     document.getElementById("live").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -3038,7 +3069,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     hidePanels();
   }
 
-  function runHunt(forceFresh) {
+  function runHunt(forceFresh, matchMode) {
     var q = inputValue();
     if (!q) return;
     var headline = "Hunt · " + q;
@@ -3047,7 +3078,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       "results arrive as each source answers — best match first, newest upload inside each band");
     document.getElementById("live-hits").innerHTML = "";
     var body = {
-      q: q, lens: lens, limit: 0, sort: "accuracy", match: "exact",
+      q: q, lens: lens, limit: 0, sort: "accuracy", match: matchMode || "exact",
       only_exact: false, unrestricted: true, fresh: !!forceFresh
     };
     var nudge = setTimeout(function () {
@@ -3055,9 +3086,9 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       if (note) note.textContent = "still gathering — a slow source does not hold the whole page";
     }, 5000);
 
-    function finish(report) {
+    function finish(report, opts) {
       clearTimeout(nudge);
-      renderReport(report, headline);
+      renderReport(report, headline, opts);
       var slow = (report.stats || {}).slow_providers || 0;
       toast((report.hits || []).length + " results" + (slow ? " · " + slow + " still answering" : ""));
     }
@@ -3072,7 +3103,11 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     }).catch(function () {
       // A proxy that buffers SSE, or an older engine: fall back to one POST.
       clearTimeout(nudge);
-      post("/api/v1/hunt", body).then(finish).catch(function (err) {
+      post("/api/v1/hunt", body).then(function (report) {
+        // the stream had already fetched this; calling it a cached repeat would
+        // be true of the request and wrong about what the person just saw
+        finish(report, { noCacheClaim: true });
+      }).catch(function (err) {
         toast("hunt failed · " + err.message);
       });
     });
@@ -3123,6 +3158,18 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       return;
     }
     var headline = "Crawl · " + q;
+    // a crawl is not a search: say what is being read instead of leaving the
+    // understanding from whatever was searched for before
+    var crawlUnderstood = document.getElementById("live-understood");
+    if (crawlUnderstood) {
+      crawlUnderstood.innerHTML = "";
+      var crawlLabel = document.createElement("b");
+      crawlLabel.textContent = "Reading · ";
+      crawlUnderstood.appendChild(crawlLabel);
+      crawlUnderstood.appendChild(document.createTextNode(
+        "only the site you pointed at \u2014 pages it dates older than 730 days are left out, undated pages are kept"));
+      crawlUnderstood.hidden = false;
+    }
     var state = { hits: 0, pages: 0, files: 0, blocked: 0, errors: 0, cut: 0 };
     crawlRows = [];
     crawlErrors = [];
@@ -3189,7 +3236,8 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     if (blocked) note.push(blocked + " blocked by robots");
     if (errors) note.push(errors + " errors");
     if (stats.cut_older) note.push(stats.cut_older + " older than " + (stats.window_days || 730) + " days left out");
-    if (stats.took_ms) note.push(stats.took_ms + " ms");
+    if (errors && crawlErrors.length) note.push("first problem: " + crawlErrors[0].slice(0, 90));
+    if (stats.took_ms) note.push(plainMs(stats.took_ms));
     document.getElementById("live-note").textContent = note.join(" · ");
 
     var bar = document.getElementById("live-counts");
@@ -3208,6 +3256,87 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   }
 
   // Nothing is filtered to get here, so an empty crawl has to explain itself.
+  // An empty answer is still an answer: it says which sources were asked, what
+  // was set aside and why, and what to try instead of leaving a blank page.
+  function showHuntEmpty(report) {
+    var box = document.getElementById("live-hits");
+    if (!box) return;
+    box.innerHTML = "";
+    var stats = report.stats || {};
+    var intent = report.intent || {};
+    var wrap = document.createElement("div");
+    wrap.className = "empty-note";
+
+    var head = document.createElement("p");
+    var askedFor = (report.query || document.getElementById("q").value || "").replace(/[<>&]/g, "");
+    head.innerHTML = (report.hits || []).length
+      ? "Nothing matched <b>" + askedFor + "</b>."
+      : "Nothing came back for <b>" + askedFor + "</b>.";
+    wrap.appendChild(head);
+
+    var why = document.createElement("p");
+    why.textContent = "Nothing was thrown away to make this look empty. Here is what happened:";
+    wrap.appendChild(why);
+
+    var list = document.createElement("ul");
+    function line(text) {
+      var item = document.createElement("li");
+      item.textContent = text;
+      list.appendChild(item);
+    }
+    var ok = stats.providers_ok || 0;
+    var failed = stats.providers_failed || 0;
+    line(ok + " source" + (ok === 1 ? "" : "s") + " answered" +
+      (failed ? ", " + failed + " could not be reached from this machine" : ""));
+    if (intent.removed_by_type) {
+      line(intent.removed_by_type + " result" + (intent.removed_by_type === 1 ? "" : "s") +
+        " were set aside because you asked for " + ((intent.types || []).join(" / ") || "one type"));
+    }
+    if (stats.local_excluded) {
+      line(stats.local_excluded + " came from the built-in practice site and were left out");
+    }
+    if (stats.cut_older) {
+      line(stats.cut_older + " were dated older than " + (stats.window_days || 730) + " days and were cut");
+    }
+    if (!ok) {
+      line("no source was reachable — the network here is closed, so this is not a verdict on the web");
+    }
+    wrap.appendChild(list);
+
+    var row = document.createElement("div");
+    row.className = "row";
+    row.style.marginTop = "14px";
+    if ((intent.types || []).length) {
+      var dropType = document.createElement("button");
+      dropType.type = "button";
+      dropType.className = "btn btn-sm";
+      dropType.textContent = "Search without the file-type word";
+      dropType.addEventListener("click", function () {
+        var words = (intent.types || []).map(function (t) { return new RegExp("\\b" + t + "\\b", "ig"); });
+        var q = document.getElementById("q").value || "";
+        words.forEach(function (re) { q = q.replace(re, " "); });
+        document.getElementById("q").value = q.replace(/\s+/g, " ").trim();
+        runHunt();
+      });
+      row.appendChild(dropType);
+    }
+    var loosen = document.createElement("button");
+    loosen.type = "button";
+    loosen.className = "btn btn-sm";
+    loosen.textContent = "Allow gaps between my words";
+    loosen.title = "same words, but they no longer have to be next to each other — exact matches still lead";
+    loosen.addEventListener("click", function () { runHunt(false, "loose"); });
+    row.appendChild(loosen);
+    var again = document.createElement("button");
+    again.type = "button";
+    again.className = "btn btn-sm";
+    again.textContent = "Ask again, skipping anything remembered";
+    again.addEventListener("click", function () { runHunt(true); });
+    row.appendChild(again);
+    wrap.appendChild(row);
+    box.appendChild(wrap);
+  }
+
   function showCrawlEmpty(pages, blocked, errors) {
     var box = document.getElementById("live-hits");
     box.innerHTML = "";

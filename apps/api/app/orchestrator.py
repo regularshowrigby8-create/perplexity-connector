@@ -4,8 +4,11 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import math
+import re
 import time
 from typing import Any, Awaitable, Callable
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -330,6 +333,69 @@ def refresh_ages(hits: list[Hit], now=None) -> None:
             hit.age_source = None
 
 
+_WORDS = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
+
+# words that carry no subject: a result matching only these is not about the query
+_FILLER = {
+    "the", "and", "for", "with", "from", "that", "this", "into", "over", "under", "about",
+    "near", "next", "last", "new", "best", "top", "list", "all", "any", "how", "what", "when",
+    "where", "which", "who", "why", "can", "could", "should", "would", "you", "your", "our",
+    "pdf", "doc", "docx", "xls", "xlsx", "csv", "zip", "apk", "exe", "mp3", "mp4", "json",
+    "site", "www", "com", "org", "net", "http", "https", "html", "php",
+}
+
+
+def content_words(text: str) -> list[str]:
+    """The words that carry the subject of a search."""
+    out: list[str] = []
+    for word in _WORDS.findall((text or "").lower()):
+        if word in _FILLER or word in out:
+            continue
+        out.append(word)
+    return out
+
+
+def judge_words(hit: Hit, words: list[str]) -> None:
+    """How many of the query's own words a result actually contains.
+
+    A release feed answers "what is new" no matter what was asked; those rows
+    would otherwise lead every search because they are seconds old. They are
+    not removed — they are marked, counted, and sorted below every result that
+    contains at least one of the words that were typed.
+    """
+    hay = f"{hit.title} {hit.snippet} {hit.url}".lower()
+    hits = sum(1 for word in words if word in hay)
+    hit.words_hit = hits
+    if not words:
+        hit.off_topic = False
+        return
+    # One shared word is not a match. "form" appears in a thousand package
+    # descriptions; a search for a grant application form is not answered by a
+    # React form library. A result has to carry a real share of the words that
+    # were typed — a third of them, and never fewer than two unless the query
+    # itself is a single word.
+    need = 1 if len(words) == 1 else max(2, math.ceil(len(words) * 0.34))
+    hit.off_topic = hits < need
+
+
+LOOPBACK = {"127.0.0.1", "localhost", "0.0.0.0", "::1", "[::1]"}
+
+
+def is_practice_site(hit: Hit) -> bool:
+    """The demo site this engine ships with, served from its own machine.
+
+    Only that path is held out of a real answer: it is practice material, not
+    something the web published. A site *you* crawl on localhost is yours, and
+    stays searchable.
+    """
+    try:
+        parts = urlsplit(hit.url)
+    except ValueError:
+        return False
+    host = (parts.hostname or "").lower()
+    return host in LOOPBACK and parts.path.startswith("/demo/")
+
+
 def verbatim_key(hit: Hit) -> tuple:
     """Word-for-word first: literal match, then how far apart the words are."""
     proximity = hit.proximity if hit.proximity is not None else 10**6
@@ -357,7 +423,10 @@ def rank(hits: list[Hit], sort: str, verbatim: bool = True) -> list[Hit]:
                 date_tier, date_value = 1, float(-age)
             else:
                 date_tier, date_value = 0, float(age)
-            return (hit.junk, band, proximity, date_tier, date_value, -hit.score, -hit.depth)
+            # "not about your words" is the strongest demotion there is; junk
+            # (parked, login wall) is the next one down
+            return (hit.off_topic, hit.junk, band, proximity, date_tier, date_value,
+                    -hit.score, -hit.depth)
 
         hits.sort(key=accuracy_key)
     elif sort == "newest":
@@ -372,10 +441,10 @@ def rank(hits: list[Hit], sort: str, verbatim: bool = True) -> list[Hit]:
             age = freshness.age_seconds(stamp, now)
             tier = (*verbatim_key(hit),) if verbatim else ()
             if age is None:
-                return (hit.junk, *tier, 2, 0.0, -hit.score, -hit.depth)
+                return (hit.off_topic, hit.junk, *tier, 2, 0.0, -hit.score, -hit.depth)
             if age < 0:
-                return (hit.junk, *tier, 1, float(-age), -hit.score, -hit.depth)
-            return (hit.junk, *tier, 0, float(age), -hit.score, -hit.depth)
+                return (hit.off_topic, hit.junk, *tier, 1, float(-age), -hit.score, -hit.depth)
+            return (hit.off_topic, hit.junk, *tier, 0, float(age), -hit.score, -hit.depth)
 
         hits.sort(key=newest_key)
     else:
@@ -464,7 +533,9 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     # Read the question first: what kind of thing is wanted, what the subject
     # phrase is, which place or organisation was named, which year was mentioned.
     understanding = understand.read(req.q)
+    local_left_out = 0
     asked = query_intent.parse(req.q)
+    asked_words = content_words(asked.query if asked.wants_files else req.q)
     search_text = asked.query if asked.wants_files else req.q
     if not search_text.strip():
         search_text = " ".join(asked.matched) or req.q
@@ -576,12 +647,21 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
                         batch.append(hit)
                     else:
                         dropped += 1
+                kept_batch: list[Hit] = []
                 for hit in batch:
+                    # the practice site shipped with the engine answers from this
+                    # machine; it belongs in practice, not in an answer about the web
+                    if not req.include_practice and is_practice_site(hit):
+                        local_left_out += 1
+                        continue
+                    judge_words(hit, asked_words)
                     # a small nudge towards the kind of artefact that was described;
                     # accuracy still decides the order, this only breaks ties
                     bonus = understanding.relevance_bonus(hit)
                     if bonus:
                         hit.score += bonus
+                    kept_batch.append(hit)
+                batch = kept_batch
                 collected.extend(batch)
                 statuses.append({"id": provider.id, "name": provider.name,
                                  "status": "error" if error else ("empty" if not raws else "ok"),
@@ -694,9 +774,17 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
     if asked.hosts:
         fused, host_lifted = query_intent.boost_hosts(fused, asked.hosts)
 
-    launchers = [hit for hit in fused if hit.kind in LAUNCHER_KINDS] if req.sort == "newest" else []
+    # A launcher is "search this portal yourself" — a link to someone else's
+    # search box. It is useful, but it is not a result, and it used to win every
+    # ranking because its title is the query word for word. Launchers are held
+    # back here, in every sort order, and put at the end where they belong.
+    launchers = [hit for hit in fused if hit.kind in LAUNCHER_KINDS]
     if launchers:
         fused = [hit for hit in fused if hit.kind not in LAUNCHER_KINDS]
+        for launcher in launchers:
+            launcher.meta = {**(launcher.meta or {}), "launcher": True}
+            if "launcher" not in launcher.tags:
+                launcher.tags = [*(launcher.tags or []), "launcher"]
 
     fused = rank(fused, req.sort, verbatim=bool(phrase))
     if asked.hosts:
@@ -746,6 +834,8 @@ async def hunt(req: HuntRequest, emit: Emit | None = None, use_cache: bool = Tru
         post_ms=int((time.perf_counter() - after_sources) * 1000),
         copies_scanned=int(scanned),
         window_days=int(window_stats["window_days"]),
+        local_excluded=int(local_left_out),
+        off_topic=sum(1 for hit in fused if hit.off_topic),
         cut_older=int(window_stats["cut_older"]),
         cut_future=int(window_stats["cut_future"]),
         undated_kept=int(window_stats["undated_kept"]),

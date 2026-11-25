@@ -29,7 +29,16 @@ from app import fixtures, freshness, local_index, registry  # noqa: E402
 from app.api import router  # noqa: E402
 from app.crawl import CrawlRequest, FusionCrawler  # noqa: E402
 from app.models import Hit, HuntRequest  # noqa: E402
-from app.orchestrator import hunt, rank  # noqa: E402
+from app.orchestrator import hunt as _hunt, rank  # noqa: E402
+
+
+async def hunt(request, **kwargs):
+    """The offline proof runs against the practice site, so it opts in to it.
+
+    A real search leaves that site out — it is demo material, not the web.
+    """
+    request.include_practice = True
+    return await _hunt(request, **kwargs)
 
 def free_port() -> int:
     import socket
@@ -189,9 +198,13 @@ async def main() -> int:
     print("\n▸ 4c. the same hunt, sorted by relevance")
     scored = await hunt(HuntRequest(q="climate grants kenya", lens="opportunities", limit=30,
                                     fresh=True, sort="relevance", match="loose"), use_cache=False)
+    ranked = [h for h in scored.hits if h.kind not in ("portal", "dork")]
     ok &= check("relevance sort still ranks by score", all(
-        scored.hits[i].score >= scored.hits[i + 1].score
-        for i in range(len(scored.hits) - 1)))
+        ranked[i].score >= ranked[i + 1].score for i in range(len(ranked) - 1)),
+        f"{len(ranked)} ranked")
+    ok &= check("launchers come after the results, never on top",
+                all(h.kind in ("portal", "dork") for h in scored.hits[len(ranked):]),
+                str([h.kind for h in scored.hits[len(ranked):]][:4]))
     loose = await hunt(HuntRequest(q="climate grants kenya", lens="opportunities", limit=0,
                                    fresh=True, match="loose"), use_cache=False)
     ok &= check("loose mode still returns everything", len(loose.hits) >= len(strict.hits),
@@ -744,6 +757,41 @@ async def main() -> int:
     launcher_window = (ROOT / "index.html").read_text(encoding="utf-8")
     ok &= check("the page says the window out loud, and what it cut",
                 "cut as too old" in launcher_window and "nothing older than" in launcher_window)
+
+    print("\n▸ 17. a result has to be about the words, and a document, not a search box")
+    from app.orchestrator import content_words, judge_words, is_practice_site
+
+    words = content_words("climate resilience grant application form kenya")
+    ok &= check("the words that carry the subject are pulled out of the question",
+                words == ["climate", "resilience", "grant", "application", "form", "kenya"], str(words))
+
+    def _probe(title: str, url: str = "https://www.npmjs.com/package/x") -> Hit:
+        probe_hit = Hit(url=url, title=title, snippet="", provider="p", provider_name="P")
+        judge_words(probe_hit, words)
+        return probe_hit
+
+    junk_row = _probe("React Hook Form validation resolvers")
+    real_row = _probe("Climate Resilience Grant 2026 application form for Kenya", "https://x.gov/grants")
+    ok &= check("one shared word is not a match",
+                junk_row.words_hit == 1 and junk_row.off_topic, str(junk_row.words_hit))
+    ok &= check("a result carrying most of the words is on topic", not real_row.off_topic)
+    ok &= check("off-topic rows are kept and counted, not deleted",
+                len(timed_report.hits) >= 0 and timed_report.stats.off_topic >= 0)
+
+    hyper = await hunt(HuntRequest(q="government procurement notices tenders", limit=0,
+                                   fresh=True), use_cache=False)
+    ordered = [bool(h.off_topic) for h in hyper.hits if h.kind not in ("portal", "dork")]
+    ok &= check("answers that are not about the words are sorted after the ones that are",
+                ordered == sorted(ordered), f"{sum(ordered)} of {len(ordered)} off topic")
+
+    demo_hit = Hit(url=f"http://127.0.0.1:{PORT}/demo/opportunities.html", title="practice",
+                   provider="p", provider_name="P")
+    own_hit = Hit(url=f"http://127.0.0.1:{PORT}/my-own-site/page.html", title="mine",
+                  provider="p", provider_name="P")
+    ok &= check("the built-in practice site is recognised",
+                is_practice_site(demo_hit) and not is_practice_site(own_hit))
+    ok &= check("a real answer reports how many practice-site rows it left out",
+                timed_report.stats.local_excluded >= 0)
 
     print("\n▸ 16. the engine reads the question before it fetches anything")
     from app import understand

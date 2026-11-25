@@ -66,6 +66,8 @@ class Hit(BaseModel):
     match_where: str | None = None     # title | snippet | url
     # nothing is discarded; these say what would have been in a filtered engine
     copies: int = 0                    # near-duplicates reported, not removed
+    words_hit: int = 0                 # how many of the query's own words this result contains
+    off_topic: bool = False            # none of them — kept, sorted below everything that does
     junk: bool = False                 # parked / login wall / error — kept, sorted last
     noise: bool = False                # URL a mainstream engine would drop outright
     sources: list[ProviderRef] = Field(default_factory=list)
@@ -89,6 +91,9 @@ class HuntRequest(BaseModel):
     only_exact: bool = False
     # no dedup folding, no junk removal, no diversity penalty, no truncation
     unrestricted: bool = True
+    # the demo site this engine ships with is practice material, not the web:
+    # it is left out of an answer unless a test asks for it by name
+    include_practice: bool = False
     fresh: bool = False
     # how long to wait for engines before answering with what has arrived;
     # 0 means "use the server's budget" (2.5 s by default)
@@ -149,6 +154,8 @@ class HuntStats(BaseModel):
     copies_scanned: int = 0
     # the recency window: what it was, and how much it cut
     window_days: int = 0
+    local_excluded: int = 0            # the practice site on this machine, left out of a real answer
+    off_topic: int = 0                 # kept, but contains none of the query's words — sorted last
     cut_older: int = 0
     cut_future: int = 0
     undated_kept: int = 0

@@ -333,6 +333,26 @@ A host word (`mediafire`, `mega`, `drive`, `dropbox`, `apkmirror`, `archive.org`
 `fdroid`, `archivefiles`, `sourceforge`) and lifts those results to the front. A host we cannot reach
 returns nothing and says so — it never turns into "no results".
 
+## What a session with the page actually found
+
+[AUDIT.md](AUDIT.md) is a full session driven only through the page — seven searches, timed,
+with the before/after of every defect it turned up. The short version:
+
+- **It is not better than Google**, and the page no longer implies it is. Navigational and
+  factual lookups belong to Google. Nighthawk is for the other job: a **document, form, notice
+  or dataset** that contains specific words, with a real date, and a ledger of what was set aside.
+- **A result has to be about the words you typed.** A result carrying less than a third of them
+  (and fewer than two, unless the query is one word) is kept, counted, tagged *"none of your
+  words"* and sorted last. A release feed's "newest package" no longer leads a search about grants.
+- **A launcher is not a result.** Links into a portal's own search box are labelled *"opens that
+  site's own search"* and placed after the results, in every sort order — they used to win every
+  ranking, because their title is the query word for word.
+- **The practice site stays in practice.** The demo documents the engine ships with are left out
+  of a real answer and reported (`6 practice-site results left out`), never shown as found pages.
+- **An empty answer explains itself**: how many sources replied, how many could not be reached,
+  what the type filter set aside, what the window cut — plus one click to search without the
+  type word, or to allow gaps between your words (exact matches still lead).
+
 ## Nothing older than two years — the window is the search
 
 Every answer is bounded to the **last 730 days**. A result whose own clock says it is older than
@@ -759,6 +779,7 @@ apps/api/app/
   fixtures.py      the offline practice target
 apps/web/          Next.js 15 interface (hunt, crawl, arsenal, vault, watchers)
 docs/              architecture, engine reference, deployment, and REPOS.md (what was imported)
+AUDIT.md           a session driven through the page, and what it found
 scripts/selftest.py  end-to-end proof: crawl the fixture, then search inside it, then
                      derive a link shape and find its siblings
 ```
