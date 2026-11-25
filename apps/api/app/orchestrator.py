@@ -498,8 +498,11 @@ def rank(hits: list[Hit], sort: str, verbatim: bool = True,
             # words the result actually carries: a page with all three words beats
             # a dated commit that happens to share one, and the date only decides
             # between results that are equally about the question.
+            # The type comes before the word count: when somebody types "signal
+            # apk" the APK is the answer, even if the support page repeats both
+            # words and the file only carries one.
             return (hit.off_topic, hit.junk, is_chatter(hit, query_text), band, proximity,
-                    -int(hit.words_hit or 0), type_tier(hit, types or []),
+                    type_tier(hit, types or []), -int(hit.words_hit or 0),
                     date_tier, date_value, -hit.score, -hit.depth)
 
         hits.sort(key=accuracy_key)
