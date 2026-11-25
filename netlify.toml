@@ -1,0 +1,37 @@
+# Nighthawk launcher — static page, remote engine.
+#
+# Netlify can host index.html but it cannot run the Python crawler. This config
+# makes the page same-origin with a real engine by proxying /api/* to it.
+#
+# 1. Point ENGINE at wherever the API is running (a VPS, Fly, Render, a tunnel,
+#    the sandbox preview, …). No trailing slash.
+# 2. Deploy. The launcher's probe then finds the engine as "this origin".
+#
+# If you would rather not proxy at all, leave this file alone and set the engine
+# in the page instead: <meta name="nighthawk-engine" content="https://…">,
+# ?api=https://… on the URL, or the "engine settings" box.
+
+[build]
+  publish = "."
+  command = ""
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://8000-ixtiz5sfw8zwxh7pkstrz.e2b.app/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/launch"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store"

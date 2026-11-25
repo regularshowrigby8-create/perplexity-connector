@@ -305,6 +305,24 @@ GET  /api/docs               OpenAPI
 
 Everything is proxied through the Next.js app, so the browser only ever talks to one origin.
 
+## Deploying the launcher on a static host (Netlify / Vercel)
+
+`index.html` is a static page; the crawler is a Python service. Netlify can serve the page but not
+run `/api/*`, which is exactly why a freshly-dropped deployment says **"No engine answered"** — the
+page is fine, it just has nothing to talk to. Three ways to fix it, in order of preference:
+
+1. **Proxy (best).** The repo ships `netlify.toml` and `vercel.json` with an `/api/*` proxy. Edit the
+   one `to`/`destination` URL to point at a running engine, redeploy, and the launcher finds it as
+   "this origin" — same behaviour as self-hosting.
+2. **Bake it into the page.** Set `<meta name="nighthawk-engine" content="https://your-engine">`
+   before deploying.
+3. **Point it per visit.** Add `?api=https://your-engine` to the page URL, or paste the URL into
+   **engine settings** (stored in `localStorage`).
+
+The probe tries, in order: `?api=` → the meta tag → the saved setting → this origin → the
+`8000-<sandbox>` preview convention → `localhost` (only when the page itself is local). The banner
+lists every URL it tried, so "offline" is never a mystery.
+
 ## Deploy
 
 ```bash

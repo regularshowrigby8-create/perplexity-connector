@@ -225,6 +225,21 @@ async def main() -> int:
     ok &= check("a normal crawl does not magically find the unlinked page",
                 not any("off-cycle" in hit["url"] for hit in linked["hits"]))
 
+    print("\n▸ 6. the launcher file itself")
+    from lxml import html as lxml_html
+
+    launcher = (ROOT / "index.html").read_text(encoding="utf-8")
+    doc = lxml_html.fromstring(launcher)
+    ids_present = all(doc.get_element_by_id(anchor) is not None for anchor in
+                      ("hunt", "deep", "deep-seeds", "deep-run", "banner", "status"))
+    ok &= check("launcher parses and has its anchors", ids_present)
+    ok &= check("launcher probes several engine locations",
+                "candidates" in launcher and "meta nighthawk-engine" in launcher)
+    ok &= check("launcher documents the deep reasons",
+                "not-linked" in launcher and "attachment" in launcher)
+    ok &= check("launcher is not minified", launcher.count("\n") > 1200,
+                f"{launcher.count(chr(10))} lines")
+
     httpd.shutdown()
     print("\n" + ("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED"))
     return 0 if ok else 1

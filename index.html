@@ -6,194 +6,1079 @@
 <title>Nighthawk — buried files &amp; opportunities engine</title>
 <meta name="description" content="A fusion crawler with 119 remote engines, an 86-engine crawl arsenal and a local vault. Finds the files, calls and portals mainstream search never shows — with funder, amount, deadline and real file type attached." />
 <meta name="theme-color" content="#06070a" />
+<!-- Static deployments (Netlify, Vercel, GitHub Pages, S3): put the engine's base URL
+     here, or add ?api=https://your-engine to the page URL, or use engine settings. -->
+<meta name="nighthawk-engine" content="" />
 <meta property="og:title" content="Nighthawk — find what search engines bury" />
 <meta property="og:description" content="Fusion crawler + 86-engine arsenal + 119 remote engines. Buried files, open calls, exposed listings, datasets — with funder, amount and closing date." />
 <meta property="og:type" content="website" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23c2ff3d'/%3E%3Ctext x='16' y='23' font-family='system-ui,sans-serif' font-size='19' font-weight='800' text-anchor='middle' fill='%23070a04'%3EN%3C/text%3E%3C/svg%3E" />
 <style>
-  :root{
-    --bg:#06070a; --bg2:#0a0c11; --panel:#0d1015; --panel2:#12161d;
-    --line:#1d232c; --line2:#2a323d; --ink:#e9eef6; --ink2:#b6c0cf;
-    --muted:#7c8798; --dim:#5b6472; --lime:#c2ff3d; --cyan:#4fe0ff;
-    --amber:#ffb648; --red:#ff5f7e; --violet:#a78bfa;
-    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
-    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  :root {
+    --bg: #06070a;
+    --bg2: #0a0c11;
+    --panel: #0d1015;
+    --panel2: #12161d;
+    --line: #1d232c;
+    --line2: #2a323d;
+    --ink: #e9eef6;
+    --ink2: #b6c0cf;
+    --muted: #7c8798;
+    --dim: #5b6472;
+    --lime: #c2ff3d;
+    --cyan: #4fe0ff;
+    --amber: #ffb648;
+    --red: #ff5f7e;
+    --violet: #a78bfa;
+    --mono: ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
   }
-  *{box-sizing:border-box}
-  html{color-scheme:dark;scroll-behavior:smooth}
-  body{
-    margin:0;background:
-      radial-gradient(1100px 600px at 78% -12%,rgba(78,224,255,.07),transparent 60%),
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background: radial-gradient(1100px 600px at 78% -12%,rgba(78,224,255,.07),transparent 60%),
       radial-gradient(900px 520px at 12% -8%,rgba(194,255,61,.06),transparent 62%),
       var(--bg);
-    color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
-    -webkit-font-smoothing:antialiased;min-height:100vh
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
   }
-  a{color:inherit;text-decoration:none}
-  button,input,select{font:inherit;color:inherit}
-  ::selection{background:rgba(194,255,61,.28)}
-  .wrap{width:min(1180px,100% - 40px);margin:0 auto}
-  .mono{font-family:var(--mono)}
-  .tiny{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim)}
-  .dim{color:var(--muted)}
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  ::selection {
+    background: rgba(194,255,61,.28);
+  }
+
+  .wrap {
+    width: min(1180px,100% - 40px);
+    margin: 0 auto;
+  }
+
+  .mono {
+    font-family: var(--mono);
+  }
+
+  .tiny {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .dim {
+    color: var(--muted);
+  }
+
 
   /* nav */
-  .nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);background:rgba(6,7,10,.8);border-bottom:1px solid var(--line)}
-  .nav-in{display:flex;align-items:center;gap:14px;height:60px}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.02em}
-  .brand-mark{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(145deg,var(--lime),#5fd30a);color:#070a04;font-weight:900;font-size:15px;box-shadow:0 0 24px rgba(194,255,61,.28)}
-  .brand small{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
-  .nav-links{display:flex;gap:2px;margin-left:10px}
-  .nav-links a{padding:7px 11px;border-radius:9px;color:var(--ink2);font-size:13.5px}
-  .nav-links a:hover{background:var(--panel2);color:var(--ink)}
-  .nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-  .chip{font-family:var(--mono);font-size:11px;border:1px solid var(--line2);background:var(--panel);padding:5px 10px;border-radius:999px;white-space:nowrap;color:var(--ink2)}
-  .chip b{color:var(--lime);font-weight:600}
-  .chip .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--dim);margin-right:6px;vertical-align:middle}
-  .chip.online .dot{background:var(--lime);box-shadow:0 0 10px var(--lime)}
-  .chip.offline .dot{background:var(--amber)}
-  @media (max-width:820px){.nav-links{display:none}}
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: blur(14px);
+    background: rgba(6,7,10,.8);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav-in {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 60px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+
+  .brand-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg,var(--lime),#5fd30a);
+    color: #070a04;
+    font-weight: 900;
+    font-size: 15px;
+    box-shadow: 0 0 24px rgba(194,255,61,.28);
+  }
+
+  .brand small {
+    display: block;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: .18em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    margin-left: 10px;
+  }
+
+  .nav-links a {
+    padding: 7px 11px;
+    border-radius: 9px;
+    color: var(--ink2);
+    font-size: 13.5px;
+  }
+
+  .nav-links a:hover {
+    background: var(--panel2);
+    color: var(--ink);
+  }
+
+  .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    border: 1px solid var(--line2);
+    background: var(--panel);
+    padding: 5px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+    color: var(--ink2);
+  }
+
+  .chip b {
+    color: var(--lime);
+    font-weight: 600;
+  }
+
+  .chip .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--dim);
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .chip.online .dot {
+    background: var(--lime);
+    box-shadow: 0 0 10px var(--lime);
+  }
+
+  .chip.offline .dot {
+    background: var(--amber);
+  }
+
+  @media (max-width:820px) {
+    .nav-links {
+      display: none;
+    }
+
+  }
 
   /* hero */
-  .hero{padding:56px 0 18px;position:relative;overflow:hidden}
-  .hero:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
-    background-image:linear-gradient(to right,rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.035) 1px,transparent 1px);
-    background-size:64px 64px;
-    -webkit-mask-image:radial-gradient(700px 340px at 30% 0%,#000 20%,transparent 78%);
-    mask-image:radial-gradient(700px 340px at 30% 0%,#000 20%,transparent 78%)}
-  .hero-in{position:relative}
-  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--lime)}
-  .eyebrow .pulse{width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 12px var(--lime);animation:pulse 2.4s infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-  h1.title{font-size:clamp(38px,6.2vw,72px);line-height:.98;letter-spacing:-.045em;margin:16px 0 14px;font-weight:800}
-  h1.title .grad{background:linear-gradient(96deg,var(--lime),var(--cyan) 58%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .lede{max-width:720px;color:var(--ink2);font-size:16.5px}
-  .lede b{color:var(--ink);font-weight:600}
+  .hero {
+    padding: 56px 0 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero:before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .5;
+    background-image: linear-gradient(to right,rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(700px 340px at 30% 0%,#000 20%,transparent 78%);
+    mask-image: radial-gradient(700px 340px at 30% 0%,#000 20%,transparent 78%);
+  }
+
+  .hero-in {
+    position: relative;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--lime);
+  }
+
+  .eyebrow .pulse {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--lime);
+    box-shadow: 0 0 12px var(--lime);
+    animation: pulse 2.4s infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: .35;
+    }
+
+  }
+  h1.title {
+    font-size: clamp(38px,6.2vw,72px);
+    line-height: .98;
+    letter-spacing: -.045em;
+    margin: 16px 0 14px;
+    font-weight: 800;
+  }
+
+  h1.title .grad {
+    background: linear-gradient(96deg,var(--lime),var(--cyan) 58%,var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .lede {
+    max-width: 720px;
+    color: var(--ink2);
+    font-size: 16.5px;
+  }
+
+  .lede b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
 
   /* search */
-  .panel{margin-top:24px;border:1px solid var(--line2);border-radius:18px;padding:14px;
-    background:linear-gradient(180deg,rgba(18,22,29,.96),rgba(11,14,19,.96));
-    box-shadow:0 30px 80px -40px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.04)}
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .field{flex:1;display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:0 14px;min-width:220px;transition:border-color .15s,box-shadow .15s}
-  .field:focus-within{border-color:rgba(194,255,61,.5);box-shadow:0 0 0 4px rgba(194,255,61,.08)}
-  .field .glyph{color:var(--dim);font-family:var(--mono)}
-  .field input{flex:1;background:transparent;border:0;outline:0;padding:15px 0;font-size:16px;min-width:0}
-  .field input::placeholder{color:#56606e}
-  .warn-strip{display:flex;gap:12px;align-items:flex-start;margin:18px 0 4px;padding:13px 15px;border-radius:10px;
-    border:1px solid rgba(255,182,72,.32);background:linear-gradient(180deg,rgba(255,182,72,.09),rgba(255,182,72,.035))}
-  .warn-strip strong{color:var(--amber);font-size:13.5px}
-  .warn-strip p{margin:5px 0 0;font-size:12.6px;line-height:1.6;color:#a9b4c4;max-width:78ch}
-  .warn-strip .warn-mark{flex:none;width:20px;height:20px;border-radius:6px;display:grid;place-items:center;
-    background:rgba(255,182,72,.16);color:var(--amber);font-family:var(--mono);font-size:12px;font-weight:700}
-  .chip-warn{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;
-    border-radius:6px;white-space:nowrap;color:var(--amber);border:1px solid rgba(255,182,72,.34);background:rgba(255,182,72,.08)}
-  .caps{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
-  .cap{display:inline-flex;gap:7px;align-items:center;font-size:12.2px;color:#9aa7b8;padding:6px 11px;
-    border:1px solid var(--line2);border-radius:999px;background:rgba(255,255,255,.02)}
-  .cap b{color:var(--lime);font-weight:600}
-  .deep textarea{width:100%;min-height:104px;resize:vertical;border-radius:11px;padding:12px 13px;
-    border:1px solid var(--line2);background:var(--panel2);color:var(--fg);font-family:var(--mono);
-    font-size:12.5px;line-height:1.65}
-  .deep textarea::placeholder{color:#5f6b7d}
-  .deep-controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:10px}
-  .deep-controls label{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:#9aa7b8}
-  .deep-controls select,.deep-controls input[type=number]{border-radius:9px;padding:6px 8px;
-    border:1px solid var(--line2);background:var(--panel2);color:var(--fg);font-family:var(--mono);font-size:12px}
-  .deep-log{margin-top:12px;max-height:190px;overflow:auto;border:1px solid var(--line2);border-radius:10px;
-    background:#080a0e;padding:10px 12px;font-family:var(--mono);font-size:11.6px;line-height:1.7;color:#8d9aac;display:none}
-  .deep-log.show{display:block}
-  .deep-log .ok{color:var(--lime)} .deep-log .warn{color:var(--amber)} .deep-log .bad{color:#ff7b72}
-  .deep-counts{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
-  .deep-counts .tick{display:inline-flex;gap:6px;align-items:center;padding:4px 10px;border-radius:999px;
-    border:1px solid var(--line2);font-size:11.6px;color:#9aa7b8;font-variant-numeric:tabular-nums}
-  .deep-counts .tick b{color:var(--fg)}
-  .deep-results{margin-top:14px;display:flex;flex-direction:column;gap:9px}
-  .deep-row{border:1px solid var(--line2);border-radius:11px;padding:12px 13px;background:var(--panel2)}
-  .deep-row .t{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
-  .deep-row a{color:var(--fg);font-weight:600;font-size:13.6px;text-decoration:none}
-  .deep-row a:hover{color:var(--lime)}
-  .deep-row .u{margin-top:4px;font-family:var(--mono);font-size:11px;color:#6f7d90;word-break:break-all}
-  .deep-row .s{margin-top:6px;font-size:12.4px;color:#a9b4c4;line-height:1.55}
-  .deep-row mark{background:rgba(194,255,61,.16);color:var(--fg);border-bottom:1px solid rgba(194,255,61,.5)}
-  .deep-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-  .pill.reason{border-color:rgba(194,255,61,.4);color:var(--lime);background:rgba(194,255,61,.07);font-size:10.5px}
-  .pill.reason.amber{border-color:rgba(255,182,72,.45);color:var(--amber);background:rgba(255,182,72,.08)}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;padding:12px 18px;font-weight:600;font-size:14px;border:1px solid var(--line2);background:var(--panel2);cursor:pointer;white-space:nowrap;transition:transform .12s,background .15s,border-color .15s}
-  .btn:hover{background:#171d26}
-  .btn:active{transform:translateY(1px)}
-  .btn-primary{background:var(--lime);color:#0a1200;border-color:var(--lime);box-shadow:0 10px 30px -12px rgba(194,255,61,.55)}
-  .btn-primary:hover{background:#d0ff5e}
-  .btn-sm{padding:7px 11px;font-size:12.5px;border-radius:9px}
-  .lens-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
-  .lens{font-family:var(--mono);font-size:12.5px;padding:7px 13px;border-radius:999px;cursor:pointer;border:1px solid var(--line);background:var(--bg2);color:var(--ink2);transition:all .15s}
-  .lens:hover{border-color:var(--line2);color:var(--ink)}
-  .lens[aria-pressed="true"]{background:rgba(194,255,61,.12);border-color:rgba(194,255,61,.45);color:var(--lime)}
-  .settings{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px;display:none;gap:12px;align-items:end;flex-wrap:wrap}
-  .settings.open{display:flex}
-  .settings label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
-  .settings input{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13px;outline:0;min-width:290px;max-width:100%}
-  .settings input:focus{border-color:rgba(194,255,61,.4)}
-  .link-btn{background:none;border:0;color:var(--muted);cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;margin-left:auto;padding:6px 2px}
-  .link-btn:hover{color:var(--ink)}
+  .panel {
+    margin-top: 24px;
+    border: 1px solid var(--line2);
+    border-radius: 18px;
+    padding: 14px;
+    background: linear-gradient(180deg,rgba(18,22,29,.96),rgba(11,14,19,.96));
+    box-shadow: 0 30px 80px -40px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg2);
+    border: 1px solid var(--line2);
+    border-radius: 12px;
+    padding: 0 14px;
+    min-width: 220px;
+    transition: border-color .15s,box-shadow .15s;
+  }
+
+  .field:focus-within {
+    border-color: rgba(194,255,61,.5);
+    box-shadow: 0 0 0 4px rgba(194,255,61,.08);
+  }
+
+  .field .glyph {
+    color: var(--dim);
+    font-family: var(--mono);
+  }
+
+  .field input {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    padding: 15px 0;
+    font-size: 16px;
+    min-width: 0;
+  }
+
+  .field input::placeholder {
+    color: #56606e;
+  }
+
+  .warn-strip {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin: 18px 0 4px;
+    padding: 13px 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,182,72,.32);
+    background: linear-gradient(180deg,rgba(255,182,72,.09),rgba(255,182,72,.035));
+  }
+
+  .warn-strip strong {
+    color: var(--amber);
+    font-size: 13.5px;
+  }
+
+  .warn-strip p {
+    margin: 5px 0 0;
+    font-size: 12.6px;
+    line-height: 1.6;
+    color: #a9b4c4;
+    max-width: 78ch;
+  }
+
+  .warn-strip .warn-mark {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,182,72,.16);
+    color: var(--amber);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .chip-warn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    color: var(--amber);
+    border: 1px solid rgba(255,182,72,.34);
+    background: rgba(255,182,72,.08);
+  }
+
+  .caps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0 16px;
+  }
+
+  .cap {
+    display: inline-flex;
+    gap: 7px;
+    align-items: center;
+    font-size: 12.2px;
+    color: #9aa7b8;
+    padding: 6px 11px;
+    border: 1px solid var(--line2);
+    border-radius: 999px;
+    background: rgba(255,255,255,.02);
+  }
+
+  .cap b {
+    color: var(--lime);
+    font-weight: 600;
+  }
+
+  .deep textarea {
+    width: 100%;
+    min-height: 104px;
+    resize: vertical;
+    border-radius: 11px;
+    padding: 12px 13px;
+    border: 1px solid var(--line2);
+    background: var(--panel2);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+  }
+
+  .deep textarea::placeholder {
+    color: #5f6b7d;
+  }
+
+  .deep-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .deep-controls label {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 12px;
+    color: #9aa7b8;
+  }
+
+  .deep-controls select,
+  .deep-controls input[type=number] {
+    border-radius: 9px;
+    padding: 6px 8px;
+    border: 1px solid var(--line2);
+    background: var(--panel2);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .deep-log {
+    margin-top: 12px;
+    max-height: 190px;
+    overflow: auto;
+    border: 1px solid var(--line2);
+    border-radius: 10px;
+    background: #080a0e;
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 11.6px;
+    line-height: 1.7;
+    color: #8d9aac;
+    display: none;
+  }
+
+  .deep-log.show {
+    display: block;
+  }
+
+  .deep-log .ok {
+    color: var(--lime);
+  }
+
+  .deep-log .warn {
+    color: var(--amber);
+  }
+
+  .deep-log .bad {
+    color: #ff7b72;
+  }
+
+  .deep-counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 12px;
+  }
+
+  .deep-counts .tick {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line2);
+    font-size: 11.6px;
+    color: #9aa7b8;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .deep-counts .tick b {
+    color: var(--fg);
+  }
+
+  .deep-results {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .deep-row {
+    border: 1px solid var(--line2);
+    border-radius: 11px;
+    padding: 12px 13px;
+    background: var(--panel2);
+  }
+
+  .deep-row .t {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+
+  .deep-row a {
+    color: var(--fg);
+    font-weight: 600;
+    font-size: 13.6px;
+    text-decoration: none;
+  }
+
+  .deep-row a:hover {
+    color: var(--lime);
+  }
+
+  .deep-row .u {
+    margin-top: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #6f7d90;
+    word-break: break-all;
+  }
+
+  .deep-row .s {
+    margin-top: 6px;
+    font-size: 12.4px;
+    color: #a9b4c4;
+    line-height: 1.55;
+  }
+
+  .deep-row mark {
+    background: rgba(194,255,61,.16);
+    color: var(--fg);
+    border-bottom: 1px solid rgba(194,255,61,.5);
+  }
+
+  .deep-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .pill.reason {
+    border-color: rgba(194,255,61,.4);
+    color: var(--lime);
+    background: rgba(194,255,61,.07);
+    font-size: 10.5px;
+  }
+
+  .pill.reason.amber {
+    border-color: rgba(255,182,72,.45);
+    color: var(--amber);
+    background: rgba(255,182,72,.08);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 11px;
+    padding: 12px 18px;
+    font-weight: 600;
+    font-size: 14px;
+    border: 1px solid var(--line2);
+    background: var(--panel2);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform .12s,background .15s,border-color .15s;
+  }
+
+  .btn:hover {
+    background: #171d26;
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+  }
+
+  .btn-primary {
+    background: var(--lime);
+    color: #0a1200;
+    border-color: var(--lime);
+    box-shadow: 0 10px 30px -12px rgba(194,255,61,.55);
+  }
+
+  .btn-primary:hover {
+    background: #d0ff5e;
+  }
+
+  .btn-sm {
+    padding: 7px 11px;
+    font-size: 12.5px;
+    border-radius: 9px;
+  }
+
+  .lens-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 12px;
+  }
+
+  .lens {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    padding: 7px 13px;
+    border-radius: 999px;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: var(--bg2);
+    color: var(--ink2);
+    transition: all .15s;
+  }
+
+  .lens:hover {
+    border-color: var(--line2);
+    color: var(--ink);
+  }
+
+  .lens[aria-pressed="true"] {
+    background: rgba(194,255,61,.12);
+    border-color: rgba(194,255,61,.45);
+    color: var(--lime);
+  }
+
+  .settings {
+    margin-top: 12px;
+    border-top: 1px dashed var(--line);
+    padding-top: 12px;
+    display: none;
+    gap: 12px;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+
+  .settings.open {
+    display: flex;
+  }
+
+  .settings label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+
+  .settings input {
+    background: var(--bg2);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 9px 11px;
+    font-size: 13px;
+    outline: 0;
+    min-width: 290px;
+    max-width: 100%;
+  }
+
+  .settings input:focus {
+    border-color: rgba(194,255,61,.4);
+  }
+
+  .link-btn {
+    background: none;
+    border: 0;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-left: auto;
+    padding: 6px 2px;
+  }
+
+  .link-btn:hover {
+    color: var(--ink);
+  }
+
 
   /* banner */
-  .banner{margin-top:16px;border:1px solid rgba(255,182,72,.28);background:rgba(255,182,72,.06);border-radius:12px;padding:13px 15px;color:#ffd79a;font-size:13px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  .banner .code{font-family:var(--mono);background:#07090d;border:1px solid var(--line2);border-radius:7px;padding:5px 8px;color:var(--lime)}
+  .banner {
+    margin-top: 16px;
+    border: 1px solid rgba(255,182,72,.28);
+    background: rgba(255,182,72,.06);
+    border-radius: 12px;
+    padding: 13px 15px;
+    color: #ffd79a;
+    font-size: 13px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .banner-main {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 88ch;
+  }
+
+  .banner-list {
+    margin: 2px 0 0;
+    padding-left: 18px;
+    font-family: var(--mono);
+    font-size: 11.6px;
+    color: #c9b48b;
+  }
+
+  .banner-list li {
+    margin: 1px 0;
+  }
+
+  .banner .code {
+    font-family: var(--mono);
+    background: #07090d;
+    border: 1px solid var(--line2);
+    border-radius: 7px;
+    padding: 5px 8px;
+    color: var(--lime);
+  }
+
 
   /* stats */
-  .section{padding:36px 0 6px}
-  .head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
-  .head h2{font-size:20px;letter-spacing:-.02em;margin:0}
-  .head .rule{flex:1;height:1px;background:var(--line)}
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px}
-  .stat{border:1px solid var(--line);border-radius:14px;padding:14px 15px;background:linear-gradient(180deg,rgba(18,22,29,.7),rgba(10,12,17,.7))}
-  .stat .n{font-size:25px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-  .stat .n.lime{color:var(--lime)}.stat .n.cyan{color:var(--cyan)}.stat .n.amber{color:var(--amber)}
-  .stat .l{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-top:2px}
+  .section {
+    padding: 36px 0 6px;
+  }
+
+  .head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .head h2 {
+    font-size: 20px;
+    letter-spacing: -.02em;
+    margin: 0;
+  }
+
+  .head .rule {
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+    gap: 11px;
+  }
+
+  .stat {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 15px;
+    background: linear-gradient(180deg,rgba(18,22,29,.7),rgba(10,12,17,.7));
+  }
+
+  .stat .n {
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: -.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat .n.lime {
+    color: var(--lime);
+  }
+
+  .stat .n.cyan {
+    color: var(--cyan);
+  }
+
+  .stat .n.amber {
+    color: var(--amber);
+  }
+
+  .stat .l {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
 
   /* cards */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-  .card{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--panel);transition:border-color .15s,transform .15s,background .15s;display:block}
-  .card:hover{border-color:var(--line2);background:var(--panel2);transform:translateY(-1px)}
-  .card h3{margin:0 0 6px;font-size:15px;letter-spacing:-.01em}
-  .card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
-  .pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:6px;border:1px solid var(--line2);color:var(--ink2);white-space:nowrap}
-  .pill.lime{color:var(--lime);border-color:rgba(194,255,61,.35);background:rgba(194,255,61,.07)}
-  .pill.cyan{color:var(--cyan);border-color:rgba(79,224,255,.3);background:rgba(79,224,255,.07)}
-  .pill.violet{color:var(--violet);border-color:rgba(167,139,250,.32);background:rgba(167,139,250,.07)}
-  .pill.amber{color:var(--amber);border-color:rgba(255,182,72,.32);background:rgba(255,182,72,.07)}
-  .card .top{display:flex;gap:6px;margin-bottom:9px;flex-wrap:wrap}
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+    gap: 12px;
+  }
+
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    background: var(--panel);
+    transition: border-color .15s,transform .15s,background .15s;
+    display: block;
+  }
+
+  .card:hover {
+    border-color: var(--line2);
+    background: var(--panel2);
+    transform: translateY(-1px);
+  }
+
+  .card h3 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    letter-spacing: -.01em;
+  }
+
+  .card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--line2);
+    color: var(--ink2);
+    white-space: nowrap;
+  }
+
+  .pill.lime {
+    color: var(--lime);
+    border-color: rgba(194,255,61,.35);
+    background: rgba(194,255,61,.07);
+  }
+
+  .pill.cyan {
+    color: var(--cyan);
+    border-color: rgba(79,224,255,.3);
+    background: rgba(79,224,255,.07);
+  }
+
+  .pill.violet {
+    color: var(--violet);
+    border-color: rgba(167,139,250,.32);
+    background: rgba(167,139,250,.07);
+  }
+
+  .pill.amber {
+    color: var(--amber);
+    border-color: rgba(255,182,72,.32);
+    background: rgba(255,182,72,.07);
+  }
+
+  .card .top {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 9px;
+    flex-wrap: wrap;
+  }
+
 
   /* steps + commands */
-  .steps{counter-reset:s;display:grid;gap:10px}
-  .step{display:flex;gap:13px;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:13px 15px}
-  .step:before{counter-increment:s;content:counter(s);flex:none;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-family:var(--mono);font-size:11px;background:rgba(194,255,61,.12);color:var(--lime);border:1px solid rgba(194,255,61,.3)}
-  .step h4{margin:0 0 3px;font-size:14px}
-  .step p{margin:0;color:var(--muted);font-size:13px}
-  .cmds{display:grid;gap:8px}
-  .cmd{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;background:#07090d;padding:10px 12px;font-family:var(--mono);font-size:12.5px;color:var(--ink2);overflow:auto}
-  .cmd code{white-space:nowrap}
-  .cmd .copy{margin-left:auto;background:var(--panel2);border:1px solid var(--line2);color:var(--muted);border-radius:7px;padding:4px 8px;font-family:var(--mono);font-size:10.5px;cursor:pointer}
-  .cmd .copy:hover{color:var(--ink)}
-  .note{border:1px solid rgba(79,224,255,.25);background:rgba(79,224,255,.05);border-radius:12px;padding:12px 14px;color:#b9edfa;font-size:12.5px}
+  .steps {
+    counter-reset: s;
+    display: grid;
+    gap: 10px;
+  }
 
-  footer{border-top:1px solid var(--line);margin-top:44px;padding:22px 0 44px;color:var(--dim);font-size:12.5px}
-  .foot{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
-  .foot a:hover{color:var(--ink)}
-  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:10px 16px;font-size:13px;z-index:60;box-shadow:0 20px 50px -20px #000;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(-3px)}
+  .step {
+    display: flex;
+    gap: 13px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    padding: 13px 15px;
+  }
 
-  @media (max-width:560px){
-    .hero{padding:34px 0 10px}
-    h1.title{font-size:38px}
-    .lede{font-size:15px}
-    .stats{grid-template-columns:repeat(2,1fr)}
-    #hunt-form .btn{flex:1}
-    .panel{padding:11px}
-    .cmd{font-size:11.5px}
-    .settings input{min-width:100%}
-    .nav-right .btn{display:none}
+  .step:before {
+    counter-increment: s;
+    content: counter(s);
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    background: rgba(194,255,61,.12);
+    color: var(--lime);
+    border: 1px solid rgba(194,255,61,.3);
+  }
+
+  .step h4 {
+    margin: 0 0 3px;
+    font-size: 14px;
+  }
+
+  .step p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .cmds {
+    display: grid;
+    gap: 8px;
+  }
+
+  .cmd {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #07090d;
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink2);
+    overflow: auto;
+  }
+
+  .cmd code {
+    white-space: nowrap;
+  }
+
+  .cmd .copy {
+    margin-left: auto;
+    background: var(--panel2);
+    border: 1px solid var(--line2);
+    color: var(--muted);
+    border-radius: 7px;
+    padding: 4px 8px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    cursor: pointer;
+  }
+
+  .cmd .copy:hover {
+    color: var(--ink);
+  }
+
+  .note {
+    border: 1px solid rgba(79,224,255,.25);
+    background: rgba(79,224,255,.05);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: #b9edfa;
+    font-size: 12.5px;
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    margin-top: 44px;
+    padding: 22px 0 44px;
+    color: var(--dim);
+    font-size: 12.5px;
+  }
+
+  .foot {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .foot a:hover {
+    color: var(--ink);
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    background: var(--panel2);
+    border: 1px solid var(--line2);
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 13px;
+    z-index: 60;
+    box-shadow: 0 20px 50px -20px #000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s,transform .2s;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-3px);
+  }
+
+  @media (max-width:560px) {
+    .hero {
+      padding: 34px 0 10px;
+    }
+
+    h1.title {
+      font-size: 38px;
+    }
+
+    .lede {
+      font-size: 15px;
+    }
+
+    .stats {
+      grid-template-columns: repeat(2,1fr);
+    }
+
+    #hunt-form .btn {
+      flex: 1;
+    }
+
+    .panel {
+      padding: 11px;
+    }
+
+    .cmd {
+      font-size: 11.5px;
+    }
+
+    .settings input {
+      min-width: 100%;
+    }
+
+    .nav-right .btn {
+      display: none;
+    }
+
   }
 </style>
 </head>
@@ -280,11 +1165,18 @@
       </div>
 
       <div class="banner" id="banner" hidden>
-        <strong>Engine offline.</strong>
-        <span>This page is static — start the crawler and UI with</span>
-        <span class="code">./run.sh</span>
-        <span>then set the engine URL above (default <span class="mono">http://localhost:3000</span>).</span>
-      </div>
+        <div class="banner-main">
+          <strong id="banner-title">No engine answered.</strong>
+          <span id="banner-body">This file is static; the crawler runs as its own service. Tried:</span>
+          <ul class="banner-list" id="banner-tried"></ul>
+          <span class="dim">
+            Paste the engine URL in <b>engine settings</b> (e.g.
+            <span class="mono">http://localhost:8000</span>), or add
+            <span class="mono">?api=https://your-engine</span> to this page’s URL.
+          </span>
+        </div>
+        <button class="btn btn-sm" type="button" id="banner-retry">retry</button>
+        <button class="btn btn-sm" type="button" id="banner-settings">engine settings</button>
     </div>
   </section>
 
@@ -302,13 +1194,41 @@
   <section class="wrap section">
     <div class="head"><h2>Seven ways in</h2><span class="rule"></span><span class="tiny">all proxied through one origin</span></div>
     <div class="grid">
-      <a class="card" href="/hunt" data-route="hunt"><div class="top"><span class="pill lime">federated</span></div><h3>Hunt</h3><p>One query fans out to every reachable engine, folds near-duplicates into the richest record, then fuses by reciprocal rank — funder, amount, location and closing date attached.</p></a>
-      <a class="card" href="/crawl" data-route="crawl"><div class="top"><span class="pill cyan">primary</span></div><h3>Fusion crawler</h3><p>Point it at seeds or a query. It harvests, walks the frontier, opens PDFs and spreadsheets, and indexes the text.</p></a>
-      <a class="card" href="/arsenal" data-route="arsenal"><div class="top"><span class="pill violet">86 engines</span></div><h3>Arsenal</h3><p>Crawlee, Scrapy, Katana, hakrawler, gau, ffuf, trafilatura, pypdf — probed live, dispatched by role.</p></a>
-      <a class="card" href="/vault" data-route="vault"><div class="top"><span class="pill amber">local</span></div><h3>Vault</h3><p>SQLite FTS5 + Whoosh + Tantivy over metadata and extracted full text. Works with the network unplugged.</p></a>
-      <a class="card" href="#deep"><div class="top"><span class="pill lime">deep links</span></div><h3>Deep crawl</h3><p>Paste exact URLs a search engine never crawled — portal notices, unlinked annexes, sitemap-only pages — and get a report of why nothing else could reach them.</p></a>
-      <a class="card" href="/hunts" data-route="hunts"><div class="top"><span class="pill">diffing</span></div><h3>Watchers</h3><p>Save a hunt, run it again later — it only reports URLs it has genuinely never seen before.</p></a>
-      <a class="card" href="/api/docs" data-route="api/docs"><div class="top"><span class="pill cyan">rest</span></div><h3>API</h3><p>POST /hunt, /hunt/stream, /crawl/stream, /vault. SSE events for every page, file and block.</p></a>
+      <a class="card" href="/hunt" data-route="hunt">
+        <div class="top"><span class="pill lime">federated</span></div>
+        <h3>Hunt</h3>
+        <p>One query fans out to every reachable engine, folds near-duplicates into the richest record, then fuses by reciprocal rank — funder, amount, location and closing date attached.</p>
+      </a>
+      <a class="card" href="/crawl" data-route="crawl">
+        <div class="top"><span class="pill cyan">primary</span></div>
+        <h3>Fusion crawler</h3>
+        <p>Point it at seeds or a query. It harvests, walks the frontier, opens PDFs and spreadsheets, and indexes the text.</p>
+      </a>
+      <a class="card" href="/arsenal" data-route="arsenal">
+        <div class="top"><span class="pill violet">86 engines</span></div>
+        <h3>Arsenal</h3>
+        <p>Crawlee, Scrapy, Katana, hakrawler, gau, ffuf, trafilatura, pypdf — probed live, dispatched by role.</p>
+      </a>
+      <a class="card" href="/vault" data-route="vault">
+        <div class="top"><span class="pill amber">local</span></div>
+        <h3>Vault</h3>
+        <p>SQLite FTS5 + Whoosh + Tantivy over metadata and extracted full text. Works with the network unplugged.</p>
+      </a>
+      <a class="card" href="#deep">
+        <div class="top"><span class="pill lime">deep links</span></div>
+        <h3>Deep crawl</h3>
+        <p>Paste exact URLs a search engine never crawled — portal notices, unlinked annexes, sitemap-only pages — and get a report of why nothing else could reach them.</p>
+      </a>
+      <a class="card" href="/hunts" data-route="hunts">
+        <div class="top"><span class="pill">diffing</span></div>
+        <h3>Watchers</h3>
+        <p>Save a hunt, run it again later — it only reports URLs it has genuinely never seen before.</p>
+      </a>
+      <a class="card" href="/api/docs" data-route="api/docs">
+        <div class="top"><span class="pill cyan">rest</span></div>
+        <h3>API</h3>
+        <p>POST /hunt, /hunt/stream, /crawl/stream, /vault. SSE events for every page, file and block.</p>
+      </a>
     </div>
   </section>
 
@@ -353,9 +1273,24 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   <section class="wrap section" id="practice">
     <div class="head"><h2>Prove it in 20 seconds — no internet needed</h2><span class="rule"></span><span class="tiny">offline practice target</span></div>
     <div class="steps">
-      <div class="step"><div><h4>Open the crawler</h4><p>Local fixture site with an “Index of /files” listing, three PDFs, a CSV, JSON, a ZIP and a robots-disallowed page.</p></div></div>
-      <div class="step"><div><h4>Press “Load practice target”, then “Start crawl”</h4><p>Watch fetch → parse → extract → index, with each arsenal engine named in the log.</p></div></div>
-      <div class="step"><div><h4>Search inside the documents</h4><p>Open the vault and search <span class="mono">solar mini-grid</span> — the match comes from inside the tender PDF.</p></div></div>
+      <div class="step">
+          <div>
+            <h4>Open the crawler</h4>
+            <p>Local fixture site with an “Index of /files” listing, three PDFs, a CSV, JSON, a ZIP and a robots-disallowed page.</p>
+          </div>
+        </div>
+      <div class="step">
+          <div>
+            <h4>Press “Load practice target”, then “Start crawl”</h4>
+            <p>Watch fetch → parse → extract → index, with each arsenal engine named in the log.</p>
+          </div>
+        </div>
+      <div class="step">
+          <div>
+            <h4>Search inside the documents</h4>
+            <p>Open the vault and search <span class="mono">solar mini-grid</span> — the match comes from inside the tender PDF.</p>
+          </div>
+        </div>
     </div>
     <div class="row" style="margin-top:13px">
       <button class="btn btn-primary" type="button" id="practice-btn">Run practice crawl →</button>
@@ -367,10 +1302,30 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   <section class="wrap section" id="deploy">
     <div class="head"><h2>Launch</h2><span class="rule"></span><span class="tiny">zero config, no keys</span></div>
     <div class="cmds">
-      <div class="cmd"><code>./run.sh</code><button class="copy" data-copy="./run.sh">copy</button><span class="dim">api :8000 · web :3000</span></div>
-      <div class="cmd"><code>docker compose up -d --build</code><button class="copy" data-copy="docker compose up -d --build">copy</button><span class="dim">self-hosted VPS</span></div>
-      <div class="cmd"><code>python scripts/selftest.py</code><button class="copy" data-copy="python scripts/selftest.py">copy</button><span class="dim">20 end-to-end assertions</span></div>
-      <div class="cmd"><code>python3 -m http.server 8080</code><button class="copy" data-copy="python3 -m http.server 8080">copy</button><span class="dim">serve this page alone</span></div>
+      
+        <div class="cmd">
+          <code>./run.sh</code>
+          <button class="copy" data-copy="./run.sh">copy</button>
+          <span class="dim">api :8000 · web :3000</span>
+        </div>
+      
+        <div class="cmd">
+          <code>docker compose up -d --build</code>
+          <button class="copy" data-copy="docker compose up -d --build">copy</button>
+          <span class="dim">self-hosted VPS</span>
+        </div>
+      
+        <div class="cmd">
+          <code>python scripts/selftest.py</code>
+          <button class="copy" data-copy="python scripts/selftest.py">copy</button>
+          <span class="dim">20 end-to-end assertions</span>
+        </div>
+      
+        <div class="cmd">
+          <code>python3 -m http.server 8080</code>
+          <button class="copy" data-copy="python3 -m http.server 8080">copy</button>
+          <span class="dim">serve this page alone</span>
+        </div>
     </div>
     <div class="note" style="margin-top:14px">
       This page is a standalone launcher — one file, no build step. Drop it on Vercel, Netlify, S3 or a USB
@@ -412,8 +1367,58 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   var online = false;
 
   // ---------------------------------------------------------------- base url
+  var resolvedBase = null;     // set once an engine actually answers
+  var triedBases = [];         // what the last probe attempted, for the banner
+
   function storedBase() {
     try { return localStorage.getItem("nh.base") || ""; } catch (e) { return ""; }
+  }
+
+  function trimBase(value) {
+    return String(value || "").trim().replace(/\/+$/, "");
+  }
+
+  /** Every plausible engine location, most specific first. */
+  function candidates() {
+    var list = [];
+    var seen = {};
+    function push(label, base) {
+      base = trimBase(base);
+      if (seen[base]) return;
+      seen[base] = true;
+      list.push({ label: label, base: base });
+    }
+
+    var fromQuery = "";
+    try {
+      fromQuery = new URLSearchParams(location.search).get("api") || "";
+    } catch (e) { /* older browsers */ }
+    if (fromQuery) push("?api= parameter", fromQuery);
+
+    var meta = document.querySelector('meta[name="nighthawk-engine"]');
+    if (meta && meta.content) push("meta nighthawk-engine", meta.content);
+
+    if (storedBase()) push("saved setting", storedBase());
+
+    if (location.protocol !== "file:") push("this origin", "");
+
+    // 3000-sandbox.e2b.app → 8000-sandbox.e2b.app (the preview convention)
+    if (location.protocol !== "file:") {
+      var host = location.hostname || "";
+      var prefixed = host.match(/^\d+-(.+)$/);
+      if (prefixed) push("preview api port", location.protocol + "//8000-" + prefixed[1]);
+    }
+
+    // localhost only makes sense when this page *is* local; on a static host it
+    // is the visitor's own machine and would just be three seconds of nothing.
+    var host0 = location.hostname || "";
+    var local = location.protocol === "file:" || host0 === "localhost" ||
+      host0 === "127.0.0.1" || host0 === "" || host0 === "0.0.0.0";
+    if (local) {
+      push("local api", "http://localhost:8000");
+      push("local web", "http://localhost:3000");
+    }
+    return list;
   }
 
   function base() {
@@ -424,7 +1429,8 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   }
 
   function url(path) {
-    return base() + (path.charAt(0) === "/" ? path : "/" + path);
+    var root = resolvedBase !== null ? resolvedBase : base();
+    return root + (path.charAt(0) === "/" ? path : "/" + path);
   }
 
   function toast(message) {
@@ -475,31 +1481,77 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
     online = state === "online";
   }
 
-  function probe() {
-    var controller = new AbortController();
-    var timer = setTimeout(function () { controller.abort(); }, 4000);
-    setStatus("", "checking engine");
+  function applyHealth(data) {
+    var vault = data.vault || {};
+    document.getElementById("s-remote").textContent = (data.engines_remote || 119);
+    document.getElementById("s-arsenal").textContent = data.engines_arsenal || 86;
+    document.getElementById("s-ready").textContent = data.arsenal_ready || "—";
+    document.getElementById("s-portals").textContent = data.portals || 54;
+    document.getElementById("s-files").textContent = vault.files || 0;
+    document.getElementById("s-docs").textContent = vault.documents || 0;
+  }
 
-    fetch(url("/api/v1/health"), { signal: controller.signal, cache: "no-store" })
-      .then(function (res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-      })
-      .then(function (data) {
-        clearTimeout(timer);
-        setStatus("online", "engine online");
-        var vault = data.vault || {};
-        document.getElementById("s-remote").textContent = (data.engines_remote || 119);
-        document.getElementById("s-arsenal").textContent = data.engines_arsenal || 86;
-        document.getElementById("s-ready").textContent = data.arsenal_ready || "—";
-        document.getElementById("s-portals").textContent = data.portals || 54;
-        document.getElementById("s-files").textContent = vault.files || 0;
-        document.getElementById("s-docs").textContent = vault.documents || 0;
-      })
-      .catch(function () {
-        clearTimeout(timer);
+  function tryBase(base) {
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, 3500);
+    return fetch(trimBase(base) + "/api/v1/health", {
+      signal: controller.signal, cache: "no-store"
+    }).then(function (res) {
+      clearTimeout(timer);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    });
+  }
+
+  function probe() {
+    setStatus("", "checking engine");
+    triedBases = [];
+    var list = candidates();
+
+    function attempt(index) {
+      if (index >= list.length) {
         setStatus("offline", "engine offline");
+        showBanner();
+        return;
+      }
+      var candidate = list[index];
+      triedBases.push(candidate);
+      tryBase(candidate.base).then(function (data) {
+        resolvedBase = candidate.base;
+        document.getElementById("status").title = resolvedBase || "engine: this origin";
+        document.getElementById("banner").hidden = true;
+        setStatus("online", "engine online");
+        applyHealth(data);
+        wireRoutes();                       // links now point at the live engine
+        toast(candidate.base ? "engine: " + candidate.base : "engine: this origin");
+      }).catch(function () {
+        attempt(index + 1);
       });
+    }
+
+    attempt(0);
+  }
+
+  function staticHost() {
+    var host = location.hostname || "";
+    return /(^|\.)(netlify|vercel)\.app$|(^|\.)pages\.dev$|(^|\.)github\.io$|(^|\.)netlify\.com$/i.test(host);
+  }
+
+  function showBanner() {
+    var banner = document.getElementById("banner");
+    var box = document.getElementById("banner-tried");
+    box.innerHTML = "";
+    triedBases.forEach(function (item) {
+      var li = document.createElement("li");
+      li.textContent = (item.base || "this origin") + "  ·  " + item.label;
+      box.appendChild(li);
+    });
+    document.getElementById("banner-body").textContent = staticHost()
+      ? "This deployment is static — Netlify/Vercel can host this page but not the Python "
+        + "crawler. Point it at a running engine (below), or add the /api proxy from "
+        + "netlify.toml. Tried:"
+      : "This file is static; the crawler runs as its own service. Tried:";
+    banner.hidden = false;
   }
 
   // ------------------------------------------------------------------ actions
@@ -527,6 +1579,15 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       + "&q=climate%20grant");
   });
 
+  document.getElementById("banner-retry").addEventListener("click", function () {
+    probe();
+  });
+  document.getElementById("banner-settings").addEventListener("click", function () {
+    settings.classList.add("open");
+    document.getElementById("base").value = storedBase();
+    document.getElementById("base").focus();
+  });
+
   // ----------------------------------------------------------------- settings
   var settings = document.getElementById("settings");
   document.getElementById("settings-toggle").addEventListener("click", function () {
@@ -543,6 +1604,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
       if (value) localStorage.setItem("nh.base", value);
       else localStorage.removeItem("nh.base");
     } catch (e) { /* private mode */ }
+    resolvedBase = null;
     wireRoutes();
     probe();
     toast(value ? "engine URL saved" : "using this origin");
@@ -551,6 +1613,7 @@ https://example.org/annex/off-cycle-notice.html"></textarea>
   document.getElementById("reset-base").addEventListener("click", function () {
     try { localStorage.removeItem("nh.base"); } catch (e) {}
     document.getElementById("base").value = "";
+    resolvedBase = null;
     wireRoutes();
     probe();
     toast("engine URL reset");
